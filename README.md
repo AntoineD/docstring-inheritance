@@ -1,3 +1,12 @@
+<!--
+ Copyright 2021 Antoine DECHAUME
+
+ This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+ International License. To view a copy of this license, visit
+ http://creativecommons.org/licenses/by-sa/4.0/ or send a letter to Creative
+ Commons, PO Box 1866, Mountain View, CA 94042, USA.
+ -->
+
 `docstring-inheritance` is a python package to avoid writing and maintaining duplicated python docstrings.
 The typical usage is to enable the inheritance from a base class
 such that its derived classes fully or partly inherit the docstrings.
@@ -28,7 +37,7 @@ The dependencies, with their licenses, are given in the CREDITS.rst file.
 Install via pip:
 
 ```shell
-    pip install docstring-inheritance
+pip install docstring-inheritance
 ```
 
 # Basic Usage
@@ -47,6 +56,7 @@ The docstring inheritance is performed for the docstrings of the:
 - properties
 
 Use `NumpyDocstringInheritanceMeta` to inherit docstrings with numpy format.
+
 Use `GoogleDocstringInheritanceMeta` to inherit docstrings with google format.
 
 ```python
@@ -107,10 +117,11 @@ Child notes.
 
 ## Inheriting docstrings for functions
 
-`docstring-inheritance` provides functions to inherit the docstring of a callable
-from a string.
+`docstring-inheritance` provides functions to inherit the docstring of a callable from a string.
 This is typically used to inherit the docstring of a function from another function.
+
 Use `inherit_google_docstring` to inherit docstrings with google format.
+
 Use `inherit_numpy_docstring` to inherit docstrings with numpy format.
 
 ```python
@@ -141,6 +152,7 @@ def child():
     """
 
 inherit_google_docstring(parent.__doc__, child)
+
 child.__doc__ = """Parent summary.
 
 Args:
@@ -159,7 +171,7 @@ Notes:
 
 ## Sections order
 
-The sections of an inherited docstring are sorted according to order defined in
+The sections of an inherited docstring are sorted according to order defined in the
 [NumPy docstring format specification](https://numpydoc.readthedocs.io/en/latest/format.html):
 - `Summary`
 - `Extended summary`
@@ -191,10 +203,10 @@ Those sections are:
 - `Attributes`
 
 The inheritance is done at the key level,
-i.e. an inheritor section will not fully override the parent one:
-- keys of the parent section and not in the child section are inherited,
-- keys of the child section and not in the parent section are kept,
-- for keys that are both in the parent and child sections,
+i.e. a section of the inheritor will not fully override the parent one:
+- keys in the parent section and not in the child section are inherited,
+- keys in the child section and not in the parent section are kept,
+- for keys that are both in the parent and child section,
   the child ones are kept.
 
 This allows to only document the new keys in such a section of an inheritor.
@@ -303,3 +315,8 @@ class Meta(abc.ABCMeta, NumpyDocstringInheritorMeta):
 class Parent(metaclass=Meta):
     ...
 ```
+# Similar projects
+
+[custom_inherit](https://github.com/rsokl/custom_inherit):
+`docstring-inherit` started as fork of this project,
+we would like to thank its author.

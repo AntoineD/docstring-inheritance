@@ -73,9 +73,9 @@ repos:
         - LICENSES/headers/MIT.txt
     - id: insert-license
       name: insert CC BY-SA license
-      files: \.rst$
+      files: \.md$
       args:
         - --license-filepath
         - LICENSES/headers/CC-BY-SA-4.0.txt
         - --comment-style
-        - ..|   |
+        - <!--|| -->
