@@ -10,6 +10,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/docstring-inheritance)
 ![PyPI](https://img.shields.io/pypi/v/docstring-inheritance)
 ![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)
+![Codecov branch](https://img.shields.io/codecov/c/gh/AntoineD/docstring-inheritance/main)
 
 `docstring-inheritance` is a python package to avoid writing and maintaining duplicated python docstrings.
 The typical usage is to enable the inheritance of the docstrings from a base class

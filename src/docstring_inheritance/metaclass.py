@@ -65,9 +65,6 @@ class AbstractDocstringInheritanceMeta(type):
     ) -> None:
         mro_classes = [mro_cls for base in class_bases for mro_cls in base.mro()]
 
-        if object in mro_classes:
-            mro_classes.remove(object)
-
         for attr_name, attr in class_dict.items():
             if not isinstance(attr, FunctionType):
                 continue
