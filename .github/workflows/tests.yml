@@ -1,6 +1,16 @@
 name: Tests
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - "*.md"
+      - "LICENSE**"
+      - ".gitignore"
+  pull_request:
+    paths-ignore:
+      - "*.md"
+      - "LICENSE**"
+      - ".gitignore"
 
 jobs:
   test:
@@ -19,4 +29,10 @@ jobs:
         run: pip install tox
       - name: Run tox
         # Run tox using the version of Python in `PATH`.
-        run: tox -e py
+        run: tox -e py-coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+#          fail_ci_if_error: true
+          files: ./coverage.xml
+          verbose: true
