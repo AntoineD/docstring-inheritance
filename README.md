@@ -7,13 +7,17 @@
  Commons, PO Box 1866, Mountain View, CA 94042, USA.
  -->
 
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/docstring-inheritance)
+![PyPI](https://img.shields.io/pypi/v/docstring-inheritance)
+![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)
+
 `docstring-inheritance` is a python package to avoid writing and maintaining duplicated python docstrings.
-The typical usage is to enable the inheritance from a base class
+The typical usage is to enable the inheritance of the docstrings from a base class
 such that its derived classes fully or partly inherit the docstrings.
 
 # Features
 
-- Handle numpy and google docstring formats, i.e. sections based docstrings.
+- Handle numpy and google docstring formats (i.e. sections based docstrings):
     - [NumPy docstring format specification](https://numpydoc.readthedocs.io/en/latest/format.html)
     - [Google docstring format specification](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
 - Handle docstrings for functions, classes, methods, class methods, static methods, properties.
@@ -36,7 +40,7 @@ The dependencies, with their licenses, are given in the CREDITS.rst file.
 
 Install via pip:
 
-```shell
+```commandline
 pip install docstring-inheritance
 ```
 
@@ -55,9 +59,9 @@ The docstring inheritance is performed for the docstrings of the:
 - staticmethods
 - properties
 
-Use `NumpyDocstringInheritanceMeta` to inherit docstrings with numpy format.
+Use the `NumpyDocstringInheritanceMeta` metaclass to inherit docstrings in numpy format.
 
-Use `GoogleDocstringInheritanceMeta` to inherit docstrings with google format.
+Use the `GoogleDocstringInheritanceMeta` metaclass to inherit docstrings in google format.
 
 ```python
 from docstring_inheritance import NumpyDocstringInheritorMeta
@@ -79,6 +83,7 @@ class Parent(metaclass=NumpyDocstringInheritorMeta):
         Parent notes.
         """
 
+
 class Child(Parent):
     def meth(self, x, z):
         """
@@ -96,6 +101,8 @@ class Child(Parent):
         Child notes.
         """
 
+
+# The inherited docstring is
 Child.meth.__doc__ = """Parent summary.
 
 Parameters
@@ -120,12 +127,13 @@ Child notes.
 `docstring-inheritance` provides functions to inherit the docstring of a callable from a string.
 This is typically used to inherit the docstring of a function from another function.
 
-Use `inherit_google_docstring` to inherit docstrings with google format.
+Use the `inherit_google_docstring` function to inherit docstrings in google format.
 
-Use `inherit_numpy_docstring` to inherit docstrings with numpy format.
+Use the `inherit_numpy_docstring` function to inherit docstrings in numpy format.
 
 ```python
 from docstring_inheritance import inherit_google_docstring
+
 
 def parent():
     """Parent summary.
@@ -150,9 +158,12 @@ def child():
     Notes:
         Child notes.
     """
+    
 
 inherit_google_docstring(parent.__doc__, child)
 
+
+# The inherited docstring is
 child.__doc__ = """Parent summary.
 
 Args:
@@ -204,8 +215,8 @@ Those sections are:
 
 The inheritance is done at the key level,
 i.e. a section of the inheritor will not fully override the parent one:
-- keys in the parent section and not in the child section are inherited,
-- keys in the child section and not in the parent section are kept,
+- the keys in the parent section and not in the child section are inherited,
+- the keys in the child section and not in the parent section are kept,
 - for keys that are both in the parent and child section,
   the child ones are kept.
 
@@ -214,6 +225,7 @@ For instance:
 
 ```python
 from docstring_inheritance import NumpyDocstringInheritorMeta
+
 
 class Parent(metaclass=NumpyDocstringInheritorMeta):
     """
@@ -225,6 +237,7 @@ class Parent(metaclass=NumpyDocstringInheritorMeta):
        Description for y
     """
 
+
 class Child(Parent):
     """
     Attributes
@@ -235,6 +248,8 @@ class Child(Parent):
        Description for z
     """
 
+    
+# The inherited docstring is
 Child.__doc__ = """
 Attributes
 ----------
@@ -258,13 +273,14 @@ Those sections are:
 - `Parameters` (numpy format only)
 - `Args` (google format only)
 
-In addition to the inheritance behavior described [above](#docstring-sections-not-for-signatures):
-- arguments not existing in the inheritor signature are removed,
-- arguments are sorted according the inheritor signature,
-- missing arguments' descriptions are provided with a dummy description.
+In addition to the inheritance behavior described [above](#sections-with-items):
+- the arguments not existing in the inheritor signature are removed,
+- the arguments are sorted according the inheritor signature,
+- the arguments with no descriptions are provided with a dummy description.
 
 ```python
 from docstring_inheritance import GoogleDocstringInheritorMeta
+
 
 class Parent(metaclass=GoogleDocstringInheritorMeta):
     def meth(self, w, x, y):
@@ -275,6 +291,7 @@ class Parent(metaclass=GoogleDocstringInheritorMeta):
             y: Description for y
         """
 
+
 class Child(Parent):
     def meth(self, w, y, z):
         """
@@ -283,6 +300,8 @@ class Child(Parent):
             y: Overridden description for y
         """
 
+
+# The inherited docstring is
 Child.meth.__doc__ = """
 Args:
     w: Description for w
@@ -313,7 +332,7 @@ class Meta(abc.ABCMeta, NumpyDocstringInheritorMeta):
 
 
 class Parent(metaclass=Meta):
-    ...
+    pass
 ```
 # Similar projects
 
