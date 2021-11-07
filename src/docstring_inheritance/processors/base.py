@@ -49,7 +49,8 @@ class AbstractDocstringProcessor:
     _ARGS_SECTION_ITEMS_NAMES: Set[str]
     _SECTION_ITEMS_NAMES: Set[str]
 
-    _MISSING_ARG_DESCRIPTION = "The description is missing."
+    # Description without formatting.
+    MISSING_ARG_DESCRIPTION = "The description is missing."
 
     @classmethod
     @abc.abstractmethod
@@ -227,7 +228,7 @@ class AbstractDocstringProcessor:
 
         The argument `self` is removed. The arguments are ordered according to the
         signature of `func`. An argument of `func` missing in `section_items` gets a
-        default description defined in :attr:`._MISSING_ARG_DESCRIPTION`.
+        default description defined in :attr:`.MISSING_ARG_DESCRIPTION`.
         """
         args, varargs, varkw, _, kwonlyargs = inspect.getfullargspec(func)[:5]
 
@@ -248,7 +249,7 @@ class AbstractDocstringProcessor:
             if arg in section_items:
                 ordered_section[arg] = section_items[arg]
             else:
-                ordered_section[arg] = cls._MISSING_ARG_DESCRIPTION
+                ordered_section[arg] = cls.MISSING_ARG_DESCRIPTION
 
         return ordered_section
 

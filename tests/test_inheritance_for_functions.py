@@ -63,7 +63,7 @@ def test_google():
             Parent yields
         """
 
-    def child(x, *child_varargs, **child_kwargs):
+    def child(x, missing_doc, *child_varargs, **child_kwargs):
         """Child summary.
 
         Yields:
@@ -95,6 +95,7 @@ def test_google():
 
 Args:
     x: X
+    missing_doc: The description is missing.
     *child_varargs: Child *args
     **child_kwargs: Child **kwargs
 

@@ -24,15 +24,15 @@ from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 def test_inheritance():
     class Parent(metaclass=NumpyDocstringInheritanceMeta):
-        def meth(self, x, *args, y=None, **kwargs):
+        def meth(self, w, x, *args, y=None, **kwargs):
             """
             Parameters
             ----------
+            w
             x: int
             *args: int
             y: float
             **kwargs: int
-                If None, foo.
             """
 
     class Child(Parent):
@@ -41,7 +41,6 @@ def test_inheritance():
             Parameters
             ----------
             xx: int
-            yy: float
             """
 
     excepted = """
@@ -50,10 +49,10 @@ Parameters
 xx: int
 x: int
 *args: int
-yy: float
+yy:
+The description is missing.
 y: float
-**kwargs: int
-    If None, foo."""
+**kwargs: int"""
 
     assert Child.meth.__doc__ == excepted
 

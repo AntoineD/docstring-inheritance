@@ -58,6 +58,8 @@ class NumpyDocstringProcessor(AbstractDocstringProcessor):
         "Methods",
     }
 
+    MISSING_ARG_DESCRIPTION = f":\n{AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION}"
+
     @classmethod
     def _parse_section_items(cls, section_body: str) -> Dict[str, str]:
         return parse_section_items(section_body)

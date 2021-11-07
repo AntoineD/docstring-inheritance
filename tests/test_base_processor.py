@@ -109,7 +109,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
         (
             func_args_kwonlyargs,
             {"arg1": ""},
-            {"arg1": "", "arg2": AbstractDocstringProcessor._MISSING_ARG_DESCRIPTION},
+            {"arg1": "", "arg2": AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION},
         ),
         # Args are ordered according to the signature.
         (
@@ -121,7 +121,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
         (
             func_varargs,
             {},
-            {"*varargs": AbstractDocstringProcessor._MISSING_ARG_DESCRIPTION},
+            {"*varargs": AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION},
         ),
         (
             func_varargs,
@@ -132,7 +132,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
         (
             func_varkw,
             {},
-            {"**varkw": AbstractDocstringProcessor._MISSING_ARG_DESCRIPTION},
+            {"**varkw": AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION},
         ),
         (
             func_varkw,
@@ -143,7 +143,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
         (
             func_kwonlyargs,
             {},
-            {"arg": AbstractDocstringProcessor._MISSING_ARG_DESCRIPTION},
+            {"arg": AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION},
         ),
         (
             func_kwonlyargs,

@@ -20,6 +20,37 @@
 from docstring_inheritance import GoogleDocstringInheritanceMeta
 
 
+def test_inheritance():
+    class Parent(metaclass=GoogleDocstringInheritanceMeta):
+        def meth(self, w, x, *args, y=None, **kwargs):
+            """
+            Args:
+                w
+                x: int
+                *args: int
+                y: float
+                **kwargs: int
+            """
+
+    class Child(Parent):
+        def meth(self, xx, x, *args, yy=None, y=None, **kwargs):
+            """
+            Args:
+                xx: int
+            """
+
+    excepted = """
+Args:
+    xx: int
+    x: int
+    *args: int
+    yy: The description is missing.
+    y: float
+    **kwargs: int"""
+
+    assert Child.meth.__doc__ == excepted
+
+
 def test_several_inheritance():
     class GrandParent(metaclass=GoogleDocstringInheritanceMeta):
         """Class GrandParent.

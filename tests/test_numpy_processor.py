@@ -254,4 +254,15 @@ def test_render_docstring(sections, expected):
     assert NumpyDocstringProcessor._render_docstring(sections) == expected
 
 
+def test_inherit_section_items_with_args():
+    def func(arg):
+        """"""
+
+    expected = {"arg": NumpyDocstringProcessor.MISSING_ARG_DESCRIPTION}
+
+    assert (
+        NumpyDocstringProcessor._inherit_section_items_with_args(func, {}) == expected
+    )
+
+
 # TODO: test section order and all sections items
