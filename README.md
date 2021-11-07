@@ -159,7 +159,7 @@ def child():
     Notes:
         Child notes.
     """
-    
+
 
 inherit_google_docstring(parent.__doc__, child)
 
@@ -249,7 +249,7 @@ class Child(Parent):
        Description for z
     """
 
-    
+
 # The inherited docstring is
 Child.__doc__ = """
 Attributes
@@ -264,9 +264,9 @@ z:
 ```
 
 Here the keys are the attribute names.
-The description for the key `y` has been overridden
-and the description for the key `z` has been added.
-The only remaining description from the parent is for the key `x`.
+The description for the attribute `y` has been overridden
+and the description for the attribute `z` has been added.
+The only remaining description from the parent is for the attribute `x`.
 
 ### Sections documenting signatures
 
@@ -277,7 +277,7 @@ Those sections are:
 In addition to the inheritance behavior described [above](#sections-with-items):
 - the arguments not existing in the inheritor signature are removed,
 - the arguments are sorted according the inheritor signature,
-- the arguments with no descriptions are provided with a dummy description.
+- the arguments with no description are provided with a dummy description.
 
 ```python
 from docstring_inheritance import GoogleDocstringInheritanceMeta
@@ -311,10 +311,10 @@ Args:
 """
 ```
 
-Here the keys are the arguments names.
-The description for the key `y` has been overridden
-and the description for the key `z` has been added.
-The only remaining description from the parent is for the key `w`.
+Here the keys are the argument names.
+The description for the argument `y` has been overridden
+and the description for the argument `z` has been added.
+The only remaining description from the parent is for the argument `w`.
 
 # Advanced usage
 
@@ -338,5 +338,5 @@ class Parent(metaclass=Meta):
 # Similar projects
 
 [custom_inherit](https://github.com/rsokl/custom_inherit):
-`docstring-inherit` started as fork of this project,
-we would like to thank its author.
+`docstring-inherit` started as fork of this project before being re-written,
+we thank its author.
