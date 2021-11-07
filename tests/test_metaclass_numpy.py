@@ -53,10 +53,9 @@ x: int
 yy: float
 y: float
 **kwargs: int
-    If None, foo.
-"""
+    If None, foo."""
 
-    assert Child.meth.__doc__ == excepted.strip("\n")
+    assert Child.meth.__doc__ == excepted
 
 
 def test_missing_parent_attr():

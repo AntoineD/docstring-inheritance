@@ -166,4 +166,31 @@ def test_parse_one_section(line1, line2s, expected):
     assert GoogleDocstringProcessor._parse_one_section(line1, line2s, []) == expected
 
 
+@pytest.mark.parametrize(
+    "sections,expected",
+    [
+        ({}, ""),
+        (
+            {None: "body"},
+            """body""",
+        ),
+        (
+            {None: "body", "name": "body"},
+            """body
+
+name:
+    body""",
+        ),
+        (
+            {"name": "body"},
+            """
+name:
+    body""",
+        ),
+    ],
+)
+def test_render_docstring(sections, expected):
+    assert GoogleDocstringProcessor._render_docstring(sections) == expected
+
+
 # TODO: test section order and all sections items

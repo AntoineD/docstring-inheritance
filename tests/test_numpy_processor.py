@@ -241,6 +241,13 @@ name
 ----
 body""",
         ),
+        (
+            {"name": "body"},
+            """
+name
+----
+body""",
+        ),
     ],
 )
 def test_render_docstring(sections, expected):

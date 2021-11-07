@@ -254,7 +254,19 @@ class AbstractDocstringProcessor:
 
     @classmethod
     def _render_docstring(cls, sections: SectionsType) -> str:
+        if not sections:
+            return ""
+
         rendered_sections = []
+
         for section_name, section_body in sections.items():
             rendered_sections += [cls._render_section(section_name, section_body)]
-        return "\n\n".join(rendered_sections)
+
+        rendered = "\n\n".join(rendered_sections)
+
+        if None not in sections:
+            # Add an empty summary line,
+            # Sphinx will not behave correctly otherwise with the Google format.
+            return "\n" + rendered
+
+        return rendered
