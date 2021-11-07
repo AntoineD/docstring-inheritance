@@ -19,11 +19,11 @@
 # SOFTWARE.
 from inspect import getdoc
 
-from docstring_inheritance import NumpyDocstringInheritorMeta
+from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 
 def test_inheritance():
-    class Parent(metaclass=NumpyDocstringInheritorMeta):
+    class Parent(metaclass=NumpyDocstringInheritanceMeta):
         def meth(self, x, *args, y=None, **kwargs):
             """
             Parameters
@@ -60,7 +60,7 @@ y: float
 
 
 def test_missing_parent_attr():
-    class Parent(metaclass=NumpyDocstringInheritorMeta):
+    class Parent(metaclass=NumpyDocstringInheritanceMeta):
         pass
 
     class Child(Parent):
@@ -88,7 +88,7 @@ def test_missing_parent_attr():
 
 
 def test_missing_parent_doc_for_attr():
-    class Parent(metaclass=NumpyDocstringInheritorMeta):
+    class Parent(metaclass=NumpyDocstringInheritanceMeta):
         def method(self):
             pass
 
@@ -129,7 +129,7 @@ def test_missing_parent_doc_for_attr():
 
 
 def test_multiple_inheritance():
-    class Parent1(metaclass=NumpyDocstringInheritorMeta):
+    class Parent1(metaclass=NumpyDocstringInheritanceMeta):
         """Parent1 summary
 
         Attributes
@@ -173,7 +173,7 @@ method2
 
 
 def test_several_parents():
-    class GrandParent(metaclass=NumpyDocstringInheritorMeta):
+    class GrandParent(metaclass=NumpyDocstringInheritanceMeta):
         """GrandParent summary
 
         Attributes

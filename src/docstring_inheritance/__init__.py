@@ -47,5 +47,5 @@ def DocstringInheritanceMeta(  # noqa: N802
 
 
 # Helper metaclasses for each docstring styles.
-NumpyDocstringInheritorMeta = DocstringInheritanceMeta(inherit_numpy_docstring)
-GoogleDocstringInheritorMeta = DocstringInheritanceMeta(inherit_google_docstring)
+NumpyDocstringInheritanceMeta = DocstringInheritanceMeta(inherit_numpy_docstring)
+GoogleDocstringInheritanceMeta = DocstringInheritanceMeta(inherit_google_docstring)

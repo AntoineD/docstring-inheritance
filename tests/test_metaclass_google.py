@@ -17,11 +17,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from docstring_inheritance import GoogleDocstringInheritorMeta
+from docstring_inheritance import GoogleDocstringInheritanceMeta
 
 
 def test_several_inheritance():
-    class GrandParent(metaclass=GoogleDocstringInheritorMeta):
+    class GrandParent(metaclass=GoogleDocstringInheritanceMeta):
         """Class GrandParent.
 
         Attributes:

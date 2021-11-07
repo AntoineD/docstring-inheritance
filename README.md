@@ -65,10 +65,10 @@ Use the `NumpyDocstringInheritanceMeta` metaclass to inherit docstrings in numpy
 Use the `GoogleDocstringInheritanceMeta` metaclass to inherit docstrings in google format.
 
 ```python
-from docstring_inheritance import NumpyDocstringInheritorMeta
+from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 
-class Parent(metaclass=NumpyDocstringInheritorMeta):
+class Parent(metaclass=NumpyDocstringInheritanceMeta):
     def meth(self, x, y=None):
         """Parent summary.
 
@@ -225,10 +225,10 @@ This allows to only document the new keys in such a section of an inheritor.
 For instance:
 
 ```python
-from docstring_inheritance import NumpyDocstringInheritorMeta
+from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 
-class Parent(metaclass=NumpyDocstringInheritorMeta):
+class Parent(metaclass=NumpyDocstringInheritanceMeta):
     """
     Attributes
     ----------
@@ -280,10 +280,10 @@ In addition to the inheritance behavior described [above](#sections-with-items):
 - the arguments with no descriptions are provided with a dummy description.
 
 ```python
-from docstring_inheritance import GoogleDocstringInheritorMeta
+from docstring_inheritance import GoogleDocstringInheritanceMeta
 
 
-class Parent(metaclass=GoogleDocstringInheritorMeta):
+class Parent(metaclass=GoogleDocstringInheritanceMeta):
     def meth(self, w, x, y):
         """
         Args:
@@ -325,10 +325,10 @@ an additional metaclass is required:
 
 ```python
 import abc
-from docstring_inheritance import NumpyDocstringInheritorMeta
+from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 
-class Meta(abc.ABCMeta, NumpyDocstringInheritorMeta):
+class Meta(abc.ABCMeta, NumpyDocstringInheritanceMeta):
     pass
 
 
