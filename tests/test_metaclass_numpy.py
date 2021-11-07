@@ -214,3 +214,14 @@ method1
 method2
 """
     assert getdoc(Child) == excepted.strip("\n")
+
+
+def test_do_not_inherit_object():
+    class Parent(metaclass=NumpyDocstringInheritanceMeta):
+        def __init__(self):
+            pass
+
+    class Child(Parent):
+        pass
+
+    assert Child.__init__.__doc__ is None

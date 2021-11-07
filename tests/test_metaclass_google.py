@@ -72,3 +72,14 @@ Note:
 """
 
     assert Child.__doc__ == excepted
+
+
+def test_do_not_inherit_object():
+    class Parent(metaclass=GoogleDocstringInheritanceMeta):
+        def __init__(self):
+            pass
+
+    class Child(Parent):
+        pass
+
+    assert Child.__init__.__doc__ is None
