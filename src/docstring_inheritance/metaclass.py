@@ -85,9 +85,6 @@ class AbstractDocstringInheritanceMeta(type):
     @staticmethod
     def _get_mro_classes(class_bases: Tuple[type]) -> List[type]:
         mro_classes = [mro_cls for base in class_bases for mro_cls in base.mro()]
-
-        if object in mro_classes:
-            # Do not inherit the docstrings from the object base class.
-            mro_classes.remove(object)
-
+        # Do not inherit the docstrings from the object base class.
+        mro_classes.remove(object)
         return mro_classes

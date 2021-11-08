@@ -106,7 +106,7 @@ Note:
 
 
 def test_do_not_inherit_object():
-    class Parent(metaclass=GoogleDocstringInheritanceMeta):
+    class Parent(object, metaclass=GoogleDocstringInheritanceMeta):
         def __init__(self):
             pass
 
