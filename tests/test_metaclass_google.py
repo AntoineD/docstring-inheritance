@@ -20,7 +20,7 @@
 from docstring_inheritance import GoogleDocstringInheritanceMeta
 
 
-def test_inheritance():
+def test_args_inheritance():
     class Parent(metaclass=GoogleDocstringInheritanceMeta):
         def meth(self, w, x, *args, y=None, **kwargs):
             """

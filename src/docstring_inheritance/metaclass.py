@@ -21,6 +21,7 @@ from types import FunctionType
 from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Tuple
 
@@ -54,7 +55,7 @@ class AbstractDocstringInheritanceMeta(type):
     ) -> None:
         dummy_func = create_dummy_func_with_doc(class_dict.get("__doc__"))
 
-        for base_class in class_bases:
+        for base_class in cls._get_mro_classes(class_bases):
             cls.docstring_processor(base_class.__doc__, dummy_func)
 
         class_dict["__doc__"] = dummy_func.__doc__
@@ -63,11 +64,7 @@ class AbstractDocstringInheritanceMeta(type):
     def _process_attrs_docstrings(
         cls, class_bases: Tuple[type], class_dict: Dict[str, Any]
     ) -> None:
-        mro_classes = [mro_cls for base in class_bases for mro_cls in base.mro()]
-
-        if object in mro_classes:
-            # Do not inherit the docstrings from the object base class.
-            mro_classes.remove(object)
+        mro_classes = cls._get_mro_classes(class_bases)
 
         for attr_name, attr in class_dict.items():
             if not isinstance(attr, FunctionType):
@@ -84,3 +81,13 @@ class AbstractDocstringInheritanceMeta(type):
                 continue
 
             cls.docstring_processor(parent_doc, attr)
+
+    @staticmethod
+    def _get_mro_classes(class_bases: Tuple[type]) -> List[type]:
+        mro_classes = [mro_cls for base in class_bases for mro_cls in base.mro()]
+
+        if object in mro_classes:
+            # Do not inherit the docstrings from the object base class.
+            mro_classes.remove(object)
+
+        return mro_classes
