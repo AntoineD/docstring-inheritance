@@ -19,6 +19,7 @@
 # SOFTWARE.
 import abc
 import inspect
+import sys
 from itertools import tee
 from typing import Callable
 from typing import Dict
@@ -31,10 +32,9 @@ from typing import Union
 SectionsType = Dict[Optional[str], Union[str, Dict[str, str]]]
 
 
-try:
+if sys.version_info >= (3, 10):
     from itertools import pairwise
-except ImportError:
-    # Backport for Python < 3.10.
+else:
     # See https://docs.python.org/3/library/itertools.html#itertools.pairwise
     def pairwise(iterable):
         a, b = tee(iterable)
@@ -108,7 +108,7 @@ class AbstractDocstringProcessor:
         lines_pairs = iter(pairwise(reversed(lines)))
 
         reversed_section_body_lines: List[str] = []
-        reversed_sections = {}
+        reversed_sections: Dict[str, Union[str, Dict[str, str]]] = {}
 
         # Iterate 2 lines at a time to look for the section_items headers
         # that are underlined.
@@ -118,11 +118,13 @@ class AbstractDocstringProcessor:
             section_name, section_body = cls._parse_one_section(
                 line1, line2_rstripped, reversed_section_body_lines
             )
-            if section_name is not None:
+            if section_name is not None and section_body is not None:
                 if section_name in cls._SECTION_ITEMS_NAMES:
-                    section_body = cls._parse_section_items(section_body)
-
-                reversed_sections[section_name] = section_body
+                    reversed_sections[section_name] = cls._parse_section_items(
+                        section_body
+                    )
+                else:
+                    reversed_sections[section_name] = section_body
 
                 # We took into account line1 in addition to line2,
                 # we no longer need to process line1.

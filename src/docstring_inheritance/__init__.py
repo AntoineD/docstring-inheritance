@@ -20,10 +20,9 @@
 from typing import Callable
 from typing import Optional
 
-from docstring_inheritance.processors.google import GoogleDocstringProcessor
-from docstring_inheritance.processors.numpy import NumpyDocstringProcessor
-
 from .metaclass import AbstractDocstringInheritanceMeta
+from .processors.google import GoogleDocstringProcessor
+from .processors.numpy import NumpyDocstringProcessor
 
 DocstringProcessorType = Callable[[Optional[str], Callable], None]
 
@@ -34,9 +33,6 @@ inherit_google_docstring = GoogleDocstringProcessor()
 def DocstringInheritanceMeta(  # noqa: N802
     docstring_processor: DocstringProcessorType,
 ) -> type:
-    """A metaclass that merges the respective docstrings of a parent class and of its
-    child, along with their properties, methods (including classmethod, staticmethod,
-    decorated methods)."""
     metaclass = type(
         AbstractDocstringInheritanceMeta.__name__,
         AbstractDocstringInheritanceMeta.__bases__,
