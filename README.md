@@ -9,6 +9,7 @@
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/docstring-inheritance)
 ![PyPI](https://img.shields.io/pypi/v/docstring-inheritance)
+![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/docstring-inheritance)
 ![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Codecov branch](https://img.shields.io/codecov/c/gh/AntoineD/docstring-inheritance/main)
 
@@ -39,10 +40,16 @@ The dependencies, with their licenses, are given in the CREDITS.rst file.
 
 # Installation
 
-Install via pip:
+Install with pip:
 
 ```commandline
 pip install docstring-inheritance
+```
+
+Or with conda:
+
+```commandline
+conda install -c conda-forge docstring-inheritance
 ```
 
 # Basic Usage
