@@ -1,9 +1,9 @@
 <!--
  Copyright 2021 Antoine DECHAUME
 
- This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+ This work is licensed under the Creative Commons Attribution 4.0
  International License. To view a copy of this license, visit
- http://creativecommons.org/licenses/by-sa/4.0/ or send a letter to Creative
+ http://creativecommons.org/licenses/by/4.0/ or send a letter to Creative
  Commons, PO Box 1866, Mountain View, CA 94042, USA.
  -->
 
@@ -35,7 +35,7 @@ such that its derived classes fully or partly inherit the docstrings.
 # Licenses
 
 The source code is distributed under the MIT license.
-The documentation is distributed under the CC BY-SA 4.0 license.
+The documentation is distributed under the CC BY 4.0 license.
 The dependencies, with their licenses, are given in the CREDITS.rst file.
 
 # Installation

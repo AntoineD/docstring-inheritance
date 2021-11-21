@@ -72,10 +72,10 @@ repos:
         - --license-filepath
         - LICENSES/headers/MIT.txt
     - id: insert-license
-      name: insert CC BY-SA license
+      name: insert CC BY license
       files: \.md$
       args:
         - --license-filepath
-        - LICENSES/headers/CC-BY-SA-4.0.txt
+        - LICENSES/headers/CC-BY-4.0.txt
         - --comment-style
         - <!--|| -->
