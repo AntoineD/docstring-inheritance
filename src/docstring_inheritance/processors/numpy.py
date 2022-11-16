@@ -17,12 +17,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
 from itertools import dropwhile
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Union
 
 from . import parse_section_items
 from .base import AbstractDocstringProcessor
@@ -61,14 +58,14 @@ class NumpyDocstringProcessor(AbstractDocstringProcessor):
     MISSING_ARG_DESCRIPTION = f":\n{AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION}"
 
     @classmethod
-    def _parse_section_items(cls, section_body: str) -> Dict[str, str]:
+    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
         return parse_section_items(section_body)
 
     @classmethod
     def _parse_one_section(
-        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: List[str]
-    ) -> Union[Tuple[str, str], Tuple[None, None]]:
-        # See https://github.com/numpy/numpydoc/blob/d85f54ea342c1d223374343be88da94ce9f58dec/numpydoc/docscrape.py#L179  # noqa: E501
+        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: list[str]
+    ) -> tuple[str, str] | tuple[None, None]:
+        # See https://github.com/numpy/numpydoc/blob/d85f54ea342c1d223374343be88da94ce9f58dec/numpydoc/docscrape.py#L179  # noqa: B950
         if len(line2_rstripped) >= 3 and (set(line2_rstripped) in ({"-"}, {"="})):
             line1s = line1.rstrip()
             min_line_length = len(line1s)
@@ -79,7 +76,7 @@ class NumpyDocstringProcessor(AbstractDocstringProcessor):
         return None, None
 
     @classmethod
-    def _get_section_body(cls, reversed_section_body_lines: List[str]) -> str:
+    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
         reversed_section_body_lines = list(
             dropwhile(lambda x: not x, reversed_section_body_lines)
         )
@@ -88,7 +85,7 @@ class NumpyDocstringProcessor(AbstractDocstringProcessor):
 
     @classmethod
     def _render_section(
-        cls, section_name: Optional[str], section_body: Union[str, Dict[str, str]]
+        cls, section_name: str | None, section_body: str | dict[str, str]
     ) -> str:
         if section_name is None:
             return section_body

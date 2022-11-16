@@ -17,6 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
 from docstring_inheritance import GoogleDocstringInheritanceMeta
 
 
@@ -106,7 +108,7 @@ Note:
 
 
 def test_do_not_inherit_object():
-    class Parent(object, metaclass=GoogleDocstringInheritanceMeta):
+    class Parent(metaclass=GoogleDocstringInheritanceMeta):
         def __init__(self):
             pass
 

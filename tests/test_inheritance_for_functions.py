@@ -17,9 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
 import inspect
 
 import pytest
+
 from docstring_inheritance import inherit_google_docstring
 from docstring_inheritance import inherit_numpy_docstring
 from docstring_inheritance.metaclass import create_dummy_func_with_doc

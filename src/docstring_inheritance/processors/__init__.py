@@ -17,12 +17,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
 import re
-from typing import Dict
 
 _SECTION_ITEMS_REGEX = re.compile(r"(\**\w+)(.*?)(?:$|(?=\n\**\w+))", flags=re.DOTALL)
 
 
-def parse_section_items(section_body: str) -> Dict[str, str]:
+def parse_section_items(section_body: str) -> dict[str, str]:
     """Parse the section items for numpy and google docstrings."""
     return dict(_SECTION_ITEMS_REGEX.findall(section_body))

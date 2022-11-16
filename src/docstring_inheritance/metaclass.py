@@ -17,16 +17,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
 from types import FunctionType
 from typing import Any
 from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
 
 
-def create_dummy_func_with_doc(docstring: Optional[str]) -> Callable:
+def create_dummy_func_with_doc(docstring: str | None) -> Callable:
     """Return a dummy function with a given docstring."""
 
     def func():  # pragma: no cover
@@ -39,11 +37,11 @@ def create_dummy_func_with_doc(docstring: Optional[str]) -> Callable:
 class AbstractDocstringInheritanceMeta(type):
     """Abstract metaclass for inheriting class docstrings."""
 
-    docstring_processor: Callable[[Optional[str], Callable], str]
+    docstring_processor: Callable[[str | None, Callable], str]
 
     def __new__(
-        cls, class_name: str, class_bases: Tuple[type], class_dict: Dict[str, Any]
-    ) -> "AbstractDocstringInheritanceMeta":
+        cls, class_name: str, class_bases: tuple[type], class_dict: dict[str, Any]
+    ) -> AbstractDocstringInheritanceMeta:
         if class_bases:
             cls._process_class_docstring(class_bases, class_dict)
             cls._process_attrs_docstrings(class_bases, class_dict)
@@ -51,7 +49,7 @@ class AbstractDocstringInheritanceMeta(type):
 
     @classmethod
     def _process_class_docstring(
-        cls, class_bases: Tuple[type], class_dict: Dict[str, Any]
+        cls, class_bases: tuple[type], class_dict: dict[str, Any]
     ) -> None:
         dummy_func = create_dummy_func_with_doc(class_dict.get("__doc__"))
 
@@ -62,7 +60,7 @@ class AbstractDocstringInheritanceMeta(type):
 
     @classmethod
     def _process_attrs_docstrings(
-        cls, class_bases: Tuple[type], class_dict: Dict[str, Any]
+        cls, class_bases: tuple[type], class_dict: dict[str, Any]
     ) -> None:
         mro_classes = cls._get_mro_classes(class_bases)
 
@@ -83,7 +81,7 @@ class AbstractDocstringInheritanceMeta(type):
             cls.docstring_processor(parent_doc, attr)
 
     @staticmethod
-    def _get_mro_classes(class_bases: Tuple[type]) -> List[type]:
+    def _get_mro_classes(class_bases: tuple[type]) -> list[type]:
         mro_classes = [mro_cls for base in class_bases for mro_cls in base.mro()]
         # Do not inherit the docstrings from the object base class.
         mro_classes.remove(object)

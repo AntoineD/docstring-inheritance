@@ -17,12 +17,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
 import textwrap
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Union
 
 from . import parse_section_items
 from .base import AbstractDocstringProcessor
@@ -43,20 +40,20 @@ class GoogleDocstringProcessor(AbstractDocstringProcessor):
     MISSING_ARG_DESCRIPTION = f": {AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION}"
 
     @classmethod
-    def _parse_section_items(cls, section_body: str) -> Dict[str, str]:
+    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
         return parse_section_items(section_body)
 
     @classmethod
-    def _get_section_body(cls, reversed_section_body_lines: List[str]) -> str:
+    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
         return textwrap.dedent(
             NumpyDocstringProcessor._get_section_body(reversed_section_body_lines)
         )
 
     @classmethod
     def _parse_one_section(
-        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: List[str]
-    ) -> Union[Tuple[str, str], Tuple[None, None]]:
-        # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: E501
+        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: list[str]
+    ) -> tuple[str, str] | tuple[None, None]:
+        # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: B950
         line1s = line1.rstrip()
         if (
             not line1s.startswith(" ")
@@ -71,7 +68,7 @@ class GoogleDocstringProcessor(AbstractDocstringProcessor):
 
     @classmethod
     def _render_section(
-        cls, section_name: Optional[str], section_body: Union[str, Dict[str, str]]
+        cls, section_name: str | None, section_body: str | dict[str, str]
     ) -> str:
         if section_name is None:
             return section_body

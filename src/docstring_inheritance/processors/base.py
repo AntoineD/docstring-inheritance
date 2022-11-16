@@ -17,24 +17,23 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
 import abc
 import inspect
 import sys
 from itertools import tee
 from typing import Callable
 from typing import Dict
-from typing import List
 from typing import Optional
-from typing import Set
-from typing import Tuple
 from typing import Union
 
 SectionsType = Dict[Optional[str], Union[str, Dict[str, str]]]
 
 
-if sys.version_info >= (3, 10):
+if sys.version_info >= (3, 10):  # pragma: >=3.10 cover
     from itertools import pairwise
-else:
+else:  # pragma: <3.10 cover
     # See https://docs.python.org/3/library/itertools.html#itertools.pairwise
     def pairwise(iterable):
         a, b = tee(iterable)
@@ -45,16 +44,16 @@ else:
 class AbstractDocstringProcessor:
     """Abstract base class for inheriting a docstring."""
 
-    _SECTION_NAMES: List[Optional[str]]
-    _ARGS_SECTION_ITEMS_NAMES: Set[str]
-    _SECTION_ITEMS_NAMES: Set[str]
+    _SECTION_NAMES: list[str | None]
+    _ARGS_SECTION_ITEMS_NAMES: set[str]
+    _SECTION_ITEMS_NAMES: set[str]
 
     # Description without formatting.
     MISSING_ARG_DESCRIPTION = "The description is missing."
 
     @classmethod
     @abc.abstractmethod
-    def _get_section_body(cls, reversed_section_body_lines: List[str]) -> str:
+    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
         """Return the docstring part from reversed lines of a docstring section body.
 
         The trailing empty lines are removed.
@@ -63,8 +62,8 @@ class AbstractDocstringProcessor:
     @classmethod
     @abc.abstractmethod
     def _parse_one_section(
-        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: List[str]
-    ) -> Union[Tuple[str, str], Tuple[None, None]]:
+        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: list[str]
+    ) -> tuple[str, str] | tuple[None, None]:
         """Parse the name and body of a docstring section.
 
         It does not parse section_items items.
@@ -77,16 +76,16 @@ class AbstractDocstringProcessor:
     @classmethod
     @abc.abstractmethod
     def _render_section(
-        cls, section_name: Optional[str], section_body: Union[str, Dict[str, str]]
+        cls, section_name: str | None, section_body: str | dict[str, str]
     ) -> str:
         """Return a rendered docstring section."""
 
     @classmethod
     @abc.abstractmethod
-    def _parse_section_items(cls, section_body: str) -> Dict[str, str]:
+    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
         """Return the section items names bound to their descriptions."""
 
-    def __call__(self, parent_doc: Optional[str], child_func: Callable) -> None:
+    def __call__(self, parent_doc: str | None, child_func: Callable) -> None:
         if parent_doc is None:
             return
 
@@ -98,7 +97,7 @@ class AbstractDocstringProcessor:
         child_func.__doc__ = self._render_docstring(child_sections)
 
     @classmethod
-    def _parse_sections(cls, docstring: Optional[str]) -> SectionsType:
+    def _parse_sections(cls, docstring: str | None) -> SectionsType:
         if not docstring:
             return {}
 
@@ -107,8 +106,8 @@ class AbstractDocstringProcessor:
         # It seems easier to work reversed.
         lines_pairs = iter(pairwise(reversed(lines)))
 
-        reversed_section_body_lines: List[str] = []
-        reversed_sections: Dict[str, Union[str, Dict[str, str]]] = {}
+        reversed_section_body_lines: list[str] = []
+        reversed_sections: dict[str, str | dict[str, str]] = {}
 
         # Iterate 2 lines at a time to look for the section_items headers
         # that are underlined.
@@ -224,8 +223,8 @@ class AbstractDocstringProcessor:
     def _inherit_section_items_with_args(
         cls,
         func: Callable,
-        section_items: Dict[str, str],
-    ) -> Dict[str, str]:
+        section_items: dict[str, str],
+    ) -> dict[str, str]:
         """Inherit section items for the args of a signature.
 
         The argument `self` is removed. The arguments are ordered according to the
