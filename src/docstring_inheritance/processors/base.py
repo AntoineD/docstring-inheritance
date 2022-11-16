@@ -22,8 +22,10 @@ from __future__ import annotations
 import abc
 import inspect
 import sys
+from itertools import dropwhile
 from itertools import tee
 from typing import Callable
+from typing import ClassVar
 from typing import Dict
 from typing import Optional
 from typing import Union
@@ -31,9 +33,9 @@ from typing import Union
 SectionsType = Dict[Optional[str], Union[str, Dict[str, str]]]
 
 
-if sys.version_info >= (3, 10):  # pragma: >=3.10 cover
+if sys.version_info >= (3, 10):
     from itertools import pairwise
-else:  # pragma: <3.10 cover
+else:
     # See https://docs.python.org/3/library/itertools.html#itertools.pairwise
     def pairwise(iterable):
         a, b = tee(iterable)
@@ -44,20 +46,36 @@ else:  # pragma: <3.10 cover
 class AbstractDocstringProcessor:
     """Abstract base class for inheriting a docstring."""
 
-    _SECTION_NAMES: list[str | None]
-    _ARGS_SECTION_ITEMS_NAMES: set[str]
-    _SECTION_ITEMS_NAMES: set[str]
+    _SECTION_NAMES: ClassVar[list[str | None]] = [
+        None,
+        "Parameters",
+        "Returns",
+        "Yields",
+        "Receives",
+        "Other Parameters",
+        "Attributes",
+        "Methods",
+        "Raises",
+        "Warns",
+        "Warnings",
+        "See Also",
+        "Notes",
+        "References",
+        "Examples",
+    ]
+    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]]
+    _SECTION_ITEMS_NAMES: ClassVar[set[str]]
 
     # Description without formatting.
-    MISSING_ARG_DESCRIPTION = "The description is missing."
+    MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
 
     @classmethod
-    @abc.abstractmethod
     def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
-        """Return the docstring part from reversed lines of a docstring section body.
-
-        The trailing empty lines are removed.
-        """
+        reversed_section_body_lines = list(
+            dropwhile(lambda x: not x, reversed_section_body_lines)
+        )
+        reversed_section_body_lines.reverse()
+        return "\n".join(reversed_section_body_lines)
 
     @classmethod
     @abc.abstractmethod
@@ -214,7 +232,7 @@ class AbstractDocstringProcessor:
             if section_name in temp_sections
         }
 
-        # Add the remaining non standard sections.
+        # Add the remaining non-standard sections.
         new_child_sections.update(temp_sections)
 
         return new_child_sections

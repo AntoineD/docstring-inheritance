@@ -20,6 +20,7 @@
 from __future__ import annotations
 
 import textwrap
+from typing import ClassVar
 
 from . import parse_section_items
 from .base import AbstractDocstringProcessor
@@ -27,12 +28,14 @@ from .numpy import NumpyDocstringProcessor
 
 
 class GoogleDocstringProcessor(AbstractDocstringProcessor):
-    _SECTION_NAMES = list(NumpyDocstringProcessor._SECTION_NAMES)
+    _SECTION_NAMES: ClassVar[list[str | None]] = list(
+        AbstractDocstringProcessor._SECTION_NAMES
+    )
     _SECTION_NAMES[1] = "Args"
 
-    _ARGS_SECTION_ITEMS_NAMES = {"Args"}
+    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {"Args"}
 
-    _SECTION_ITEMS_NAMES = _ARGS_SECTION_ITEMS_NAMES | {
+    _SECTION_ITEMS_NAMES: ClassVar[set[str]] = _ARGS_SECTION_ITEMS_NAMES | {
         "Attributes",
         "Methods",
     }
@@ -71,6 +74,7 @@ class GoogleDocstringProcessor(AbstractDocstringProcessor):
         cls, section_name: str | None, section_body: str | dict[str, str]
     ) -> str:
         if section_name is None:
+            assert isinstance(section_body, str)
             return section_body
         if isinstance(section_body, dict):
             section_body = "\n".join(

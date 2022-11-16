@@ -34,6 +34,7 @@ inherit_google_docstring = GoogleDocstringProcessor()
 
 def DocstringInheritanceMeta(  # noqa: N802
     docstring_processor: DocstringProcessorType,
+    __init__in_class_doc: bool = False,
 ) -> type:
     metaclass = type(
         AbstractDocstringInheritanceMeta.__name__,
@@ -41,6 +42,7 @@ def DocstringInheritanceMeta(  # noqa: N802
         dict(AbstractDocstringInheritanceMeta.__dict__),
     )
     metaclass.docstring_processor = docstring_processor
+    metaclass.init_in_class = __init__in_class_doc
     return metaclass
 
 
