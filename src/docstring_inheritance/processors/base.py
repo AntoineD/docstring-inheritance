@@ -37,7 +37,7 @@ if sys.version_info >= (3, 10):
     from itertools import pairwise
 else:
     # See https://docs.python.org/3/library/itertools.html#itertools.pairwise
-    def pairwise(iterable):
+    def pairwise(iterable):  # pragma: no cover
         a, b = tee(iterable)
         next(b, None)
         return zip(a, b)
@@ -66,7 +66,6 @@ class AbstractDocstringProcessor:
     _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]]
     _SECTION_ITEMS_NAMES: ClassVar[set[str]]
 
-    # Description without formatting.
     MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
 
     @classmethod
@@ -88,7 +87,7 @@ class AbstractDocstringProcessor:
 
         Returns:
             The name and docstring body parts of a section,
-            or `(None, None)` if no section is found.
+            or ``(None, None)`` if no section is found.
         """
 
     @classmethod
@@ -245,9 +244,9 @@ class AbstractDocstringProcessor:
     ) -> dict[str, str]:
         """Inherit section items for the args of a signature.
 
-        The argument `self` is removed. The arguments are ordered according to the
-        signature of `func`. An argument of `func` missing in `section_items` gets a
-        default description defined in :attr:`.MISSING_ARG_DESCRIPTION`.
+        The argument ``self`` is removed. The arguments are ordered according to the
+        signature of ``func``. An argument of ``func`` missing in ``section_items`` gets
+        a default description defined in :attr:`.MISSING_ARG_DESCRIPTION`.
         """
         args, varargs, varkw, _, kwonlyargs = inspect.getfullargspec(func)[:5]
 
