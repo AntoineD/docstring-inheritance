@@ -56,33 +56,19 @@ class AbstractDocstringInheritanceMeta(type):
     def __new__(
         cls, class_name: str, class_bases: tuple[type], class_dict: dict[str, Any]
     ) -> AbstractDocstringInheritanceMeta:
+        new_cls = type.__new__(cls, class_name, class_bases, class_dict)
         if class_bases:
-            classes = cls._get_classes_mro(class_bases)
-            cls._inherit_class_docstring(classes, class_dict)
-            cls._inherit_attrs_docstrings(classes, class_dict)
-        return type.__new__(cls, class_name, class_bases, class_dict)
-
-    @staticmethod
-    def _get_classes_mro(classes: tuple[type]) -> list[type]:
-        """Sort the classes according to the Method Resolution Order.
-
-        The object class is removed because inheriting its docstring is useless.
-
-        Args:
-            classes: The classes to sort.
-
-        Returns:
-            The classes.
-        """
-        classes = list(
-            dict.fromkeys([cls for base in classes for cls in base.__mro__])
-        )
-        classes.remove(object)
-        return classes
+            # Remove the class itself and object from the mro.
+            mro_classes = new_cls.mro()[1:-1]
+            cls._inherit_class_docstring(mro_classes, new_cls)
+            cls._inherit_attrs_docstrings(mro_classes, new_cls.__dict__)
+        return new_cls
 
     @classmethod
     def _inherit_class_docstring(
-        cls, classes: list[type], class_dict: dict[str, Any]
+        cls,
+        classes: list[type],
+        class_: type,
     ) -> None:
         """Create the inherited docstring for the class docstring.
 
@@ -90,12 +76,12 @@ class AbstractDocstringInheritanceMeta(type):
             classes: The classes to inherit from.
             class_dict: The class definition.
         """
-        func = cls._get_class_dummy_func(classes, class_dict.get("__doc__"))
+        func = cls._get_class_dummy_func(classes, class_.__doc__)
 
         for cls_ in classes:
             cls.docstring_processor(cls_.__doc__, func)
 
-        class_dict["__doc__"] = func.__doc__
+        class_.__doc__ = func.__doc__
 
     @classmethod
     def _inherit_attrs_docstrings(
