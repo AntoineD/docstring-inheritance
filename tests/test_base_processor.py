@@ -23,8 +23,7 @@ import textwrap
 
 import pytest
 
-from docstring_inheritance.processors import parse_section_items
-from docstring_inheritance.processors.base import AbstractDocstringProcessor
+from docstring_inheritance.docstring_processors.base import AbstractDocstringProcessor
 
 
 def _test_parse_sections(parse_sections, unindented_docstring, expected_sections):
@@ -53,7 +52,10 @@ def _test_parse_sections(parse_sections, unindented_docstring, expected_sections
     ),
 )
 def test_section_items_regex(section_body, expected_matches):
-    assert parse_section_items(section_body) == expected_matches
+    assert (
+        AbstractDocstringProcessor._parse_section_items(section_body)
+        == expected_matches
+    )
 
 
 def func_none():

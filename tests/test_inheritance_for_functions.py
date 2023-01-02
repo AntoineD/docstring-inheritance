@@ -23,9 +23,9 @@ import inspect
 
 import pytest
 
-from docstring_inheritance import inherit_google_docstring
-from docstring_inheritance import inherit_numpy_docstring
-from docstring_inheritance.metaclass import create_dummy_func_with_doc
+from docstring_inheritance import process_google_docstring
+from docstring_inheritance import process_numpy_docstring
+from docstring_inheritance.class_processor import ClassDocstringsInheritor
 
 
 def test_side_effect():
@@ -34,7 +34,7 @@ def test_side_effect():
 
     ref_signature = inspect.signature(f)
 
-    inherit_numpy_docstring(None, f)
+    process_numpy_docstring(None, f)
     assert inspect.signature(f) == ref_signature
 
 
@@ -133,12 +133,12 @@ Todo:
     Parent todo
 """
 
-    inherit_google_docstring(parent.__doc__, child)
+    process_google_docstring(parent.__doc__, child)
     assert child.__doc__ == expected.strip("\n")
 
 
 @pytest.mark.parametrize(
-    "inherit_docstring", [inherit_numpy_docstring, inherit_google_docstring]
+    "inherit_docstring", [process_numpy_docstring, process_google_docstring]
 )
 @pytest.mark.parametrize(
     "parent_docstring,child_docstring,expected_docstring",
@@ -147,6 +147,6 @@ Todo:
 def test_simple(
     inherit_docstring, parent_docstring, child_docstring, expected_docstring
 ):
-    dummy_func = create_dummy_func_with_doc(child_docstring)
+    dummy_func = ClassDocstringsInheritor._create_dummy_func_with_doc(child_docstring)
     inherit_docstring(parent_docstring, dummy_func)
     assert dummy_func.__doc__ == expected_docstring

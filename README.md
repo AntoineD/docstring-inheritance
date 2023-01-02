@@ -76,38 +76,38 @@ from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 
 class Parent(metaclass=NumpyDocstringInheritanceMeta):
-    def meth(self, x, y=None):
-        """Parent summary.
+  def meth(self, x, y=None):
+    """Parent summary.
 
-        Parameters
-        ----------
-        x:
-           Description for x.
-        y:
-           Description for y.
+    Parameters
+    ----------
+    x:
+       Description for x.
+    y:
+       Description for y.
 
-        Notes
-        -----
-        Parent notes.
-        """
+    Notes
+    -----
+    Parent notes.
+    """
 
 
 class Child(Parent):
-    def meth(self, x, z):
-        """
-        Parameters
-        ----------
-        z:
-           Description for z.
+  def meth(self, x, z):
+    """
+    Parameters
+    ----------
+    z:
+       Description for z.
 
-        Returns
-        -------
-        Something.
+    Returns
+    -------
+    Something.
 
-        Notes
-        -----
-        Child notes.
-        """
+    Notes
+    -----
+    Child notes.
+    """
 
 
 # The inherited docstring is
@@ -140,7 +140,7 @@ Use the `inherit_google_docstring` function to inherit docstrings in google form
 Use the `inherit_numpy_docstring` function to inherit docstrings in numpy format.
 
 ```python
-from docstring_inheritance import inherit_google_docstring
+from docstring_inheritance import process_google_docstring
 
 
 def parent():
@@ -168,8 +168,7 @@ def child():
     """
 
 
-inherit_google_docstring(parent.__doc__, child)
-
+process_google_docstring(parent.__doc__, child)
 
 # The inherited docstring is
 child.__doc__ = """Parent summary.
@@ -236,25 +235,25 @@ from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 
 class Parent(metaclass=NumpyDocstringInheritanceMeta):
-    """
-    Attributes
-    ----------
-    x:
-       Description for x
-    y:
-       Description for y
-    """
+  """
+  Attributes
+  ----------
+  x:
+     Description for x
+  y:
+     Description for y
+  """
 
 
 class Child(Parent):
-    """
-    Attributes
-    ----------
-    y:
-       Overridden description for y
-    z:
-       Description for z
-    """
+  """
+  Attributes
+  ----------
+  y:
+     Overridden description for y
+  z:
+     Description for z
+  """
 
 
 # The inherited docstring is
@@ -291,22 +290,22 @@ from docstring_inheritance import GoogleDocstringInheritanceMeta
 
 
 class Parent(metaclass=GoogleDocstringInheritanceMeta):
-    def meth(self, w, x, y):
-        """
-        Args:
-            w: Description for w
-            x: Description for x
-            y: Description for y
-        """
+  def meth(self, w, x, y):
+    """
+    Args:
+        w: Description for w
+        x: Description for x
+        y: Description for y
+    """
 
 
 class Child(Parent):
-    def meth(self, w, y, z):
-        """
-        Args:
-            z: Description for z
-            y: Overridden description for y
-        """
+  def meth(self, w, y, z):
+    """
+    Args:
+        z: Description for z
+        y: Overridden description for y
+    """
 
 
 # The inherited docstring is
@@ -336,11 +335,11 @@ from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 
 class Meta(abc.ABCMeta, NumpyDocstringInheritanceMeta):
-    pass
+  pass
 
 
 class Parent(metaclass=Meta):
-    pass
+  pass
 ```
 # Similar projects
 

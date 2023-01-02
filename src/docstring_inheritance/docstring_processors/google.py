@@ -19,57 +19,50 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import textwrap
 from typing import ClassVar
-from typing import overload
 
-from . import parse_section_items
 from .base import AbstractDocstringProcessor
+from .numpy import NumpyDocstringProcessor
 
 
-class NumpyDocstringProcessor(AbstractDocstringProcessor):
-    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {
-        "Parameters",
-        "Other Parameters",
-    }
+class GoogleDocstringProcessor(AbstractDocstringProcessor):
+    _SECTION_NAMES: ClassVar[list[str | None]] = list(
+        AbstractDocstringProcessor._SECTION_NAMES
+    )
+    _SECTION_NAMES[1] = "Args"
+
+    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {"Args"}
 
     _SECTION_ITEMS_NAMES: ClassVar[set[str]] = _ARGS_SECTION_ITEMS_NAMES | {
         "Attributes",
         "Methods",
     }
 
-    MISSING_ARG_DESCRIPTION: ClassVar[
-        str
-    ] = f":\n{AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION}"
+    MISSING_ARG_DESCRIPTION = f": {AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION}"
 
     @classmethod
-    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
-        return parse_section_items(section_body)
+    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
+        return textwrap.dedent(
+            NumpyDocstringProcessor._get_section_body(reversed_section_body_lines)
+        )
 
     @classmethod
     def _parse_one_section(
         cls, line1: str, line2_rstripped: str, reversed_section_body_lines: list[str]
     ) -> tuple[str, str] | tuple[None, None]:
-        # See https://github.com/numpy/numpydoc/blob/d85f54ea342c1d223374343be88da94ce9f58dec/numpydoc/docscrape.py#L179  # noqa: B950
-        if len(line2_rstripped) >= 3 and (set(line2_rstripped) in ({"-"}, {"="})):
-            line1s = line1.rstrip()
-            min_line_length = len(line1s)
-            if line2_rstripped.startswith(
-                "-" * min_line_length
-            ) or line2_rstripped.startswith("=" * min_line_length):
-                return line1s, cls._get_section_body(reversed_section_body_lines)
+        # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: B950
+        line1s = line1.rstrip()
+        if (
+            not line1s.startswith(" ")
+            and line1s.endswith(":")
+            and line2_rstripped.startswith("  ")
+        ):
+            reversed_section_body_lines += [line2_rstripped]
+            return line1s.rstrip(" :"), cls._get_section_body(
+                reversed_section_body_lines
+            )
         return None, None
-
-    @overload
-    @classmethod
-    def _render_section(cls, section_name: None, section_body: str) -> str:
-        ...
-
-    @overload
-    @classmethod
-    def _render_section(
-        cls, section_name: str, section_body: str | dict[str, str]
-    ) -> str:
-        ...
 
     @classmethod
     def _render_section(
@@ -82,4 +75,5 @@ class NumpyDocstringProcessor(AbstractDocstringProcessor):
             section_body = "\n".join(
                 f"{key}{value}" for key, value in section_body.items()
             )
-        return f"{section_name}\n{'-' * len(section_name)}\n{section_body}"
+        section_body = textwrap.indent(section_body, " " * 4)
+        return f"{section_name}:\n{section_body}"

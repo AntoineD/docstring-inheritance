@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import abc
 import inspect
+import re
 import sys
 from itertools import dropwhile
 from itertools import tee
@@ -96,11 +97,6 @@ class AbstractDocstringProcessor:
         cls, section_name: str | None, section_body: str | dict[str, str]
     ) -> str:
         """Return a rendered docstring section."""
-
-    @classmethod
-    @abc.abstractmethod
-    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
-        """Return the section items names bound to their descriptions."""
 
     def __call__(self, parent_doc: str | None, child_func: Callable) -> None:
         if parent_doc is None:
@@ -289,3 +285,12 @@ class AbstractDocstringProcessor:
             return "\n" + rendered
 
         return rendered
+
+    _SECTION_ITEMS_REGEX = re.compile(
+        r"(\**\w+)(.*?)(?:$|(?=\n\**\w+))", flags=re.DOTALL
+    )
+
+    @classmethod
+    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
+        """Parse the section items for numpy and google docstrings."""
+        return dict(cls._SECTION_ITEMS_REGEX.findall(section_body))

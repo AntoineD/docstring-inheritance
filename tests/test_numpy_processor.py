@@ -22,7 +22,7 @@ from __future__ import annotations
 import pytest
 from test_base_processor import _test_parse_sections
 
-from docstring_inheritance.processors.numpy import NumpyDocstringProcessor
+from docstring_inheritance.docstring_processors.numpy import NumpyDocstringProcessor
 
 
 @pytest.mark.parametrize(
