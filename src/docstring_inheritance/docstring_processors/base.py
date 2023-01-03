@@ -25,7 +25,9 @@ import re
 import sys
 from itertools import dropwhile
 from itertools import tee
+from typing import Any
 from typing import Callable
+from typing import cast
 from typing import ClassVar
 from typing import Dict
 from typing import Optional
@@ -98,7 +100,7 @@ class AbstractDocstringProcessor:
     ) -> str:
         """Return a rendered docstring section."""
 
-    def __call__(self, parent_doc: str | None, child_func: Callable) -> None:
+    def __call__(self, parent_doc: str | None, child_func: Callable[..., Any]) -> None:
         if parent_doc is None:
             return
 
@@ -165,8 +167,8 @@ class AbstractDocstringProcessor:
             sections[None] = cls._get_section_body(reversed_section_body_lines)
 
         # dict.items() is not reversible in python < 3.8: cast to tuple.
-        for section_name, section_body in reversed(tuple(reversed_sections.items())):
-            sections[section_name] = section_body
+        for section_name_, section_body_ in reversed(tuple(reversed_sections.items())):
+            sections[section_name_] = section_body_
 
         return sections
 
@@ -175,7 +177,7 @@ class AbstractDocstringProcessor:
         cls,
         parent_sections: SectionsType,
         child_sections: SectionsType,
-        child_func: Callable,
+        child_func: Callable[..., Any],
     ) -> SectionsType:
         # TODO:
         # prnt_only_raises = "Raises" in parent_sections and not (
@@ -209,8 +211,12 @@ class AbstractDocstringProcessor:
         )
 
         for section_name in common_section_names_with_items:
-            temp_section_items = parent_sections[section_name].copy()
-            temp_section_items.update(child_sections[section_name])
+            temp_section_items = cast(
+                dict[str, str], parent_sections[section_name]
+            ).copy()
+            temp_section_items.update(
+                cast(dict[str, str], child_sections[section_name])
+            )
 
             if section_name in cls._ARGS_SECTION_ITEMS_NAMES:
                 temp_section_items = cls._inherit_section_items_with_args(
@@ -235,7 +241,7 @@ class AbstractDocstringProcessor:
     @classmethod
     def _inherit_section_items_with_args(
         cls,
-        func: Callable,
+        func: Callable[..., Any],
         section_items: dict[str, str],
     ) -> dict[str, str]:
         """Inherit section items for the args of a signature.

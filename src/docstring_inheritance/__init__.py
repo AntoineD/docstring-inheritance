@@ -22,23 +22,23 @@ from __future__ import annotations
 from typing import Any
 
 from .class_processor import ClassDocstringsInheritor
-from .class_processor import DocstringProcessorType
+from .class_processor import DocstringProcessor
 from .docstring_processors.google import GoogleDocstringProcessor
 from .docstring_processors.numpy import NumpyDocstringProcessor
 
-process_numpy_docstring = NumpyDocstringProcessor()
-process_google_docstring = GoogleDocstringProcessor()
+inherit_numpy_docstring = NumpyDocstringProcessor()
+inherit_google_docstring = GoogleDocstringProcessor()
 
 
 class _BaseDocstringInheritanceMeta(type):
-    """Metaclass for inheriting class docstrings with a docstring processor."""
+    """Base metaclass for inheriting class docstrings with a docstring processor."""
 
     def __init__(
         cls,
         class_name: str,
         class_bases: tuple[type],
         class_dict: dict[str, Any],
-        docstring_processor: DocstringProcessorType,
+        docstring_processor: DocstringProcessor,
     ) -> None:
         super().__init__(class_name, class_bases, class_dict)
         if class_bases:
@@ -56,7 +56,7 @@ class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
         class_bases: tuple[type],
         class_dict: dict[str, Any],
     ) -> None:
-        super().__init__(class_name, class_bases, class_dict, process_google_docstring)
+        super().__init__(class_name, class_bases, class_dict, inherit_google_docstring)
 
 
 class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
@@ -68,4 +68,4 @@ class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
         class_bases: tuple[type],
         class_dict: dict[str, Any],
     ) -> None:
-        super().__init__(class_name, class_bases, class_dict, process_numpy_docstring)
+        super().__init__(class_name, class_bases, class_dict, inherit_numpy_docstring)

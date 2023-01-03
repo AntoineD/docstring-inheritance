@@ -27,6 +27,8 @@ from .numpy import NumpyDocstringProcessor
 
 
 class GoogleDocstringProcessor(AbstractDocstringProcessor):
+    """A processor for docstrings in Google format."""
+
     _SECTION_NAMES: ClassVar[list[str | None]] = list(
         AbstractDocstringProcessor._SECTION_NAMES
     )

@@ -140,35 +140,35 @@ Use the `inherit_google_docstring` function to inherit docstrings in google form
 Use the `inherit_numpy_docstring` function to inherit docstrings in numpy format.
 
 ```python
-from docstring_inheritance import process_google_docstring
+from docstring_inheritance import inherit_google_docstring
 
 
 def parent():
-    """Parent summary.
+  """Parent summary.
 
-    Args:
-        x: Description for x.
-        y: Description for y.
+  Args:
+      x: Description for x.
+      y: Description for y.
 
-    Notes:
-        Parent notes.
-    """
+  Notes:
+      Parent notes.
+  """
 
 
 def child():
-    """
-    Args:
-        z: Description for z.
+  """
+  Args:
+      z: Description for z.
 
-    Returns:
-        Something.
+  Returns:
+      Something.
 
-    Notes:
-        Child notes.
-    """
+  Notes:
+      Child notes.
+  """
 
 
-process_google_docstring(parent.__doc__, child)
+inherit_google_docstring(parent.__doc__, child)
 
 # The inherited docstring is
 child.__doc__ = """Parent summary.

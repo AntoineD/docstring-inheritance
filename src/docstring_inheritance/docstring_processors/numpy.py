@@ -20,12 +20,13 @@
 from __future__ import annotations
 
 from typing import ClassVar
-from typing import overload
 
 from .base import AbstractDocstringProcessor
 
 
 class NumpyDocstringProcessor(AbstractDocstringProcessor):
+    """A processor for docstrings in Numpy format."""
+
     _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {
         "Parameters",
         "Other Parameters",
@@ -53,18 +54,6 @@ class NumpyDocstringProcessor(AbstractDocstringProcessor):
             ) or line2_rstripped.startswith("=" * min_line_length):
                 return line1s, cls._get_section_body(reversed_section_body_lines)
         return None, None
-
-    @overload
-    @classmethod
-    def _render_section(cls, section_name: None, section_body: str) -> str:
-        ...
-
-    @overload
-    @classmethod
-    def _render_section(
-        cls, section_name: str, section_body: str | dict[str, str]
-    ) -> str:
-        ...
 
     @classmethod
     def _render_section(
