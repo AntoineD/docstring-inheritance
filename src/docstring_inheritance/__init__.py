@@ -21,28 +21,28 @@ from __future__ import annotations
 
 from typing import Any
 
-from .class_processor import ClassDocstringsInheritor
-from .class_processor import DocstringProcessor
-from .docstring_processors.google import GoogleDocstringProcessor
-from .docstring_processors.numpy import NumpyDocstringProcessor
+from .class_docstrings_inheritor import ClassDocstringsInheritor
+from .class_docstrings_inheritor import DocstringInheritor
+from .docstring_inheritors.google import GoogleDocstringInheritor
+from .docstring_inheritors.numpy import NumpyDocstringInheritor
 
-inherit_numpy_docstring = NumpyDocstringProcessor()
-inherit_google_docstring = GoogleDocstringProcessor()
+inherit_numpy_docstring = NumpyDocstringInheritor()
+inherit_google_docstring = GoogleDocstringInheritor()
 
 
 class _BaseDocstringInheritanceMeta(type):
-    """Base metaclass for inheriting class docstrings with a docstring processor."""
+    """Base metaclass for inheriting class docstrings."""
 
     def __init__(
         cls,
         class_name: str,
         class_bases: tuple[type],
         class_dict: dict[str, Any],
-        docstring_processor: DocstringProcessor,
+        docstring_inheritor: DocstringInheritor,
     ) -> None:
         super().__init__(class_name, class_bases, class_dict)
         if class_bases:
-            inheritor = ClassDocstringsInheritor(cls, docstring_processor)
+            inheritor = ClassDocstringsInheritor(cls, docstring_inheritor)
             inheritor.inherit_class_docstring()
             inheritor.inherit_attrs_docstrings()
 

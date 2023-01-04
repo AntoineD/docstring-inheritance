@@ -20,9 +20,9 @@
 from __future__ import annotations
 
 import pytest
-from test_base_processor import _test_parse_sections
+from test_base_inheritor import _test_parse_sections
 
-from docstring_inheritance.docstring_processors.numpy import NumpyDocstringProcessor
+from docstring_inheritance.docstring_inheritors.numpy import NumpyDocstringInheritor
 
 
 @pytest.mark.parametrize(
@@ -102,7 +102,7 @@ Section body.
 )
 def test_parse_sections(unindented_docstring, expected_sections):
     _test_parse_sections(
-        NumpyDocstringProcessor._parse_sections, unindented_docstring, expected_sections
+        NumpyDocstringInheritor._parse_sections, unindented_docstring, expected_sections
     )
 
 
@@ -140,7 +140,7 @@ arg
 )
 def test_render_section(section_name, section_body, expected_docstring):
     assert (
-        NumpyDocstringProcessor._render_section(section_name, section_body)
+        NumpyDocstringInheritor._render_section(section_name, section_body)
         == expected_docstring
     )
 
@@ -155,7 +155,7 @@ def test_render_section(section_name, section_body, expected_docstring):
     ],
 )
 def test_get_section_body(section_body, expected):
-    assert NumpyDocstringProcessor._get_section_body(section_body) == expected
+    assert NumpyDocstringInheritor._get_section_body(section_body) == expected
 
 
 @pytest.mark.parametrize(
@@ -175,10 +175,10 @@ def test_get_section_body(section_body, expected):
     ],
 )
 def test_parse_one_section(line1, line2s, expected):
-    assert NumpyDocstringProcessor._parse_one_section(line1, line2s, []) == expected
+    assert NumpyDocstringInheritor._parse_one_section(line1, line2s, []) == expected
 
 
-# The following are test for methods of AbstractDocstringProcessor that depend
+# The following are test for methods of AbstractDocstringInheritor that depend
 # concrete implementation of abstract methods.
 
 
@@ -220,7 +220,7 @@ def test_parse_one_section(line1, line2s, expected):
     ],
 )
 def test_inherit_sections(parent_sections, child_sections, expected_sections):
-    new_child_sections = NumpyDocstringProcessor._inherit_sections(
+    new_child_sections = NumpyDocstringInheritor._inherit_sections(
         parent_sections, child_sections, lambda: None
     )
     assert new_child_sections == expected_sections
@@ -254,17 +254,17 @@ body""",
     ],
 )
 def test_render_docstring(sections, expected):
-    assert NumpyDocstringProcessor._render_docstring(sections) == expected
+    assert NumpyDocstringInheritor._render_docstring(sections) == expected
 
 
 def test_inherit_section_items_with_args():
     def func(arg):
         """"""
 
-    expected = {"arg": NumpyDocstringProcessor.MISSING_ARG_DESCRIPTION}
+    expected = {"arg": NumpyDocstringInheritor.MISSING_ARG_DESCRIPTION}
 
     assert (
-        NumpyDocstringProcessor._inherit_section_items_with_args(func, {}) == expected
+        NumpyDocstringInheritor._inherit_section_items_with_args(func, {}) == expected
     )
 
 

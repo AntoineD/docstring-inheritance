@@ -25,17 +25,17 @@ from typing import Any
 from typing import Callable
 from typing import Optional
 
-DocstringProcessor = Callable[[Optional[str], Callable[..., Any]], None]
+DocstringInheritor = Callable[[Optional[str], Callable[..., Any]], None]
 
 
 class ClassDocstringsInheritor:
-    """Processor for inheriting class docstrings."""
+    """A class for inheriting class docstrings."""
 
     _cls: type
     """The class to process."""
 
-    _processor: DocstringProcessor
-    """The docstring processor."""
+    _docstring_inheritor: DocstringInheritor
+    """The docstring inheritor."""
 
     _init_in_class: bool
     """Whether the ``__init__`` arguments documentation is in the class docstring."""
@@ -46,18 +46,18 @@ class ClassDocstringsInheritor:
     def __init__(
         self,
         cls: type,
-        docstring_processor: DocstringProcessor,
+        docstring_inheritor: DocstringInheritor,
     ) -> None:
         """
         Args:
             cls: The class to process.
-            docstring_processor: The docstring processor.
+            docstring_inheritor: The docstring inheritor.
         """
         # Remove the new class itself and the object class from the mro,
         # we do not want to inherit from object's docstrings.
         self.__mro_classes = cls.mro()[1:-1]
         self._cls = cls
-        self._processor = docstring_processor
+        self._docstring_inheritor = docstring_inheritor
         self._init_in_class = False
 
     def inherit_class_docstring(
@@ -67,7 +67,7 @@ class ClassDocstringsInheritor:
         func = self._get_class_dummy_func()
 
         for cls_ in self.__mro_classes:
-            self._processor(cls_.__doc__, func)
+            self._docstring_inheritor(cls_.__doc__, func)
 
         self._cls.__doc__ = func.__doc__
 
@@ -89,7 +89,7 @@ class ClassDocstringsInheritor:
             else:
                 continue
 
-            self._processor(parent_doc, attr)
+            self._docstring_inheritor(parent_doc, attr)
 
     def _get_class_dummy_func(
         self,

@@ -22,15 +22,15 @@ from __future__ import annotations
 import textwrap
 from typing import ClassVar
 
-from .base import AbstractDocstringProcessor
-from .numpy import NumpyDocstringProcessor
+from .base import AbstractDocstringInheritor
+from .numpy import NumpyDocstringInheritor
 
 
-class GoogleDocstringProcessor(AbstractDocstringProcessor):
-    """A processor for docstrings in Google format."""
+class GoogleDocstringInheritor(AbstractDocstringInheritor):
+    """A class for inheriting docstrings in Google format."""
 
     _SECTION_NAMES: ClassVar[list[str | None]] = list(
-        AbstractDocstringProcessor._SECTION_NAMES
+        AbstractDocstringInheritor._SECTION_NAMES
     )
     _SECTION_NAMES[1] = "Args"
 
@@ -41,12 +41,12 @@ class GoogleDocstringProcessor(AbstractDocstringProcessor):
         "Methods",
     }
 
-    MISSING_ARG_DESCRIPTION = f": {AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION}"
+    MISSING_ARG_DESCRIPTION = f": {AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
 
     @classmethod
     def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
         return textwrap.dedent(
-            NumpyDocstringProcessor._get_section_body(reversed_section_body_lines)
+            NumpyDocstringInheritor._get_section_body(reversed_section_body_lines)
         )
 
     @classmethod

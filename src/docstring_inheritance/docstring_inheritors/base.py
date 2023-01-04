@@ -46,7 +46,7 @@ else:
         return zip(a, b)
 
 
-class AbstractDocstringProcessor:
+class AbstractDocstringInheritor:
     """Abstract base class for inheriting a docstring."""
 
     _SECTION_NAMES: ClassVar[list[str | None]] = [

@@ -25,7 +25,7 @@ import pytest
 
 from docstring_inheritance import inherit_google_docstring
 from docstring_inheritance import inherit_numpy_docstring
-from docstring_inheritance.class_processor import ClassDocstringsInheritor
+from docstring_inheritance.class_docstrings_inheritor import ClassDocstringsInheritor
 
 
 def test_side_effect():

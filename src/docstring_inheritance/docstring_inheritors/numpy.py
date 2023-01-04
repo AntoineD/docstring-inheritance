@@ -21,11 +21,11 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from .base import AbstractDocstringProcessor
+from .base import AbstractDocstringInheritor
 
 
-class NumpyDocstringProcessor(AbstractDocstringProcessor):
-    """A processor for docstrings in Numpy format."""
+class NumpyDocstringInheritor(AbstractDocstringInheritor):
+    """A class for inheriting docstrings in Numpy format."""
 
     _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {
         "Parameters",
@@ -39,7 +39,7 @@ class NumpyDocstringProcessor(AbstractDocstringProcessor):
 
     MISSING_ARG_DESCRIPTION: ClassVar[
         str
-    ] = f":\n{AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION}"
+    ] = f":\n{AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
 
     @classmethod
     def _parse_one_section(
