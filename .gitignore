@@ -3,3 +3,4 @@
 /.tox
 /.coverage
 /htmlcov
+/coverage.xml

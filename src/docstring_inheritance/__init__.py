@@ -39,12 +39,13 @@ class _BaseDocstringInheritanceMeta(type):
         class_bases: tuple[type],
         class_dict: dict[str, Any],
         docstring_inheritor: DocstringInheritor,
+        init_in_class: bool,
     ) -> None:
         super().__init__(class_name, class_bases, class_dict)
         if class_bases:
-            inheritor = ClassDocstringsInheritor(cls, docstring_inheritor)
-            inheritor.inherit_class_docstring()
-            inheritor.inherit_attrs_docstrings()
+            ClassDocstringsInheritor.inherit_docstring(
+                cls, docstring_inheritor, init_in_class
+            )
 
 
 class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
@@ -56,7 +57,32 @@ class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
         class_bases: tuple[type],
         class_dict: dict[str, Any],
     ) -> None:
-        super().__init__(class_name, class_bases, class_dict, inherit_google_docstring)
+        super().__init__(
+            class_name,
+            class_bases,
+            class_dict,
+            inherit_google_docstring,
+            init_in_class=False,
+        )
+
+
+class GoogleDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
+    """Metaclass for inheriting docstrings in Google format with ``__init__`` in the
+    class docstring."""
+
+    def __init__(
+        self,
+        class_name: str,
+        class_bases: tuple[type],
+        class_dict: dict[str, Any],
+    ) -> None:
+        super().__init__(
+            class_name,
+            class_bases,
+            class_dict,
+            inherit_google_docstring,
+            init_in_class=True,
+        )
 
 
 class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
@@ -68,4 +94,29 @@ class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
         class_bases: tuple[type],
         class_dict: dict[str, Any],
     ) -> None:
-        super().__init__(class_name, class_bases, class_dict, inherit_numpy_docstring)
+        super().__init__(
+            class_name,
+            class_bases,
+            class_dict,
+            inherit_numpy_docstring,
+            init_in_class=False,
+        )
+
+
+class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
+    """Metaclass for inheriting docstrings in Numpy format with ``__init__`` in the
+    class docstring."""
+
+    def __init__(
+        self,
+        class_name: str,
+        class_bases: tuple[type],
+        class_dict: dict[str, Any],
+    ) -> None:
+        super().__init__(
+            class_name,
+            class_bases,
+            class_dict,
+            inherit_numpy_docstring,
+            init_in_class=True,
+        )

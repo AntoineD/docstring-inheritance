@@ -19,8 +19,8 @@
 # SOFTWARE.
 from __future__ import annotations
 
-from copy import copy
 from types import FunctionType
+from types import WrapperDescriptorType
 from typing import Any
 from typing import Callable
 from typing import Optional
@@ -47,31 +47,74 @@ class ClassDocstringsInheritor:
         self,
         cls: type,
         docstring_inheritor: DocstringInheritor,
+        init_in_class: bool,
     ) -> None:
         """
         Args:
             cls: The class to process.
             docstring_inheritor: The docstring inheritor.
+            init_in_class: Whether the ``__init__`` arguments documentation is in the
+                class docstring.
         """
         # Remove the new class itself and the object class from the mro,
-        # we do not want to inherit from object's docstrings.
+        # object's docstrings have no interest.
         self.__mro_classes = cls.mro()[1:-1]
         self._cls = cls
         self._docstring_inheritor = docstring_inheritor
-        self._init_in_class = False
+        self._init_in_class = init_in_class
 
-    def inherit_class_docstring(
+    @classmethod
+    def inherit_docstring(
+        cls,
+        class_: type,
+        docstring_inheritor: DocstringInheritor,
+        init_in_class: bool,
+    ) -> None:
+        """Create the inherited docstring for all the docstrings of the class.
+
+        Args:
+            class_: The class to process.
+            docstring_inheritor: The docstring inheritor.
+            init_in_class: Whether the ``__init__`` arguments documentation is in the
+                class docstring.
+        """
+        inheritor = cls(class_, docstring_inheritor, init_in_class)
+        inheritor._inherit_attrs_docstrings()
+        inheritor._inherit_class_docstring()
+
+    def _inherit_class_docstring(
         self,
     ) -> None:
         """Create the inherited docstring for the class docstring."""
-        func = self._get_class_dummy_func()
+        # func = self._get_class_dummy_func()
+        func = None
+        old_init_doc = None
+        init_doc_changed = False
+
+        if self._init_in_class:
+            init_method: Callable[..., None] = self._cls.__init__  # type: ignore
+            # Ignore the case when __init__ is from object since there is no docstring
+            # and its __doc__ cannot be assigned.
+            if init_method is not None and not isinstance(
+                init_method, WrapperDescriptorType
+            ):
+                old_init_doc = init_method.__doc__
+                init_method.__doc__ = self._cls.__doc__
+                func = init_method
+                init_doc_changed = True
+
+        if func is None:
+            func = self._create_dummy_func_with_doc(self._cls.__doc__)
 
         for cls_ in self.__mro_classes:
             self._docstring_inheritor(cls_.__doc__, func)
 
         self._cls.__doc__ = func.__doc__
 
-    def inherit_attrs_docstrings(
+        if self._init_in_class and init_doc_changed:
+            init_method.__doc__ = old_init_doc
+
+    def _inherit_attrs_docstrings(
         self,
     ) -> None:
         """Create the inherited docstrings for the class attributes."""
@@ -90,35 +133,6 @@ class ClassDocstringsInheritor:
                 continue
 
             self._docstring_inheritor(parent_doc, attr)
-
-    def _get_class_dummy_func(
-        self,
-    ) -> Callable[..., None]:
-        """Return a dummy function with a given docstring.
-
-        If ``self._ìnit_in_class`` is true then the function is a copy of ``__init__``.
-
-        Returns:
-            The function with the class docstring.
-        """
-        if self._init_in_class:
-            # for cls_ in self.__mro_classes:
-            #     # Since object is no longer in the MRO classes,
-            #     # there may be not __init__.
-            #     method: Callable[..., None] = getattr(cls_, "__init__")  # noqa:B009
-            #     if method is not None:
-            #         func = copy(method)
-            #         func.__doc__ = self._cls.__doc__
-            #         return func
-            # Since object is no longer in the MRO classes,
-            # there may be not __init__.
-            method: Callable[..., None] = getattr(self._cls, "__init__")  # noqa:B009
-            if method is not None:
-                func = copy(method)
-                func.__doc__ = self._cls.__doc__
-                return func
-
-        return self._create_dummy_func_with_doc(self._cls.__doc__)
 
     @staticmethod
     def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:
