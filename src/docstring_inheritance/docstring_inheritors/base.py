@@ -36,11 +36,11 @@ from typing import Union
 SectionsType = Dict[Optional[str], Union[str, Dict[str, str]]]
 
 
-if sys.version_info >= (3, 10):
+if sys.version_info >= (3, 10):  # pragma: >=3.10 cover
     from itertools import pairwise
-else:
+else:  # pragma: <3.10 cover
     # See https://docs.python.org/3/library/itertools.html#itertools.pairwise
-    def pairwise(iterable):  # pragma: no cover
+    def pairwise(iterable):
         a, b = tee(iterable)
         next(b, None)
         return zip(a, b)
@@ -212,10 +212,10 @@ class AbstractDocstringInheritor:
 
         for section_name in common_section_names_with_items:
             temp_section_items = cast(
-                dict[str, str], parent_sections[section_name]
+                Dict[str, str], parent_sections[section_name]
             ).copy()
             temp_section_items.update(
-                cast(dict[str, str], child_sections[section_name])
+                cast(Dict[str, str], child_sections[section_name])
             )
 
             if section_name in cls._ARGS_SECTION_ITEMS_NAMES:
