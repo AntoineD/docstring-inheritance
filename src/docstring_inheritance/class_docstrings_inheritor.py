@@ -86,7 +86,6 @@ class ClassDocstringsInheritor:
         self,
     ) -> None:
         """Create the inherited docstring for the class docstring."""
-        # func = self._get_class_dummy_func()
         func = None
         old_init_doc = None
         init_doc_changed = False
@@ -95,9 +94,7 @@ class ClassDocstringsInheritor:
             init_method: Callable[..., None] = self._cls.__init__  # type: ignore
             # Ignore the case when __init__ is from object since there is no docstring
             # and its __doc__ cannot be assigned.
-            if init_method is not None and not isinstance(
-                init_method, WrapperDescriptorType
-            ):
+            if not isinstance(init_method, WrapperDescriptorType):
                 old_init_doc = init_method.__doc__
                 init_method.__doc__ = self._cls.__doc__
                 func = init_method
