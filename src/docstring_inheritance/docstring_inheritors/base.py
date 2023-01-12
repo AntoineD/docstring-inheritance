@@ -47,7 +47,10 @@ else:  # pragma: <3.10 cover
 
 
 class AbstractDocstringInheritor:
-    """Abstract base class for inheriting a docstring."""
+    """Abstract base class for inheriting a docstring.
+
+    This class produces a functor, it has no state and can only be called.
+    """
 
     _SECTION_NAMES: ClassVar[list[str | None]] = [
         None,
@@ -71,8 +74,32 @@ class AbstractDocstringInheritor:
 
     MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
 
+    def __call__(self, parent_doc: str | None, child_func: Callable[..., Any]) -> None:
+        """
+        Args:
+            parent_doc: The docstring of the parent.
+            child_func: The child function which docstring inherit from the parent.
+        """
+        if parent_doc is None:
+            return
+
+        parent_sections = self._parse_sections(parent_doc)
+        child_sections = self._parse_sections(child_func.__doc__)
+        child_sections = self._inherit_sections(
+            parent_sections, child_sections, child_func
+        )
+        child_func.__doc__ = self._render_docstring(child_sections)
+
     @classmethod
     def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
+        """Create the docstring of a section.
+
+        Args:
+            reversed_section_body_lines: The lines of docstrings in reversed order.
+
+        Returns:
+            The docstring of a section.
+        """
         reversed_section_body_lines = list(
             dropwhile(lambda x: not x, reversed_section_body_lines)
         )
@@ -98,21 +125,26 @@ class AbstractDocstringInheritor:
     def _render_section(
         cls, section_name: str | None, section_body: str | dict[str, str]
     ) -> str:
-        """Return a rendered docstring section."""
+        """Return a rendered docstring section.
 
-    def __call__(self, parent_doc: str | None, child_func: Callable[..., Any]) -> None:
-        if parent_doc is None:
-            return
+        Args:
+            section_name: The name of a docstring section.
+            section_body: The body of a docstring section.
 
-        parent_sections = self._parse_sections(parent_doc)
-        child_sections = self._parse_sections(child_func.__doc__)
-        child_sections = self._inherit_sections(
-            parent_sections, child_sections, child_func
-        )
-        child_func.__doc__ = self._render_docstring(child_sections)
+        Returns:
+            The rendered docstring.
+        """
 
     @classmethod
     def _parse_sections(cls, docstring: str | None) -> SectionsType:
+        """Parse the sections of a docstring.
+
+        Args:
+            docstring: The docstring to parse.
+
+        Returns:
+            The parsed sections.
+        """
         if not docstring:
             return {}
 
@@ -179,6 +211,16 @@ class AbstractDocstringInheritor:
         child_sections: SectionsType,
         child_func: Callable[..., Any],
     ) -> SectionsType:
+        """Inherit the sections of a child from the parent sections.
+
+        Args:
+            parent_sections: The parent docstring sections.
+            child_sections: The child docstring sections.
+            child_func: The child function which sections inherit from the parent.
+
+        Returns:
+            The inherited sections.
+        """
         # TODO:
         # prnt_only_raises = "Raises" in parent_sections and not (
         #     "Returns" in parent_sections or "Yields" in parent_sections
@@ -249,6 +291,13 @@ class AbstractDocstringInheritor:
         The argument ``self`` is removed. The arguments are ordered according to the
         signature of ``func``. An argument of ``func`` missing in ``section_items`` gets
         a default description defined in :attr:`.MISSING_ARG_DESCRIPTION`.
+
+        Args:
+            func: The function that provides the signature.
+            section_items: The docstring section items.
+
+        Returns:
+            The section items filtered with the function signature.
         """
         args, varargs, varkw, _, kwonlyargs = inspect.getfullargspec(func)[:5]
 
@@ -275,6 +324,14 @@ class AbstractDocstringInheritor:
 
     @classmethod
     def _render_docstring(cls, sections: SectionsType) -> str:
+        """Render a docstring.
+
+        Args:
+            sections: The docstring sections to render.
+
+        Returns:
+            The rendered docstring.
+        """
         if not sections:
             return ""
 
@@ -298,5 +355,12 @@ class AbstractDocstringInheritor:
 
     @classmethod
     def _parse_section_items(cls, section_body: str) -> dict[str, str]:
-        """Parse the section items for numpy and google docstrings."""
+        """Parse the section items for numpy and google docstrings.
+
+        Args:
+            section_body: The body of a docstring section.
+
+        Returns:
+            The parsed section body.
+        """
         return dict(cls._SECTION_ITEMS_REGEX.findall(section_body))
