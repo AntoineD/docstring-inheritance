@@ -25,7 +25,7 @@ such that its derived classes fully or partly inherit the docstrings.
 - Handle docstrings for functions, classes, methods, class methods, static methods, properties.
 - Handle docstrings for classes with multiple or multi-level inheritance.
 - Docstring sections are inherited individually,
-  like methods for a classes.
+  like methods.
 - For docstring sections documenting signatures,
   the signature arguments are inherited individually.
 - Minimum performance cost: the inheritance is performed at import time,
@@ -67,9 +67,15 @@ The docstring inheritance is performed for the docstrings of the:
 - staticmethods
 - properties
 
-Use the `NumpyDocstringInheritanceMeta` metaclass to inherit docstrings in numpy format.
+Use the `NumpyDocstringInheritanceMeta` metaclass to inherit docstrings in numpy format
+if `__init__` method is documented in its own docstring.
+Otherwise, if `__init__` method is documented in the class docstring,
+use the `NumpyDocstringInheritanceInitMeta` metaclass.
 
 Use the `GoogleDocstringInheritanceMeta` metaclass to inherit docstrings in google format.
+if `__init__` method is documented in its own docstring.
+Otherwise, if `__init__` method is documented in the class docstring,
+use the `GoogleDocstringInheritanceInitMeta` metaclass.
 
 ```python
 from docstring_inheritance import NumpyDocstringInheritanceMeta
@@ -111,7 +117,7 @@ class Child(Parent):
 
 
 # The inherited docstring is
-Child.meth.__doc__ = """Parent summary.
+Child.meth.__doc__ == """Parent summary.
 
 Parameters
 ----------
@@ -171,7 +177,7 @@ def child():
 inherit_google_docstring(parent.__doc__, child)
 
 # The inherited docstring is
-child.__doc__ = """Parent summary.
+child.__doc__ == """Parent summary.
 
 Args:
     x: Description for x.
@@ -257,7 +263,7 @@ class Child(Parent):
 
 
 # The inherited docstring is
-Child.__doc__ = """
+Child.__doc__ == """
 Attributes
 ----------
 x:
@@ -309,7 +315,7 @@ class Child(Parent):
 
 
 # The inherited docstring is
-Child.meth.__doc__ = """
+Child.meth.__doc__ == """
 Args:
     w: Description for w
     y: Overridden description for y
