@@ -21,9 +21,14 @@ from __future__ import annotations
 
 import abc
 import inspect
+import re
 import sys
+from itertools import dropwhile
 from itertools import tee
+from typing import Any
 from typing import Callable
+from typing import cast
+from typing import ClassVar
 from typing import Dict
 from typing import Optional
 from typing import Union
@@ -41,23 +46,65 @@ else:  # pragma: <3.10 cover
         return zip(a, b)
 
 
-class AbstractDocstringProcessor:
-    """Abstract base class for inheriting a docstring."""
+class AbstractDocstringInheritor:
+    """Abstract base class for inheriting a docstring.
 
-    _SECTION_NAMES: list[str | None]
-    _ARGS_SECTION_ITEMS_NAMES: set[str]
-    _SECTION_ITEMS_NAMES: set[str]
+    This class produces a functor, it has no state and can only be called.
+    """
 
-    # Description without formatting.
-    MISSING_ARG_DESCRIPTION = "The description is missing."
+    _SECTION_NAMES: ClassVar[list[str | None]] = [
+        None,
+        "Parameters",
+        "Returns",
+        "Yields",
+        "Receives",
+        "Other Parameters",
+        "Attributes",
+        "Methods",
+        "Raises",
+        "Warns",
+        "Warnings",
+        "See Also",
+        "Notes",
+        "References",
+        "Examples",
+    ]
+    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]]
+    _SECTION_ITEMS_NAMES: ClassVar[set[str]]
+
+    MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
+
+    def __call__(self, parent_doc: str | None, child_func: Callable[..., Any]) -> None:
+        """
+        Args:
+            parent_doc: The docstring of the parent.
+            child_func: The child function which docstring inherit from the parent.
+        """
+        if parent_doc is None:
+            return
+
+        parent_sections = self._parse_sections(parent_doc)
+        child_sections = self._parse_sections(child_func.__doc__)
+        child_sections = self._inherit_sections(
+            parent_sections, child_sections, child_func
+        )
+        child_func.__doc__ = self._render_docstring(child_sections)
 
     @classmethod
-    @abc.abstractmethod
     def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
-        """Return the docstring part from reversed lines of a docstring section body.
+        """Create the docstring of a section.
 
-        The trailing empty lines are removed.
+        Args:
+            reversed_section_body_lines: The lines of docstrings in reversed order.
+
+        Returns:
+            The docstring of a section.
         """
+        reversed_section_body_lines = list(
+            dropwhile(lambda x: not x, reversed_section_body_lines)
+        )
+        reversed_section_body_lines.reverse()
+        return "\n".join(reversed_section_body_lines)
 
     @classmethod
     @abc.abstractmethod
@@ -70,7 +117,7 @@ class AbstractDocstringProcessor:
 
         Returns:
             The name and docstring body parts of a section,
-            or `(None, None)` if no section is found.
+            or ``(None, None)`` if no section is found.
         """
 
     @classmethod
@@ -78,26 +125,26 @@ class AbstractDocstringProcessor:
     def _render_section(
         cls, section_name: str | None, section_body: str | dict[str, str]
     ) -> str:
-        """Return a rendered docstring section."""
+        """Return a rendered docstring section.
 
-    @classmethod
-    @abc.abstractmethod
-    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
-        """Return the section items names bound to their descriptions."""
+        Args:
+            section_name: The name of a docstring section.
+            section_body: The body of a docstring section.
 
-    def __call__(self, parent_doc: str | None, child_func: Callable) -> None:
-        if parent_doc is None:
-            return
-
-        parent_sections = self._parse_sections(parent_doc)
-        child_sections = self._parse_sections(child_func.__doc__)
-        child_sections = self._inherit_sections(
-            parent_sections, child_sections, child_func
-        )
-        child_func.__doc__ = self._render_docstring(child_sections)
+        Returns:
+            The rendered docstring.
+        """
 
     @classmethod
     def _parse_sections(cls, docstring: str | None) -> SectionsType:
+        """Parse the sections of a docstring.
+
+        Args:
+            docstring: The docstring to parse.
+
+        Returns:
+            The parsed sections.
+        """
         if not docstring:
             return {}
 
@@ -152,8 +199,8 @@ class AbstractDocstringProcessor:
             sections[None] = cls._get_section_body(reversed_section_body_lines)
 
         # dict.items() is not reversible in python < 3.8: cast to tuple.
-        for section_name, section_body in reversed(tuple(reversed_sections.items())):
-            sections[section_name] = section_body
+        for section_name_, section_body_ in reversed(tuple(reversed_sections.items())):
+            sections[section_name_] = section_body_
 
         return sections
 
@@ -162,8 +209,18 @@ class AbstractDocstringProcessor:
         cls,
         parent_sections: SectionsType,
         child_sections: SectionsType,
-        child_func: Callable,
+        child_func: Callable[..., Any],
     ) -> SectionsType:
+        """Inherit the sections of a child from the parent sections.
+
+        Args:
+            parent_sections: The parent docstring sections.
+            child_sections: The child docstring sections.
+            child_func: The child function which sections inherit from the parent.
+
+        Returns:
+            The inherited sections.
+        """
         # TODO:
         # prnt_only_raises = "Raises" in parent_sections and not (
         #     "Returns" in parent_sections or "Yields" in parent_sections
@@ -196,8 +253,12 @@ class AbstractDocstringProcessor:
         )
 
         for section_name in common_section_names_with_items:
-            temp_section_items = parent_sections[section_name].copy()
-            temp_section_items.update(child_sections[section_name])
+            temp_section_items = cast(
+                Dict[str, str], parent_sections[section_name]
+            ).copy()
+            temp_section_items.update(
+                cast(Dict[str, str], child_sections[section_name])
+            )
 
             if section_name in cls._ARGS_SECTION_ITEMS_NAMES:
                 temp_section_items = cls._inherit_section_items_with_args(
@@ -214,7 +275,7 @@ class AbstractDocstringProcessor:
             if section_name in temp_sections
         }
 
-        # Add the remaining non standard sections.
+        # Add the remaining non-standard sections.
         new_child_sections.update(temp_sections)
 
         return new_child_sections
@@ -222,14 +283,21 @@ class AbstractDocstringProcessor:
     @classmethod
     def _inherit_section_items_with_args(
         cls,
-        func: Callable,
+        func: Callable[..., Any],
         section_items: dict[str, str],
     ) -> dict[str, str]:
         """Inherit section items for the args of a signature.
 
-        The argument `self` is removed. The arguments are ordered according to the
-        signature of `func`. An argument of `func` missing in `section_items` gets a
-        default description defined in :attr:`.MISSING_ARG_DESCRIPTION`.
+        The argument ``self`` is removed. The arguments are ordered according to the
+        signature of ``func``. An argument of ``func`` missing in ``section_items`` gets
+        a default description defined in :attr:`.MISSING_ARG_DESCRIPTION`.
+
+        Args:
+            func: The function that provides the signature.
+            section_items: The docstring section items.
+
+        Returns:
+            The section items filtered with the function signature.
         """
         args, varargs, varkw, _, kwonlyargs = inspect.getfullargspec(func)[:5]
 
@@ -256,6 +324,14 @@ class AbstractDocstringProcessor:
 
     @classmethod
     def _render_docstring(cls, sections: SectionsType) -> str:
+        """Render a docstring.
+
+        Args:
+            sections: The docstring sections to render.
+
+        Returns:
+            The rendered docstring.
+        """
         if not sections:
             return ""
 
@@ -272,3 +348,19 @@ class AbstractDocstringProcessor:
             return "\n" + rendered
 
         return rendered
+
+    _SECTION_ITEMS_REGEX = re.compile(
+        r"(\**\w+)(.*?)(?:$|(?=\n\**\w+))", flags=re.DOTALL
+    )
+
+    @classmethod
+    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
+        """Parse the section items for numpy and google docstrings.
+
+        Args:
+            section_body: The body of a docstring section.
+
+        Returns:
+            The parsed section body.
+        """
+        return dict(cls._SECTION_ITEMS_REGEX.findall(section_body))

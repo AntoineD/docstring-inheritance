@@ -19,47 +19,27 @@
 # SOFTWARE.
 from __future__ import annotations
 
-from itertools import dropwhile
+from typing import ClassVar
 
-from . import parse_section_items
-from .base import AbstractDocstringProcessor
+from .base import AbstractDocstringInheritor
 
 
-class NumpyDocstringProcessor(AbstractDocstringProcessor):
+class NumpyDocstringInheritor(AbstractDocstringInheritor):
+    """A class for inheriting docstrings in Numpy format."""
 
-    _SECTION_NAMES = [
-        None,
-        "Parameters",
-        "Returns",
-        "Yields",
-        "Receives",
-        "Other Parameters",
-        "Attributes",
-        "Methods",
-        "Raises",
-        "Warns",
-        "Warnings",
-        "See Also",
-        "Notes",
-        "References",
-        "Examples",
-    ]
-
-    _ARGS_SECTION_ITEMS_NAMES = {
+    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {
         "Parameters",
         "Other Parameters",
     }
 
-    _SECTION_ITEMS_NAMES = _ARGS_SECTION_ITEMS_NAMES | {
+    _SECTION_ITEMS_NAMES: ClassVar[set[str]] = _ARGS_SECTION_ITEMS_NAMES | {
         "Attributes",
         "Methods",
     }
 
-    MISSING_ARG_DESCRIPTION = f":\n{AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION}"
-
-    @classmethod
-    def _parse_section_items(cls, section_body: str) -> dict[str, str]:
-        return parse_section_items(section_body)
+    MISSING_ARG_DESCRIPTION: ClassVar[
+        str
+    ] = f":\n{AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
 
     @classmethod
     def _parse_one_section(
@@ -76,18 +56,11 @@ class NumpyDocstringProcessor(AbstractDocstringProcessor):
         return None, None
 
     @classmethod
-    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
-        reversed_section_body_lines = list(
-            dropwhile(lambda x: not x, reversed_section_body_lines)
-        )
-        reversed_section_body_lines.reverse()
-        return "\n".join(reversed_section_body_lines)
-
-    @classmethod
     def _render_section(
         cls, section_name: str | None, section_body: str | dict[str, str]
     ) -> str:
         if section_name is None:
+            assert isinstance(section_body, str)
             return section_body
         if isinstance(section_body, dict):
             section_body = "\n".join(

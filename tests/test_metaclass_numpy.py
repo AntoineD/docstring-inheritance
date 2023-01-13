@@ -21,7 +21,15 @@ from __future__ import annotations
 
 from inspect import getdoc
 
+import pytest
+
+from docstring_inheritance import NumpyDocstringInheritanceInitMeta
 from docstring_inheritance import NumpyDocstringInheritanceMeta
+
+parametrize_inheritance = pytest.mark.parametrize(
+    "inheritance_class",
+    (NumpyDocstringInheritanceMeta, NumpyDocstringInheritanceInitMeta),
+)
 
 
 def assert_args_inheritance(cls):
@@ -39,8 +47,9 @@ y: float
     assert cls.meth.__doc__ == excepted
 
 
-def test_args_inheritance_parent_meta():
-    class Parent(metaclass=NumpyDocstringInheritanceMeta):
+@parametrize_inheritance
+def test_args_inheritance_parent_meta(inheritance_class):
+    class Parent(metaclass=inheritance_class):
         def meth(self, w, x, *args, y=None, **kwargs):
             """
             Parameters
@@ -63,7 +72,8 @@ def test_args_inheritance_parent_meta():
     assert_args_inheritance(Child)
 
 
-def test_args_inheritance_child_meta():
+@parametrize_inheritance
+def test_args_inheritance_child_meta(inheritance_class):
     class Parent:
         def meth(self, w, x, *args, y=None, **kwargs):
             """
@@ -76,7 +86,7 @@ def test_args_inheritance_child_meta():
             **kwargs: int
             """
 
-    class Child(Parent, metaclass=NumpyDocstringInheritanceMeta):
+    class Child(Parent, metaclass=inheritance_class):
         def meth(self, xx, x, *args, yy=None, y=None, **kwargs):
             """
             Parameters
@@ -96,8 +106,9 @@ def assert_missing_attr(cls):
     assert cls.prop.__doc__ == excepted
 
 
-def test_missing_parent_attr_parent_meta():
-    class Parent(metaclass=NumpyDocstringInheritanceMeta):
+@parametrize_inheritance
+def test_missing_parent_attr_parent_meta(inheritance_class):
+    class Parent(metaclass=inheritance_class):
         pass
 
     class Child(Parent):
@@ -119,11 +130,12 @@ def test_missing_parent_attr_parent_meta():
     assert_missing_attr(Child)
 
 
-def test_missing_parent_attr_child_meta():
+@parametrize_inheritance
+def test_missing_parent_attr_child_meta(inheritance_class):
     class Parent:
         pass
 
-    class Child(Parent, metaclass=NumpyDocstringInheritanceMeta):
+    class Child(Parent, metaclass=inheritance_class):
         def method(self, xx, x, *args, yy=None, y=None, **kwargs):
             """Summary"""
 
@@ -142,8 +154,9 @@ def test_missing_parent_attr_child_meta():
     assert_missing_attr(Child)
 
 
-def test_missing_parent_doc_for_attr_parent_meta():
-    class Parent(metaclass=NumpyDocstringInheritanceMeta):
+@parametrize_inheritance
+def test_missing_parent_doc_for_attr_parent_meta(inheritance_class):
+    class Parent(metaclass=inheritance_class):
         def method(self):
             pass
 
@@ -178,7 +191,8 @@ def test_missing_parent_doc_for_attr_parent_meta():
     assert_missing_attr(Child)
 
 
-def test_missing_parent_doc_for_attr_child_meta():
+@parametrize_inheritance
+def test_missing_parent_doc_for_attr_child_meta(inheritance_class):
     class Parent:
         def method(self):
             pass
@@ -195,7 +209,7 @@ def test_missing_parent_doc_for_attr_child_meta():
         def prop(self):
             pass
 
-    class Child(Parent, metaclass=NumpyDocstringInheritanceMeta):
+    class Child(Parent, metaclass=inheritance_class):
         def method(self, xx, x, *args, yy=None, y=None, **kwargs):
             """Summary"""
 
@@ -229,8 +243,9 @@ method2"""
     assert getdoc(cls) == excepted
 
 
-def test_multiple_inheritance_parent_meta():
-    class Parent1(metaclass=NumpyDocstringInheritanceMeta):
+@parametrize_inheritance
+def test_multiple_inheritance_parent_meta(inheritance_class):
+    class Parent1(metaclass=inheritance_class):
         """Parent summary
 
         Attributes
@@ -260,7 +275,8 @@ def test_multiple_inheritance_parent_meta():
     assert_multiple_inheritance(Child)
 
 
-def test_multiple_inheritance_child_meta():
+@parametrize_inheritance
+def test_multiple_inheritance_child_meta(inheritance_class):
     class Parent1:
         """Parent summary
 
@@ -277,7 +293,7 @@ def test_multiple_inheritance_child_meta():
         method1
         """
 
-    class Child(Parent1, Parent2, metaclass=NumpyDocstringInheritanceMeta):
+    class Child(Parent1, Parent2, metaclass=inheritance_class):
         """
         Attributes
         ----------
@@ -291,8 +307,9 @@ def test_multiple_inheritance_child_meta():
     assert_multiple_inheritance(Child)
 
 
-def test_several_parents_parent_meta():
-    class GrandParent(metaclass=NumpyDocstringInheritanceMeta):
+@parametrize_inheritance
+def test_several_parents_parent_meta(inheritance_class):
+    class GrandParent(metaclass=inheritance_class):
         """GrandParent summary
 
         Attributes
@@ -322,7 +339,8 @@ def test_several_parents_parent_meta():
     assert_multiple_inheritance(Child)
 
 
-def test_several_parents_child_meta():
+@parametrize_inheritance
+def test_several_parents_child_meta(inheritance_class):
     class GrandParent:
         """GrandParent summary
 
@@ -339,7 +357,7 @@ def test_several_parents_child_meta():
         method1
         """
 
-    class Child(Parent, metaclass=NumpyDocstringInheritanceMeta):
+    class Child(Parent, metaclass=inheritance_class):
         """
         Attributes
         ----------
@@ -353,23 +371,22 @@ def test_several_parents_child_meta():
     assert_multiple_inheritance(Child)
 
 
-def test_do_not_inherit_object_parent_meta():
-    class Parent(metaclass=NumpyDocstringInheritanceMeta):
-        def __init__(self):
-            pass
-
-    class Child(Parent):
-        pass
-
-    assert Child.__init__.__doc__ is None
-
-
-def test_do_not_inherit_object_child_meta():
+@parametrize_inheritance
+def test_do_not_inherit_object_child_meta(inheritance_class):
     class Parent:
         def __init__(self):
             pass
 
-    class Child(Parent, metaclass=NumpyDocstringInheritanceMeta):
+    class Child(Parent, metaclass=inheritance_class):
         pass
 
     assert Child.__init__.__doc__ is None
+
+
+@parametrize_inheritance
+def test_do_not_inherit_from_object(inheritance_class):
+    class Parent(metaclass=inheritance_class):
+        def __init__(self):
+            pass
+
+    assert Parent.__init__.__doc__ is None

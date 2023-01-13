@@ -23,8 +23,7 @@ import textwrap
 
 import pytest
 
-from docstring_inheritance.processors import parse_section_items
-from docstring_inheritance.processors.base import AbstractDocstringProcessor
+from docstring_inheritance.docstring_inheritors.base import AbstractDocstringInheritor
 
 
 def _test_parse_sections(parse_sections, unindented_docstring, expected_sections):
@@ -53,7 +52,10 @@ def _test_parse_sections(parse_sections, unindented_docstring, expected_sections
     ),
 )
 def test_section_items_regex(section_body, expected_matches):
-    assert parse_section_items(section_body) == expected_matches
+    assert (
+        AbstractDocstringInheritor._parse_section_items(section_body)
+        == expected_matches
+    )
 
 
 def func_none():
@@ -112,7 +114,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
         (
             func_args_kwonlyargs,
             {"arg1": ""},
-            {"arg1": "", "arg2": AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION},
+            {"arg1": "", "arg2": AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION},
         ),
         # Args are ordered according to the signature.
         (
@@ -124,7 +126,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
         (
             func_varargs,
             {},
-            {"*varargs": AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION},
+            {"*varargs": AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION},
         ),
         (
             func_varargs,
@@ -135,7 +137,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
         (
             func_varkw,
             {},
-            {"**varkw": AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION},
+            {"**varkw": AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION},
         ),
         (
             func_varkw,
@@ -146,7 +148,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
         (
             func_kwonlyargs,
             {},
-            {"arg": AbstractDocstringProcessor.MISSING_ARG_DESCRIPTION},
+            {"arg": AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION},
         ),
         (
             func_kwonlyargs,
@@ -181,6 +183,6 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
 )
 def test_inherit_section_items_with_args(func, section_items, expected):
     assert (
-        AbstractDocstringProcessor._inherit_section_items_with_args(func, section_items)
+        AbstractDocstringInheritor._inherit_section_items_with_args(func, section_items)
         == expected
     )

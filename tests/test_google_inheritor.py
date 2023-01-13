@@ -20,9 +20,9 @@
 from __future__ import annotations
 
 import pytest
-from test_base_processor import _test_parse_sections
+from test_base_inheritor import _test_parse_sections
 
-from docstring_inheritance import GoogleDocstringProcessor
+from docstring_inheritance import GoogleDocstringInheritor
 
 
 @pytest.mark.parametrize(
@@ -98,7 +98,7 @@ Section body.
 )
 def test_parse_sections(unindented_docstring, expected_sections):
     _test_parse_sections(
-        GoogleDocstringProcessor._parse_sections,
+        GoogleDocstringInheritor._parse_sections,
         unindented_docstring,
         expected_sections,
     )
@@ -135,7 +135,7 @@ Section name:
 )
 def test_render_section(section_name, section_body, expected_docstring):
     assert (
-        GoogleDocstringProcessor._render_section(section_name, section_body)
+        GoogleDocstringInheritor._render_section(section_name, section_body)
         == expected_docstring
     )
 
@@ -150,7 +150,7 @@ def test_render_section(section_name, section_body, expected_docstring):
     ],
 )
 def test_get_section_body(section_body, expected):
-    assert GoogleDocstringProcessor._get_section_body(section_body) == expected
+    assert GoogleDocstringInheritor._get_section_body(section_body) == expected
 
 
 @pytest.mark.parametrize(
@@ -166,7 +166,7 @@ def test_get_section_body(section_body, expected):
     ],
 )
 def test_parse_one_section(line1, line2s, expected):
-    assert GoogleDocstringProcessor._parse_one_section(line1, line2s, []) == expected
+    assert GoogleDocstringInheritor._parse_one_section(line1, line2s, []) == expected
 
 
 @pytest.mark.parametrize(
@@ -193,17 +193,17 @@ name:
     ],
 )
 def test_render_docstring(sections, expected):
-    assert GoogleDocstringProcessor._render_docstring(sections) == expected
+    assert GoogleDocstringInheritor._render_docstring(sections) == expected
 
 
 def test_inherit_section_items_with_args():
     def func(arg):
         """"""
 
-    expected = {"arg": GoogleDocstringProcessor.MISSING_ARG_DESCRIPTION}
+    expected = {"arg": GoogleDocstringInheritor.MISSING_ARG_DESCRIPTION}
 
     assert (
-        GoogleDocstringProcessor._inherit_section_items_with_args(func, {}) == expected
+        GoogleDocstringInheritor._inherit_section_items_with_args(func, {}) == expected
     )
 
 

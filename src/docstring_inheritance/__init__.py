@@ -19,31 +19,104 @@
 # SOFTWARE.
 from __future__ import annotations
 
-from typing import Callable
-from typing import Optional
+from typing import Any
 
-from .metaclass import AbstractDocstringInheritanceMeta
-from .processors.google import GoogleDocstringProcessor
-from .processors.numpy import NumpyDocstringProcessor
+from .class_docstrings_inheritor import ClassDocstringsInheritor
+from .class_docstrings_inheritor import DocstringInheritor
+from .docstring_inheritors.google import GoogleDocstringInheritor
+from .docstring_inheritors.numpy import NumpyDocstringInheritor
 
-DocstringProcessorType = Callable[[Optional[str], Callable], None]
-
-inherit_numpy_docstring = NumpyDocstringProcessor()
-inherit_google_docstring = GoogleDocstringProcessor()
+inherit_numpy_docstring = NumpyDocstringInheritor()
+inherit_google_docstring = GoogleDocstringInheritor()
 
 
-def DocstringInheritanceMeta(  # noqa: N802
-    docstring_processor: DocstringProcessorType,
-) -> type:
-    metaclass = type(
-        AbstractDocstringInheritanceMeta.__name__,
-        AbstractDocstringInheritanceMeta.__bases__,
-        dict(AbstractDocstringInheritanceMeta.__dict__),
-    )
-    metaclass.docstring_processor = docstring_processor
-    return metaclass
+class _BaseDocstringInheritanceMeta(type):
+    """Base metaclass for inheriting class docstrings."""
+
+    def __init__(
+        cls,
+        class_name: str,
+        class_bases: tuple[type],
+        class_dict: dict[str, Any],
+        docstring_inheritor: DocstringInheritor,
+        init_in_class: bool,
+    ) -> None:
+        super().__init__(class_name, class_bases, class_dict)
+        if class_bases:
+            ClassDocstringsInheritor.inherit_docstring(
+                cls, docstring_inheritor, init_in_class
+            )
 
 
-# Helper metaclasses for each docstring styles.
-NumpyDocstringInheritanceMeta = DocstringInheritanceMeta(inherit_numpy_docstring)
-GoogleDocstringInheritanceMeta = DocstringInheritanceMeta(inherit_google_docstring)
+class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
+    """Metaclass for inheriting docstrings in Google format."""
+
+    def __init__(
+        self,
+        class_name: str,
+        class_bases: tuple[type],
+        class_dict: dict[str, Any],
+    ) -> None:
+        super().__init__(
+            class_name,
+            class_bases,
+            class_dict,
+            inherit_google_docstring,
+            init_in_class=False,
+        )
+
+
+class GoogleDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
+    """Metaclass for inheriting docstrings in Google format with ``__init__`` in the
+    class docstring."""
+
+    def __init__(
+        self,
+        class_name: str,
+        class_bases: tuple[type],
+        class_dict: dict[str, Any],
+    ) -> None:
+        super().__init__(
+            class_name,
+            class_bases,
+            class_dict,
+            inherit_google_docstring,
+            init_in_class=True,
+        )
+
+
+class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
+    """Metaclass for inheriting docstrings in Numpy format."""
+
+    def __init__(
+        self,
+        class_name: str,
+        class_bases: tuple[type],
+        class_dict: dict[str, Any],
+    ) -> None:
+        super().__init__(
+            class_name,
+            class_bases,
+            class_dict,
+            inherit_numpy_docstring,
+            init_in_class=False,
+        )
+
+
+class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
+    """Metaclass for inheriting docstrings in Numpy format with ``__init__`` in the
+    class docstring."""
+
+    def __init__(
+        self,
+        class_name: str,
+        class_bases: tuple[type],
+        class_dict: dict[str, Any],
+    ) -> None:
+        super().__init__(
+            class_name,
+            class_bases,
+            class_dict,
+            inherit_numpy_docstring,
+            init_in_class=True,
+        )

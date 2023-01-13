@@ -19,11 +19,20 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import pytest
+
+from docstring_inheritance import GoogleDocstringInheritanceInitMeta
 from docstring_inheritance import GoogleDocstringInheritanceMeta
 
+parametrize_inheritance = pytest.mark.parametrize(
+    "inheritance_class",
+    (GoogleDocstringInheritanceMeta, GoogleDocstringInheritanceInitMeta),
+)
 
-def test_args_inheritance():
-    class Parent(metaclass=GoogleDocstringInheritanceMeta):
+
+@parametrize_inheritance
+def test_args_inheritance(inheritance_class):
+    class Parent(metaclass=inheritance_class):
         def meth(self, w, x, *args, y=None, **kwargs):
             """
             Args:
@@ -53,8 +62,9 @@ Args:
     assert Child.meth.__doc__ == excepted
 
 
-def test_several_inheritance():
-    class GrandParent(metaclass=GoogleDocstringInheritanceMeta):
+@parametrize_inheritance
+def test_class_doc_inheritance(inheritance_class):
+    class GrandParent(metaclass=inheritance_class):
         """Class GrandParent.
 
         Attributes:
@@ -107,12 +117,50 @@ Note:
     assert Child.__doc__ == excepted
 
 
-def test_do_not_inherit_object():
-    class Parent(metaclass=GoogleDocstringInheritanceMeta):
+@parametrize_inheritance
+def test_do_not_inherit_from_object(inheritance_class):
+    class Parent(metaclass=inheritance_class):
         def __init__(self):
             pass
 
-    class Child(Parent):
-        pass
+    assert Parent.__init__.__doc__ is None
 
+
+def test_class_doc_inheritance_with_init():
+    class Parent(metaclass=GoogleDocstringInheritanceInitMeta):
+        """Class Parent.
+
+        Args:
+            a: a from Parent.
+            b: b from Parent.
+        """
+
+        def __init__(self, a, b):
+            pass
+
+    class Child(Parent):
+        """Class Child.
+
+        Args:
+            c: c from Child.
+
+        Note:
+            From Child.
+        """
+
+        def __init__(self, b, c):
+            pass
+
+    excepted = """\
+Class Child.
+
+Args:
+    b: b from Parent.
+    c: c from Child.
+
+Note:
+    From Child.\
+"""
+
+    assert Child.__doc__ == excepted
     assert Child.__init__.__doc__ is None

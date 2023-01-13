@@ -25,7 +25,7 @@ import pytest
 
 from docstring_inheritance import inherit_google_docstring
 from docstring_inheritance import inherit_numpy_docstring
-from docstring_inheritance.metaclass import create_dummy_func_with_doc
+from docstring_inheritance.class_docstrings_inheritor import ClassDocstringsInheritor
 
 
 def test_side_effect():
@@ -147,6 +147,6 @@ Todo:
 def test_simple(
     inherit_docstring, parent_docstring, child_docstring, expected_docstring
 ):
-    dummy_func = create_dummy_func_with_doc(child_docstring)
+    dummy_func = ClassDocstringsInheritor._create_dummy_func_with_doc(child_docstring)
     inherit_docstring(parent_docstring, dummy_func)
     assert dummy_func.__doc__ == expected_docstring
