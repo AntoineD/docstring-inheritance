@@ -44,13 +44,13 @@ The description is missing.
 y: float
 **kwargs: int"""
 
-    assert cls.meth.__doc__ == excepted
+    assert cls.method.__doc__ == excepted
 
 
 @parametrize_inheritance
 def test_args_inheritance_parent_meta(inheritance_class):
     class Parent(metaclass=inheritance_class):
-        def meth(self, w, x, *args, y=None, **kwargs):
+        def method(self, w, x, *args, y=None, **kwargs):
             """
             Parameters
             ----------
@@ -62,7 +62,7 @@ def test_args_inheritance_parent_meta(inheritance_class):
             """
 
     class Child(Parent):
-        def meth(self, xx, x, *args, yy=None, y=None, **kwargs):
+        def method(self, xx, x, *args, yy=None, y=None, **kwargs):
             """
             Parameters
             ----------
@@ -75,7 +75,7 @@ def test_args_inheritance_parent_meta(inheritance_class):
 @parametrize_inheritance
 def test_args_inheritance_child_meta(inheritance_class):
     class Parent:
-        def meth(self, w, x, *args, y=None, **kwargs):
+        def method(self, w, x, *args, y=None, **kwargs):
             """
             Parameters
             ----------
@@ -87,7 +87,7 @@ def test_args_inheritance_child_meta(inheritance_class):
             """
 
     class Child(Parent, metaclass=inheritance_class):
-        def meth(self, xx, x, *args, yy=None, y=None, **kwargs):
+        def method(self, xx, x, *args, yy=None, y=None, **kwargs):
             """
             Parameters
             ----------
@@ -97,7 +97,7 @@ def test_args_inheritance_child_meta(inheritance_class):
     assert_args_inheritance(Child)
 
 
-def assert_missing_attr(cls):
+def assert_docstring(cls):
     excepted = "Summary"
 
     assert cls.method.__doc__ == excepted
@@ -127,7 +127,7 @@ def test_missing_parent_attr_parent_meta(inheritance_class):
         def prop(self):
             """Summary"""
 
-    assert_missing_attr(Child)
+    assert_docstring(Child)
 
 
 @parametrize_inheritance
@@ -151,7 +151,7 @@ def test_missing_parent_attr_child_meta(inheritance_class):
         def prop(self):
             """Summary"""
 
-    assert_missing_attr(Child)
+    assert_docstring(Child)
 
 
 @parametrize_inheritance
@@ -188,7 +188,7 @@ def test_missing_parent_doc_for_attr_parent_meta(inheritance_class):
         def prop(self):
             """Summary"""
 
-    assert_missing_attr(Child)
+    assert_docstring(Child)
 
 
 @parametrize_inheritance
@@ -225,7 +225,7 @@ def test_missing_parent_doc_for_attr_child_meta(inheritance_class):
         def prop(self):
             """Summary"""
 
-    assert_missing_attr(Child)
+    assert_docstring(Child)
 
 
 def assert_multiple_inheritance(cls):
@@ -305,6 +305,58 @@ def test_multiple_inheritance_child_meta(inheritance_class):
         """
 
     assert_multiple_inheritance(Child)
+
+
+@parametrize_inheritance
+def test_multiple_inheritance_child_meta_method(inheritance_class):
+    class Parent1:
+        def method(self, w, x):
+            """Summary 1
+
+            Parameters
+            ----------
+            w: w doc
+            x: x doc
+
+            Returns
+            -------
+            int
+            """
+
+    class Parent2:
+        def method(self, *args, y=None, **kwargs):
+            """Summary 2
+
+            Parameters
+            ----------
+            *args: int
+            y: float
+            **kwargs: int
+
+            Returns
+            -------
+            float
+            """
+
+    class Child(Parent1, Parent2, metaclass=inheritance_class):
+        def method(self, w, x, *args, y=None, **kwargs):
+            pass
+
+    excepted = """Summary 1
+
+Parameters
+----------
+w: w doc
+x: x doc
+*args: int
+y: float
+**kwargs: int
+
+Returns
+-------
+int"""
+
+    assert Child.method.__doc__ == excepted
 
 
 @parametrize_inheritance

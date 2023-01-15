@@ -33,7 +33,7 @@ parametrize_inheritance = pytest.mark.parametrize(
 @parametrize_inheritance
 def test_args_inheritance(inheritance_class):
     class Parent(metaclass=inheritance_class):
-        def meth(self, w, x, *args, y=None, **kwargs):
+        def method(self, w, x, *args, y=None, **kwargs):
             """
             Args:
                 w
@@ -44,7 +44,7 @@ def test_args_inheritance(inheritance_class):
             """
 
     class Child(Parent):
-        def meth(self, xx, x, *args, yy=None, y=None, **kwargs):
+        def method(self, xx, x, *args, yy=None, y=None, **kwargs):
             """
             Args:
                 xx: int
@@ -59,7 +59,7 @@ Args:
     y: float
     **kwargs: int"""
 
-    assert Child.meth.__doc__ == excepted
+    assert Child.method.__doc__ == excepted
 
 
 @parametrize_inheritance

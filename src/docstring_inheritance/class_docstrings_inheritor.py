@@ -125,11 +125,7 @@ class ClassDocstringsInheritor:
                     continue
                 parent_doc = method.__doc__
                 if parent_doc is not None:
-                    break
-            else:
-                continue
-
-            self._docstring_inheritor(parent_doc, attr)
+                    self._docstring_inheritor(parent_doc, attr)
 
     @staticmethod
     def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:

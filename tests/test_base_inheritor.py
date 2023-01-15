@@ -106,7 +106,7 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
     "func,section_items,expected",
     [
         (func_none, {}, {}),
-        # Non existing args are removed.
+        # Non-existing args are removed.
         (func_none, {"arg": ""}, {}),
         # Self arg is removed.
         (func_with_self, {"self": ""}, {}),

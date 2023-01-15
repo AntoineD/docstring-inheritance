@@ -82,7 +82,7 @@ from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 
 class Parent(metaclass=NumpyDocstringInheritanceMeta):
-  def meth(self, x, y=None):
+  def method(self, x, y=None):
     """Parent summary.
 
     Parameters
@@ -99,7 +99,7 @@ class Parent(metaclass=NumpyDocstringInheritanceMeta):
 
 
 class Child(Parent):
-  def meth(self, x, z):
+  def method(self, x, z):
     """
     Parameters
     ----------
@@ -117,7 +117,7 @@ class Child(Parent):
 
 
 # The inherited docstring is
-Child.meth.__doc__ == """Parent summary.
+Child.method.__doc__ == """Parent summary.
 
 Parameters
 ----------
@@ -296,7 +296,7 @@ from docstring_inheritance import GoogleDocstringInheritanceMeta
 
 
 class Parent(metaclass=GoogleDocstringInheritanceMeta):
-  def meth(self, w, x, y):
+  def method(self, w, x, y):
     """
     Args:
         w: Description for w
@@ -306,7 +306,7 @@ class Parent(metaclass=GoogleDocstringInheritanceMeta):
 
 
 class Child(Parent):
-  def meth(self, w, y, z):
+  def method(self, w, y, z):
     """
     Args:
         z: Description for z
@@ -315,7 +315,7 @@ class Child(Parent):
 
 
 # The inherited docstring is
-Child.meth.__doc__ == """
+Child.method.__doc__ == """
 Args:
     w: Description for w
     y: Overridden description for y

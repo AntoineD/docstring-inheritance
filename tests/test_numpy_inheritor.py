@@ -178,7 +178,7 @@ def test_parse_one_section(line1, line2s, expected):
     assert NumpyDocstringInheritor._parse_one_section(line1, line2s, []) == expected
 
 
-# The following are test for methods of AbstractDocstringInheritor that depend
+# The following are test for methods of AbstractDocstringInheritor that depend on
 # concrete implementation of abstract methods.
 
 
@@ -215,7 +215,7 @@ def test_parse_one_section(line1, line2s, expected):
             {"Parameters": {}},
             {"Parameters": {}},
         ),
-        # Standard section_items names come before non standard ones.
+        # Standard section_items names come before non-standard ones.
         ({0: 0, "Notes": 0}, {}, {"Notes": 0, 0: 0}),
     ],
 )
