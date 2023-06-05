@@ -27,12 +27,12 @@ from .base import AbstractDocstringInheritor
 class NumpyDocstringInheritor(AbstractDocstringInheritor):
     """A class for inheriting docstrings in Numpy format."""
 
-    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {
+    _ARGS_SECTION_NAMES: ClassVar[set[str]] = {
         "Parameters",
         "Other Parameters",
     }
 
-    _SECTION_ITEMS_NAMES: ClassVar[set[str]] = _ARGS_SECTION_ITEMS_NAMES | {
+    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = _ARGS_SECTION_NAMES | {
         "Attributes",
         "Methods",
     }

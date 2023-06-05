@@ -183,6 +183,5 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
 )
 def test_inherit_section_items_with_args(func, section_items, expected):
     assert (
-        AbstractDocstringInheritor._inherit_section_items_with_args(func, section_items)
-        == expected
+        AbstractDocstringInheritor._filter_args_section(func, section_items) == expected
     )

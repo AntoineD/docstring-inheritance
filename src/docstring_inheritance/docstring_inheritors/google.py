@@ -34,9 +34,9 @@ class GoogleDocstringInheritor(AbstractDocstringInheritor):
     )
     _SECTION_NAMES[1] = "Args"
 
-    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {"Args"}
+    _ARGS_SECTION_NAMES: ClassVar[set[str]] = {"Args"}
 
-    _SECTION_ITEMS_NAMES: ClassVar[set[str]] = _ARGS_SECTION_ITEMS_NAMES | {
+    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = _ARGS_SECTION_NAMES | {
         "Attributes",
         "Methods",
     }
