@@ -102,6 +102,103 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
     pass
 
 
+@pytest.fixture(scope="module")
+def concrete_inheritor() -> type[AbstractDocstringInheritor]:
+    """Return a concrete enough AbstractDocstringInheritor."""
+    AbstractDocstringInheritor._ARGS_SECTION_NAMES = {"Args"}
+    AbstractDocstringInheritor._SECTION_NAMES_WITH_ITEMS = {"Args", "Methods"}
+    yield AbstractDocstringInheritor
+    delattr(AbstractDocstringInheritor, "_ARGS_SECTION_NAMES")
+    delattr(AbstractDocstringInheritor, "_SECTION_NAMES_WITH_ITEMS")
+
+
+@pytest.mark.parametrize(
+    "parent_section,child_section,func,expected",
+    [
+        ({}, {}, func_none, {}),
+        # Non-existing section in child.
+        ({"Section": "parent"}, {}, func_none, {"Section": "parent"}),
+        # Non-existing section in parent.
+        ({}, {"Section": "child"}, func_none, {"Section": "child"}),
+        # Child section updates the parent one (no items).
+        ({"Section": "parent"}, {"Section": "child"}, func_none, {"Section": "child"}),
+        # Child section updates the parent one (no items),  with other sections.
+        (
+            {"Section": "parent", "ParentSection": "parent"},
+            {"Section": "child", "ChildSection": "child"},
+            func_none,
+            {"Section": "child", "ParentSection": "parent", "ChildSection": "child"},
+        ),
+        # Section reordering.
+        (
+            {"Section": "parent", "Returns": "", "Parameters": ""},
+            {},
+            func_none,
+            {"Parameters": "", "Returns": "", "Section": "parent"},
+        ),
+        # Sections with items (not Args).
+        # Non-existing item in child.
+        ({"Methods": {"parent_m": ""}}, {}, func_none, {"Methods": {"parent_m": ""}}),
+        # Non-existing item in parent.
+        ({}, {"Methods": {"child_m": ""}}, func_none, {"Methods": {"child_m": ""}}),
+        # Child item updates the parent one (no common items).
+        (
+            {"Methods": {"parent_m": ""}},
+            {"Methods": {"child_m": ""}},
+            func_none,
+            {"Methods": {"parent_m": "", "child_m": ""}},
+        ),
+        # Child item updates the parent one (common items).
+        (
+            {"Methods": {"method": "parent"}},
+            {"Methods": {"method": "child"}},
+            func_none,
+            {"Methods": {"method": "child"}},
+        ),
+        # Sections with args items.
+        # Non-existing section in child for function without args.
+        ({"Args": {"parent_a": ""}}, {}, func_none, {"Args": {}}),
+        # Non-existing section in parent for function without args.
+        ({}, {"Args": {"child_a": ""}}, func_none, {"Args": {}}),
+        # Missing argument description.
+        (
+            {"Args": {"parent_a": ""}},
+            {"Args": {"child_a": ""}},
+            func_args,
+            {"Args": {"arg": "The description is missing."}},
+        ),
+        # Argument description in parent.
+        (
+            {"Args": {"arg": "parent"}},
+            {"Args": {"child_a": ""}},
+            func_args,
+            {"Args": {"arg": "parent"}},
+        ),
+        # Argument description in child.
+        (
+            {"Args": {"parent_a": ""}},
+            {"Args": {"arg": "child"}},
+            func_args,
+            {"Args": {"arg": "child"}},
+        ),
+        # Argument description in both parent and child.
+        (
+            {"Args": {"arg": "parent"}},
+            {"Args": {"arg": "child"}},
+            func_args,
+            {"Args": {"arg": "child"}},
+        ),
+    ],
+)
+def test_inherit_items(
+    concrete_inheritor, parent_section, child_section, func, expected
+):
+    assert (
+        concrete_inheritor._inherit_sections(parent_section, child_section, func)
+        == expected
+    )
+
+
 @pytest.mark.parametrize(
     "func,section_items,expected",
     [

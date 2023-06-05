@@ -266,15 +266,16 @@ class AbstractDocstringInheritor:
                 cast(Dict[str, str], child_sections[section_name])
             )
 
-            if section_name in cls._ARGS_SECTION_ITEMS_NAMES:
-                temp_section_items = cls._inherit_section_items_with_args(
-                    child_func,
-                    temp_section_items,
-                )
-
             temp_sections[section_name] = temp_section_items
 
-        # Order the standard sections.
+        # Args section shall be filtered.
+        for section_name in temp_sections.keys() & cls._ARGS_SECTION_NAMES:
+            temp_sections[section_name] = cls._filter_args_section(
+                child_func,
+                cast(Dict[str, str], temp_sections[section_name]),
+            )
+
+        # Reorder the standard sections.
         new_child_sections = {
             section_name: temp_sections.pop(section_name)
             for section_name in cls._SECTION_NAMES
