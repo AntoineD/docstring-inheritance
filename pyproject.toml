@@ -1,8 +1,43 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+requires = ["setuptools", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "docstring-inheritance"
+dynamic = ["version"]
+description = "Avoid writing and maintaining duplicated docstrings."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8, <3.12"
+authors = [
+    {name = "Antoine Dechaume"},
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[project.optional-dependencies]
+test = [
+    "covdefaults",
+    "pytest",
+    "pytest-cov",
+]
+
+[project.urls]
+Documentation = "https://antoined.github.io/docstring-inheritance"
+Homepage = "https://github.com/AntoineD/docstring-inheritance"
+Source = "https://github.com/AntoineD/docstring-inheritance"
+Tracker = "https://github.com/AntoineD/docstring-inheritance/issues"
 
 [tool.setuptools_scm]
 
 [tool.black]
-target-version = ['py37']
+target-version = ['py38']
