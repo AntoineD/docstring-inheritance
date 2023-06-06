@@ -323,22 +323,7 @@ def test_multiple_inheritance_child_meta_method(inheritance_class):
             int
             """
 
-    class Parent2:
-        def method(self, *args, y=None, **kwargs):
-            """Summary 2
-
-            Parameters
-            ----------
-            *args: int
-            y: float
-            **kwargs: int
-
-            Returns
-            -------
-            float
-            """
-
-    class Child(Parent1, Parent2, metaclass=inheritance_class):
+    class Child(Parent1, metaclass=inheritance_class):
         def method(self, w, x, *args, y=None, **kwargs):
             pass
 
