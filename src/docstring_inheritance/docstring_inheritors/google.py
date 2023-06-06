@@ -22,36 +22,51 @@ from __future__ import annotations
 import textwrap
 from typing import ClassVar
 
-from .base import AbstractDocstringInheritor
-from .numpy import NumpyDocstringInheritor
+from .bases.inheritor import BaseDocstringInheritor
+from .bases.parser import BaseDocstringParser
+from .bases.renderer import BaseDocstringRenderer
 
 
-class GoogleDocstringInheritor(AbstractDocstringInheritor):
-    """A class for inheriting docstrings in Google format."""
+class DocstringRenderer(BaseDocstringRenderer):
+    @staticmethod
+    def _render_section(
+        section_name: str | None,
+        section_body: str | dict[str, str],
+    ) -> str:
+        if section_name is None:
+            assert isinstance(section_body, str)
+            return section_body
+        if isinstance(section_body, dict):
+            section_body = "\n".join(
+                f"{key}{value}" for key, value in section_body.items()
+            )
+        section_body = textwrap.indent(section_body, " " * 4)
+        return f"{section_name}:\n{section_body}"
 
-    _SECTION_NAMES: ClassVar[list[str | None]] = list(
-        AbstractDocstringInheritor._SECTION_NAMES
-    )
-    _SECTION_NAMES[1] = "Args"
 
-    _ARGS_SECTION_NAME: ClassVar[str] = "Args"
-
-    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {_ARGS_SECTION_NAME} | {
+class DocstringParser(BaseDocstringParser):
+    ARGS_SECTION_NAME: ClassVar[str] = "Args"
+    SECTION_NAMES: ClassVar[list[str | None]] = list(BaseDocstringParser.SECTION_NAMES)
+    SECTION_NAMES[1] = ARGS_SECTION_NAME
+    SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
+        ARGS_SECTION_NAME,
         "Attributes",
         "Methods",
     }
 
-    MISSING_ARG_DESCRIPTION = f": {AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
-
     @classmethod
-    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
-        return textwrap.dedent(
-            NumpyDocstringInheritor._get_section_body(reversed_section_body_lines)
-        )
+    def _get_section_body(
+        cls,
+        reversed_section_body_lines: list[str],
+    ) -> str:
+        return textwrap.dedent(super()._get_section_body(reversed_section_body_lines))
 
     @classmethod
     def _parse_one_section(
-        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: list[str]
+        cls,
+        line1: str,
+        line2_rstripped: str,
+        reversed_section_body_lines: list[str],
     ) -> tuple[str, str] | tuple[None, None]:
         # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: B950
         # The parsing of a section is complete when the first line line1 has:
@@ -72,16 +87,8 @@ class GoogleDocstringInheritor(AbstractDocstringInheritor):
             )
         return None, None
 
-    @classmethod
-    def _render_section(
-        cls, section_name: str | None, section_body: str | dict[str, str]
-    ) -> str:
-        if section_name is None:
-            assert isinstance(section_body, str)
-            return section_body
-        if isinstance(section_body, dict):
-            section_body = "\n".join(
-                f"{key}{value}" for key, value in section_body.items()
-            )
-        section_body = textwrap.indent(section_body, " " * 4)
-        return f"{section_name}:\n{section_body}"
+
+class GoogleDocstringInheritor(BaseDocstringInheritor):
+    _MISSING_ARG_TEXT = f": {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
+    _DOCSTRING_PARSER = DocstringParser
+    _DOCSTRING_RENDERER = DocstringRenderer

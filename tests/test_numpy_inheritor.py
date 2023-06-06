@@ -20,9 +20,10 @@
 from __future__ import annotations
 
 import pytest
-from test_base_inheritor import _test_parse_sections
+from test_base_parser import _test_parse_sections
 
-from docstring_inheritance.docstring_inheritors.numpy import NumpyDocstringInheritor
+from docstring_inheritance.docstring_inheritors.numpy import DocstringParser
+from docstring_inheritance.docstring_inheritors.numpy import DocstringRenderer
 
 
 @pytest.mark.parametrize(
@@ -101,9 +102,7 @@ Section body.
     ],
 )
 def test_parse_sections(unindented_docstring, expected_sections):
-    _test_parse_sections(
-        NumpyDocstringInheritor._parse_sections, unindented_docstring, expected_sections
-    )
+    _test_parse_sections(DocstringParser.parse, unindented_docstring, expected_sections)
 
 
 @pytest.mark.parametrize(
@@ -140,22 +139,9 @@ arg
 )
 def test_render_section(section_name, section_body, expected_docstring):
     assert (
-        NumpyDocstringInheritor._render_section(section_name, section_body)
+        DocstringRenderer._render_section(section_name, section_body)
         == expected_docstring
     )
-
-
-@pytest.mark.parametrize(
-    "section_body,expected",
-    [
-        ([], ""),
-        (["foo"], "foo"),
-        (["", "foo"], "foo"),
-        (["bar", "foo"], "foo\nbar"),
-    ],
-)
-def test_get_section_body(section_body, expected):
-    assert NumpyDocstringInheritor._get_section_body(section_body) == expected
 
 
 @pytest.mark.parametrize(
@@ -175,7 +161,7 @@ def test_get_section_body(section_body, expected):
     ],
 )
 def test_parse_one_section(line1, line2s, expected):
-    assert NumpyDocstringInheritor._parse_one_section(line1, line2s, []) == expected
+    assert DocstringRenderer._parse_one_section(line1, line2s, []) == expected
 
 
 # The following are test for methods of AbstractDocstringInheritor that depend on
@@ -254,16 +240,7 @@ body""",
     ],
 )
 def test_render_docstring(sections, expected):
-    assert NumpyDocstringInheritor._render_docstring(sections) == expected
-
-
-def test_inherit_section_items_with_args():
-    def func(arg):
-        """"""
-
-    expected = {"arg": NumpyDocstringInheritor.MISSING_ARG_DESCRIPTION}
-
-    assert NumpyDocstringInheritor._filter_args_section(func, {}) == expected
+    assert DocstringRenderer.render(sections) == expected
 
 
 # TODO: test section order and all sections items

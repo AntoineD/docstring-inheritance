@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handling of *object* in the class hierarchy.
 - Rendering of Google docstrings with no summaries.
 - Formatting of items without descriptions.
-- Inheritance of a metaclass'd class from its grand parents.
+- Inheritance of a metaclass'd class from its grandparents.
 
 ## [0.1] - 2021-11
 ### Added

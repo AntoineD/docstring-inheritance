@@ -21,28 +21,45 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from .base import AbstractDocstringInheritor
+from .bases.inheritor import (
+    BaseDocstringInheritor,
+)
+from .bases.parser import BaseDocstringParser
+from .bases.renderer import BaseDocstringRenderer
 
 
-class NumpyDocstringInheritor(AbstractDocstringInheritor):
-    """A class for inheriting docstrings in Numpy format."""
+class DocstringRenderer(BaseDocstringRenderer):
+    @staticmethod
+    def _render_section(
+        section_name: str | None,
+        section_body: str | dict[str, str],
+    ) -> str:
+        if section_name is None:
+            assert isinstance(section_body, str)
+            return section_body
+        if isinstance(section_body, dict):
+            section_body = "\n".join(
+                f"{key}{value}" for key, value in section_body.items()
+            )
+        return f"{section_name}\n{'-' * len(section_name)}\n{section_body}"
 
-    # The section OtherParameters is not processed for the arguments.
-    _ARGS_SECTION_NAME: ClassVar[str] = "Parameters"
 
-    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {_ARGS_SECTION_NAME} | {
+class DocstringParser(BaseDocstringParser):
+    ARGS_SECTION_NAME: ClassVar[str] = "Parameters"
+
+    SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
+        ARGS_SECTION_NAME,
         "OtherParameters",
         "Attributes",
         "Methods",
     }
 
-    MISSING_ARG_DESCRIPTION: ClassVar[
-        str
-    ] = f"\n    {AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
-
     @classmethod
     def _parse_one_section(
-        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: list[str]
+        cls,
+        line1: str,
+        line2_rstripped: str,
+        reversed_section_body_lines: list[str],
     ) -> tuple[str, str] | tuple[None, None]:
         # See https://github.com/numpy/numpydoc/blob/d85f54ea342c1d223374343be88da94ce9f58dec/numpydoc/docscrape.py#L179  # noqa: B950
         if len(line2_rstripped) >= 3 and (set(line2_rstripped) in ({"-"}, {"="})):
@@ -54,15 +71,10 @@ class NumpyDocstringInheritor(AbstractDocstringInheritor):
                 return line1s, cls._get_section_body(reversed_section_body_lines)
         return None, None
 
-    @classmethod
-    def _render_section(
-        cls, section_name: str | None, section_body: str | dict[str, str]
-    ) -> str:
-        if section_name is None:
-            assert isinstance(section_body, str)
-            return section_body
-        if isinstance(section_body, dict):
-            section_body = "\n".join(
-                f"{key}{value}" for key, value in section_body.items()
-            )
-        return f"{section_name}\n{'-' * len(section_name)}\n{section_body}"
+
+class NumpyDocstringInheritor(BaseDocstringInheritor):
+    _MISSING_ARG_TEXT: ClassVar[
+        str
+    ] = f"\n    {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
+    _DOCSTRING_PARSER = DocstringParser
+    _DOCSTRING_RENDERER = DocstringRenderer
