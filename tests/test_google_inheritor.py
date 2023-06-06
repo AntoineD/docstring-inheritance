@@ -202,9 +202,7 @@ def test_inherit_section_items_with_args():
 
     expected = {"arg": GoogleDocstringInheritor.MISSING_ARG_DESCRIPTION}
 
-    assert (
-        GoogleDocstringInheritor._inherit_section_items_with_args(func, {}) == expected
-    )
+    assert GoogleDocstringInheritor._filter_args_section(func, {}) == expected
 
 
 # TODO: test section order and all sections items

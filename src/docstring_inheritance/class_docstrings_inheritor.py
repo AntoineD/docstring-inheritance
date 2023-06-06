@@ -103,8 +103,11 @@ class ClassDocstringsInheritor:
         if func is None:
             func = self._create_dummy_func_with_doc(self._cls.__doc__)
 
-        for cls_ in self.__mro_classes:
-            self._docstring_inheritor(cls_.__doc__, func)
+        for parent_cls in self.__mro_classes:
+            # As opposed to the attribute inheritance, and following the way a class is
+            # assembled by type(), the docstring of a class is the combination of the
+            # docstrings of its parents.
+            self._docstring_inheritor(parent_cls.__doc__, func)
 
         self._cls.__doc__ = func.__doc__
 
@@ -119,13 +122,15 @@ class ClassDocstringsInheritor:
             if not isinstance(attr, FunctionType):
                 continue
 
-            for cls_ in self.__mro_classes:
-                method = getattr(cls_, attr_name, None)
-                if method is None:
-                    continue
-                parent_doc = method.__doc__
-                if parent_doc is not None:
-                    self._docstring_inheritor(parent_doc, attr)
+            for parent_cls in self.__mro_classes:
+                parent_method = getattr(parent_cls, attr_name, None)
+                if parent_method is not None:
+                    parent_doc = parent_method.__doc__
+                    if parent_doc is not None:
+                        self._docstring_inheritor(parent_doc, attr)
+                        # As opposed to the class docstring inheritance, and following
+                        # the MRO for methods, we inherit only from the first found parent.
+                        break
 
     @staticmethod
     def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:

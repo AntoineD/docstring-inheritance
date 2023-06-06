@@ -39,8 +39,8 @@ Parameters
 xx: int
 x: int
 *args: int
-yy:
-The description is missing.
+yy
+    The description is missing.
 y: float
 **kwargs: int"""
 
@@ -323,22 +323,7 @@ def test_multiple_inheritance_child_meta_method(inheritance_class):
             int
             """
 
-    class Parent2:
-        def method(self, *args, y=None, **kwargs):
-            """Summary 2
-
-            Parameters
-            ----------
-            *args: int
-            y: float
-            **kwargs: int
-
-            Returns
-            -------
-            float
-            """
-
-    class Child(Parent1, Parent2, metaclass=inheritance_class):
+    class Child(Parent1, metaclass=inheritance_class):
         def method(self, w, x, *args, y=None, **kwargs):
             pass
 
@@ -348,9 +333,12 @@ Parameters
 ----------
 w: w doc
 x: x doc
-*args: int
-y: float
-**kwargs: int
+*args
+    The description is missing.
+y
+    The description is missing.
+**kwargs
+    The description is missing.
 
 Returns
 -------

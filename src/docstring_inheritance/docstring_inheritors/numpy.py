@@ -27,19 +27,19 @@ from .base import AbstractDocstringInheritor
 class NumpyDocstringInheritor(AbstractDocstringInheritor):
     """A class for inheriting docstrings in Numpy format."""
 
-    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]] = {
+    _ARGS_SECTION_NAMES: ClassVar[set[str]] = {
         "Parameters",
         "Other Parameters",
     }
 
-    _SECTION_ITEMS_NAMES: ClassVar[set[str]] = _ARGS_SECTION_ITEMS_NAMES | {
+    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = _ARGS_SECTION_NAMES | {
         "Attributes",
         "Methods",
     }
 
     MISSING_ARG_DESCRIPTION: ClassVar[
         str
-    ] = f":\n{AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
+    ] = f"\n    {AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
 
     @classmethod
     def _parse_one_section(

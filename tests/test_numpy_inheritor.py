@@ -263,9 +263,7 @@ def test_inherit_section_items_with_args():
 
     expected = {"arg": NumpyDocstringInheritor.MISSING_ARG_DESCRIPTION}
 
-    assert (
-        NumpyDocstringInheritor._inherit_section_items_with_args(func, {}) == expected
-    )
+    assert NumpyDocstringInheritor._filter_args_section(func, {}) == expected
 
 
 # TODO: test section order and all sections items

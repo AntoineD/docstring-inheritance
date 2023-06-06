@@ -69,10 +69,16 @@ class AbstractDocstringInheritor:
         "References",
         "Examples",
     ]
-    _ARGS_SECTION_ITEMS_NAMES: ClassVar[set[str]]
-    _SECTION_ITEMS_NAMES: ClassVar[set[str]]
+    """Names of the sections."""
+
+    _ARGS_SECTION_NAMES: ClassVar[set[str]]
+    """Names of the sections for method and function arguments."""
+
+    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]]
+    """Names of the sections with items."""
 
     MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
+    """Fall back description for an argument without a given description."""
 
     def __call__(self, parent_doc: str | None, child_func: Callable[..., Any]) -> None:
         """
@@ -165,7 +171,7 @@ class AbstractDocstringInheritor:
                 line1, line2_rstripped, reversed_section_body_lines
             )
             if section_name is not None and section_body is not None:
-                if section_name in cls._SECTION_ITEMS_NAMES:
+                if section_name in cls._SECTION_NAMES_WITH_ITEMS:
                     reversed_sections[section_name] = cls._parse_section_items(
                         section_body
                     )
@@ -249,7 +255,7 @@ class AbstractDocstringInheritor:
 
         # For sections with items, the sections common to parent and child are merged.
         common_section_names_with_items = (
-            parent_section_names & child_section_names & cls._SECTION_ITEMS_NAMES
+            parent_section_names & child_section_names & cls._SECTION_NAMES_WITH_ITEMS
         )
 
         for section_name in common_section_names_with_items:
@@ -260,15 +266,16 @@ class AbstractDocstringInheritor:
                 cast(Dict[str, str], child_sections[section_name])
             )
 
-            if section_name in cls._ARGS_SECTION_ITEMS_NAMES:
-                temp_section_items = cls._inherit_section_items_with_args(
-                    child_func,
-                    temp_section_items,
-                )
-
             temp_sections[section_name] = temp_section_items
 
-        # Order the standard sections.
+        # Args section shall be filtered.
+        for section_name in temp_sections.keys() & cls._ARGS_SECTION_NAMES:
+            temp_sections[section_name] = cls._filter_args_section(
+                child_func,
+                cast(Dict[str, str], temp_sections[section_name]),
+            )
+
+        # Reorder the standard sections.
         new_child_sections = {
             section_name: temp_sections.pop(section_name)
             for section_name in cls._SECTION_NAMES
@@ -281,12 +288,12 @@ class AbstractDocstringInheritor:
         return new_child_sections
 
     @classmethod
-    def _inherit_section_items_with_args(
+    def _filter_args_section(
         cls,
         func: Callable[..., Any],
         section_items: dict[str, str],
     ) -> dict[str, str]:
-        """Inherit section items for the args of a signature.
+        """Filter the args section items with the args of a signature.
 
         The argument ``self`` is removed. The arguments are ordered according to the
         signature of ``func``. An argument of ``func`` missing in ``section_items`` gets
