@@ -39,7 +39,7 @@ class NumpyDocstringInheritor(AbstractDocstringInheritor):
 
     MISSING_ARG_DESCRIPTION: ClassVar[
         str
-    ] = f":\n{AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
+    ] = f"\n    {AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
 
     @classmethod
     def _parse_one_section(

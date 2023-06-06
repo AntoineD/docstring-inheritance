@@ -39,8 +39,8 @@ Parameters
 xx: int
 x: int
 *args: int
-yy:
-The description is missing.
+yy
+    The description is missing.
 y: float
 **kwargs: int"""
 
@@ -348,9 +348,12 @@ Parameters
 ----------
 w: w doc
 x: x doc
-*args: int
-y: float
-**kwargs: int
+*args
+    The description is missing.
+y
+    The description is missing.
+**kwargs
+    The description is missing.
 
 Returns
 -------
