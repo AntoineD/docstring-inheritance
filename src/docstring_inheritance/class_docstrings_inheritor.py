@@ -121,11 +121,10 @@ class ClassDocstringsInheritor:
 
             for cls_ in self.__mro_classes:
                 method = getattr(cls_, attr_name, None)
-                if method is None:
-                    continue
-                parent_doc = method.__doc__
-                if parent_doc is not None:
-                    self._docstring_inheritor(parent_doc, attr)
+                if method is not None:
+                    parent_doc = method.__doc__
+                    if parent_doc is not None:
+                        self._docstring_inheritor(parent_doc, attr)
 
     @staticmethod
     def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:
