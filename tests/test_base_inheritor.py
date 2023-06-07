@@ -20,6 +20,7 @@
 from __future__ import annotations
 
 import textwrap
+from typing import Generator
 
 import pytest
 
@@ -103,12 +104,12 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
 
 
 @pytest.fixture(scope="module")
-def concrete_inheritor() -> type[AbstractDocstringInheritor]:
+def concrete_inheritor() -> Generator[type[AbstractDocstringInheritor], None, None]:
     """Return a concrete enough AbstractDocstringInheritor."""
-    AbstractDocstringInheritor._ARGS_SECTION_NAMES = {"Args"}
+    AbstractDocstringInheritor._ARGS_SECTION_NAME = "Args"
     AbstractDocstringInheritor._SECTION_NAMES_WITH_ITEMS = {"Args", "Methods"}
     yield AbstractDocstringInheritor
-    delattr(AbstractDocstringInheritor, "_ARGS_SECTION_NAMES")
+    delattr(AbstractDocstringInheritor, "_ARGS_SECTION_NAME")
     delattr(AbstractDocstringInheritor, "_SECTION_NAMES_WITH_ITEMS")
 
 
@@ -160,8 +161,20 @@ def concrete_inheritor() -> type[AbstractDocstringInheritor]:
         ({"Args": {"parent_a": ""}}, {}, func_none, {}),
         # Non-existing section in parent for function without args.
         ({}, {"Args": {"child_a": ""}}, func_none, {}),
-        ({}, {"Args": {"arg": ""}}, func_args,  {"Args": {"arg": ""}}),
         # Missing argument description.
+        ({}, {}, func_args, {"Args": {"arg": "The description is missing."}}),
+        (
+            {},
+            {"Args": {"child_a": ""}},
+            func_args,
+            {"Args": {"arg": "The description is missing."}},
+        ),
+        (
+            {"Args": {"parent_a": ""}},
+            {},
+            func_args,
+            {"Args": {"arg": "The description is missing."}},
+        ),
         (
             {"Args": {"parent_a": ""}},
             {"Args": {"child_a": ""}},
@@ -171,11 +184,23 @@ def concrete_inheritor() -> type[AbstractDocstringInheritor]:
         # Argument description in parent.
         (
             {"Args": {"arg": "parent"}},
+            {},
+            func_args,
+            {"Args": {"arg": "parent"}},
+        ),
+        (
+            {"Args": {"arg": "parent"}},
             {"Args": {"child_a": ""}},
             func_args,
             {"Args": {"arg": "parent"}},
         ),
         # Argument description in child.
+        (
+            {},
+            {"Args": {"arg": "child"}},
+            func_args,
+            {"Args": {"arg": "child"}},
+        ),
         (
             {"Args": {"parent_a": ""}},
             {"Args": {"arg": "child"}},
