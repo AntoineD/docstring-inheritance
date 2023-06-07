@@ -270,10 +270,15 @@ class AbstractDocstringInheritor:
 
         # Args section shall be filtered.
         for section_name in temp_sections.keys() & cls._ARGS_SECTION_NAMES:
-            temp_sections[section_name] = cls._filter_args_section(
+            args_section = cls._filter_args_section(
                 child_func,
                 cast(Dict[str, str], temp_sections[section_name]),
             )
+            if args_section:
+                temp_sections[section_name] = args_section
+            else:
+                # The args section is empty, there is nothing to document.
+                del temp_sections[section_name]
 
         # Reorder the standard sections.
         new_child_sections = {

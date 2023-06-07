@@ -157,9 +157,10 @@ def concrete_inheritor() -> type[AbstractDocstringInheritor]:
         ),
         # Sections with args items.
         # Non-existing section in child for function without args.
-        ({"Args": {"parent_a": ""}}, {}, func_none, {"Args": {}}),
+        ({"Args": {"parent_a": ""}}, {}, func_none, {}),
         # Non-existing section in parent for function without args.
-        ({}, {"Args": {"child_a": ""}}, func_none, {"Args": {}}),
+        ({}, {"Args": {"child_a": ""}}, func_none, {}),
+        ({}, {"Args": {"arg": ""}}, func_args,  {"Args": {"arg": ""}}),
         # Missing argument description.
         (
             {"Args": {"parent_a": ""}},
