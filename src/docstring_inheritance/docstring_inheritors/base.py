@@ -71,11 +71,11 @@ class AbstractDocstringInheritor:
     ]
     """Names of the sections."""
 
-    _ARGS_SECTION_NAMES: ClassVar[set[str]]
-    """Names of the sections for method and function arguments."""
+    _ARGS_SECTION_NAME: ClassVar[str]
+    """The name of the section for method and function arguments."""
 
     _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]]
-    """Names of the sections with items."""
+    """Names of all the sections with items, including `_ARGS_SECTION_NAME`."""
 
     MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
     """Fall back description for an argument without a given description."""
@@ -269,16 +269,15 @@ class AbstractDocstringInheritor:
             temp_sections[section_name] = temp_section_items
 
         # Args section shall be filtered.
-        for section_name in temp_sections.keys() & cls._ARGS_SECTION_NAMES:
-            args_section = cls._filter_args_section(
-                child_func,
-                cast(Dict[str, str], temp_sections[section_name]),
-            )
-            if args_section:
-                temp_sections[section_name] = args_section
-            else:
-                # The args section is empty, there is nothing to document.
-                del temp_sections[section_name]
+        args_section = cls._filter_args_section(
+            child_func,
+            cast(Dict[str, str], temp_sections.get(cls._ARGS_SECTION_NAME, {})),
+        )
+        if args_section:
+            temp_sections[cls._ARGS_SECTION_NAME] = args_section
+        elif cls._ARGS_SECTION_NAME in temp_sections:
+            # The args section is empty, there is nothing to document.
+            del temp_sections[cls._ARGS_SECTION_NAME]
 
         # Reorder the standard sections.
         new_child_sections = {

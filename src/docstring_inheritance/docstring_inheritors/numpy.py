@@ -27,12 +27,11 @@ from .base import AbstractDocstringInheritor
 class NumpyDocstringInheritor(AbstractDocstringInheritor):
     """A class for inheriting docstrings in Numpy format."""
 
-    _ARGS_SECTION_NAMES: ClassVar[set[str]] = {
-        "Parameters",
-        "Other Parameters",
-    }
+    # The section OtherParameters is not processed for the arguments.
+    _ARGS_SECTION_NAME: ClassVar[str] = "Parameters"
 
-    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = _ARGS_SECTION_NAMES | {
+    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {_ARGS_SECTION_NAME} | {
+        "OtherParameters",
         "Attributes",
         "Methods",
     }
