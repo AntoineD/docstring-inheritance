@@ -193,10 +193,9 @@ def concrete_inheritor() -> type[AbstractDocstringInheritor]:
 def test_inherit_items(
     concrete_inheritor, parent_section, child_section, func, expected
 ):
-    assert (
-        concrete_inheritor._inherit_sections(parent_section, child_section, func)
-        == expected
-    )
+    concrete_inheritor._inherit_sections(parent_section, child_section, func)
+    assert  child_section== expected
+
 
 
 @pytest.mark.parametrize(

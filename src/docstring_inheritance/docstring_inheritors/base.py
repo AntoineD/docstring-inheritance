@@ -91,7 +91,8 @@ class AbstractDocstringInheritor:
 
         parent_sections = self._parse_sections(parent_doc)
         child_sections = self._parse_sections(child_func.__doc__)
-        child_sections = self._inherit_sections(
+        self._filters_sections(child_sections)
+        self._inherit_sections(
             parent_sections, child_sections, child_func
         )
         child_func.__doc__ = self._render_docstring(child_sections)

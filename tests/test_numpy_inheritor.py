@@ -220,12 +220,12 @@ def test_parse_one_section(line1, line2s, expected):
     ],
 )
 def test_inherit_sections(parent_sections, child_sections, expected_sections):
-    new_child_sections = NumpyDocstringInheritor._inherit_sections(
+    NumpyDocstringInheritor._inherit_sections(
         parent_sections, child_sections, lambda: None
     )
-    assert new_child_sections == expected_sections
+    assert child_sections == expected_sections
     # Verify the order of the keys.
-    assert list(new_child_sections.keys()) == list(expected_sections.keys())
+    assert list(child_sections.keys()) == list(expected_sections.keys())
 
 
 @pytest.mark.parametrize(
