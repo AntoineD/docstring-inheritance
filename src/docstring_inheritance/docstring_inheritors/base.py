@@ -77,6 +77,10 @@ class AbstractDocstringInheritor:
     _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]]
     """Names of the sections with items."""
 
+    _SECTION_ITEMS_REGEX: ClassVar[re.Pattern] = re.compile(
+        r"(\**\w+)(.*?)(?:$|(?=\n\**\w+))", flags=re.DOTALL
+    )
+
     MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
     """Fall back description for an argument without a given description."""
 
@@ -96,22 +100,6 @@ class AbstractDocstringInheritor:
             parent_sections, child_sections, child_func
         )
         child_func.__doc__ = self._render_docstring(child_sections)
-
-    @classmethod
-    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
-        """Create the docstring of a section.
-
-        Args:
-            reversed_section_body_lines: The lines of docstrings in reversed order.
-
-        Returns:
-            The docstring of a section.
-        """
-        reversed_section_body_lines = list(
-            dropwhile(lambda x: not x, reversed_section_body_lines)
-        )
-        reversed_section_body_lines.reverse()
-        return "\n".join(reversed_section_body_lines)
 
     @classmethod
     @abc.abstractmethod
@@ -141,6 +129,22 @@ class AbstractDocstringInheritor:
         Returns:
             The rendered docstring.
         """
+
+    @classmethod
+    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
+        """Create the docstring of a section.
+
+        Args:
+            reversed_section_body_lines: The lines of docstrings in reversed order.
+
+        Returns:
+            The docstring of a section.
+        """
+        reversed_section_body_lines = list(
+            dropwhile(lambda x: not x, reversed_section_body_lines)
+        )
+        reversed_section_body_lines.reverse()
+        return "\n".join(reversed_section_body_lines)
 
     @classmethod
     def _parse_sections(cls, docstring: str | None) -> SectionsType:
@@ -212,21 +216,33 @@ class AbstractDocstringInheritor:
         return sections
 
     @classmethod
+    def _filters_inherited_sections(
+        cls, sections: SectionsType | dict[str, str]
+    ) -> None:
+        """Filter the sections for item to be explicitly inherited.
+
+        Args:
+            sections: The sections to filter.
+        """
+        for key, item in tuple(sections.items()):
+            if isinstance(item, dict):
+                cls._filters_inherited_sections(item)
+            elif item.strip().startswith(cls.INHERIT_SECTION_TAG):
+                del sections[key]
+
+    @classmethod
     def _inherit_sections(
         cls,
         parent_sections: SectionsType,
         child_sections: SectionsType,
         child_func: Callable[..., Any],
-    ) -> SectionsType:
+    ) -> None:
         """Inherit the sections of a child from the parent sections.
 
         Args:
             parent_sections: The parent docstring sections.
             child_sections: The child docstring sections.
             child_func: The child function which sections inherit from the parent.
-
-        Returns:
-            The inherited sections.
         """
         # TODO:
         # prnt_only_raises = "Raises" in parent_sections and not (
@@ -237,8 +253,8 @@ class AbstractDocstringInheritor:
         #     "Returns" in sections or "Yields" in sections
         # ):
         #     parent_sections["Raises"] = None
-        parent_section_names = set(parent_sections)
-        child_section_names = set(child_sections)
+        parent_section_names = parent_sections.keys()
+        child_section_names = child_sections.keys()
 
         temp_sections = {}
 
@@ -277,16 +293,17 @@ class AbstractDocstringInheritor:
             )
 
         # Reorder the standard sections.
-        new_child_sections = {
-            section_name: temp_sections.pop(section_name)
-            for section_name in cls._SECTION_NAMES
-            if section_name in temp_sections
-        }
+        child_sections.clear()
+        child_sections.update(
+            {
+                section_name: temp_sections.pop(section_name)
+                for section_name in cls._SECTION_NAMES
+                if section_name in temp_sections
+            }
+        )
 
         # Add the remaining non-standard sections.
-        new_child_sections.update(temp_sections)
-
-        return new_child_sections
+        child_sections.update(temp_sections)
 
     @classmethod
     def _filter_args_section(
@@ -356,10 +373,6 @@ class AbstractDocstringInheritor:
             return "\n" + rendered
 
         return rendered
-
-    _SECTION_ITEMS_REGEX = re.compile(
-        r"(\**\w+)(.*?)(?:$|(?=\n\**\w+))", flags=re.DOTALL
-    )
 
     @classmethod
     def _parse_section_items(cls, section_body: str) -> dict[str, str]:

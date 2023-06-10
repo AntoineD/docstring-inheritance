@@ -141,19 +141,6 @@ def test_render_section(section_name, section_body, expected_docstring):
 
 
 @pytest.mark.parametrize(
-    "section_body,expected",
-    [
-        ([], ""),
-        ([" foo"], "foo"),
-        (["", " foo"], "foo"),
-        ([" bar", " foo"], "foo\nbar"),
-    ],
-)
-def test_get_section_body(section_body, expected):
-    assert GoogleDocstringInheritor._get_section_body(section_body) == expected
-
-
-@pytest.mark.parametrize(
     "line1,line2s,expected",
     [
         (" name", "  body", (None, None)),

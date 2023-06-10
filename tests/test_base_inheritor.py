@@ -26,6 +26,19 @@ import pytest
 from docstring_inheritance.docstring_inheritors.base import AbstractDocstringInheritor
 
 
+@pytest.mark.parametrize(
+    "section_body,expected",
+    [
+        ([], ""),
+        (["foo"], "foo"),
+        (["", "foo"], "foo"),
+        (["bar", "foo"], "foo\nbar"),
+    ],
+)
+def test_get_section_body(section_body, expected):
+    assert AbstractDocstringInheritor._get_section_body(section_body) == expected
+
+
 def _test_parse_sections(parse_sections, unindented_docstring, expected_sections):
     """Verify the parsing of the sections of a docstring."""
     # Indent uniformly.
@@ -194,8 +207,7 @@ def test_inherit_items(
     concrete_inheritor, parent_section, child_section, func, expected
 ):
     concrete_inheritor._inherit_sections(parent_section, child_section, func)
-    assert  child_section== expected
-
+    assert child_section == expected
 
 
 @pytest.mark.parametrize(
@@ -281,3 +293,20 @@ def test_inherit_section_items_with_args(func, section_items, expected):
     assert (
         AbstractDocstringInheritor._filter_args_section(func, section_items) == expected
     )
+
+
+@pytest.mark.parametrize(
+    "sections,expected",
+    (
+        ({}, {}),
+        ({"": ""}, {"": ""}),
+        ({"": {"": ""}}, {"": {"": ""}}),
+        ({"": "__inherit_section_doc__"}, {}),
+        ({"": "__inherit_section_doc__", "a": ""}, {"a": ""}),
+        ({"": {"": "__inherit_section_doc__"}}, {"": {}}),
+        ({"": {"": "__inherit_section_doc__", "a": ""}}, {"": {"a": ""}}),
+    ),
+)
+def test_filter_sections(sections, expected):
+    AbstractDocstringInheritor._filters_inherited_sections(sections)
+    assert sections == expected
