@@ -20,9 +20,10 @@
 from __future__ import annotations
 
 import pytest
-from test_base_inheritor import _test_parse_sections
+from test_base_parser import _test_parse_sections
 
-from docstring_inheritance.docstring_inheritors.numpy import NumpyDocstringInheritor
+from docstring_inheritance.docstring_inheritors.numpy import DocstringParser
+from docstring_inheritance.docstring_inheritors.numpy import DocstringRenderer
 
 
 @pytest.mark.parametrize(
@@ -101,9 +102,7 @@ Section body.
     ],
 )
 def test_parse_sections(unindented_docstring, expected_sections):
-    _test_parse_sections(
-        NumpyDocstringInheritor._parse_sections, unindented_docstring, expected_sections
-    )
+    _test_parse_sections(DocstringParser.parse, unindented_docstring, expected_sections)
 
 
 @pytest.mark.parametrize(
@@ -140,7 +139,7 @@ arg
 )
 def test_render_section(section_name, section_body, expected_docstring):
     assert (
-        NumpyDocstringInheritor._render_section(section_name, section_body)
+        DocstringRenderer._render_section(section_name, section_body)
         == expected_docstring
     )
 
@@ -162,57 +161,7 @@ def test_render_section(section_name, section_body, expected_docstring):
     ],
 )
 def test_parse_one_section(line1, line2s, expected):
-    assert NumpyDocstringInheritor._parse_one_section(line1, line2s, []) == expected
-
-
-# The following are test for methods of AbstractDocstringInheritor that depend on
-# concrete implementation of abstract methods.
-
-
-@pytest.mark.parametrize(
-    "parent_sections,child_sections,expected_sections",
-    [
-        # Section missing in child.
-        ({0: 0}, {}, {0: 0}),
-        # Section missing in parent.
-        ({}, {0: 0}, {0: 0}),
-        # Child override parent when section_items has no items.
-        ({0: 0}, {0: 1}, {0: 1}),
-        # Merge sections that are not common.
-        ({0: 0}, {1: 0}, {0: 0, 1: 0}),
-        # Section with items missing in child.
-        ({"Methods": {0: 0}}, {}, {"Methods": {0: 0}}),
-        # Section with items missing in parent.
-        ({}, {"Methods": {0: 0}}, {"Methods": {0: 0}}),
-        # Child override parent when section_items has items.
-        (
-            {"Methods": {0: 0}},
-            {"Methods": {0: 1}},
-            {"Methods": {0: 1}},
-        ),
-        # Merge section_items with common items that are not args.
-        (
-            {"Methods": {0: 0}},
-            {"Methods": {1: 0}},
-            {"Methods": {0: 0, 1: 0}},
-        ),
-        # Merge section_items with common items that are args.
-        (
-            {"Parameters": {}},
-            {"Parameters": {}},
-            {"Parameters": {}},
-        ),
-        # Standard section_items names come before non-standard ones.
-        ({0: 0, "Notes": 0}, {}, {"Notes": 0, 0: 0}),
-    ],
-)
-def test_inherit_sections(parent_sections, child_sections, expected_sections):
-    NumpyDocstringInheritor._inherit_sections(
-        parent_sections, child_sections, lambda: None
-    )
-    assert child_sections == expected_sections
-    # Verify the order of the keys.
-    assert list(child_sections.keys()) == list(expected_sections.keys())
+    assert DocstringParser._parse_one_section(line1, line2s, []) == expected
 
 
 @pytest.mark.parametrize(
@@ -241,16 +190,7 @@ body""",
     ],
 )
 def test_render_docstring(sections, expected):
-    assert NumpyDocstringInheritor._render_docstring(sections) == expected
-
-
-def test_inherit_section_items_with_args():
-    def func(arg):
-        """"""
-
-    expected = {"arg": NumpyDocstringInheritor.MISSING_ARG_DESCRIPTION}
-
-    assert NumpyDocstringInheritor._filter_args_section(func, {}) == expected
+    assert DocstringRenderer.render(sections) == expected
 
 
 # TODO: test section order and all sections items

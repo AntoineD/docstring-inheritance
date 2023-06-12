@@ -20,9 +20,10 @@
 from __future__ import annotations
 
 import pytest
-from test_base_inheritor import _test_parse_sections
+from test_base_parser import _test_parse_sections
 
-from docstring_inheritance import GoogleDocstringInheritor
+from docstring_inheritance.docstring_inheritors.google import DocstringParser
+from docstring_inheritance.docstring_inheritors.google import DocstringRenderer
 
 
 @pytest.mark.parametrize(
@@ -98,7 +99,7 @@ Section body.
 )
 def test_parse_sections(unindented_docstring, expected_sections):
     _test_parse_sections(
-        GoogleDocstringInheritor._parse_sections,
+        DocstringParser.parse,
         unindented_docstring,
         expected_sections,
     )
@@ -135,7 +136,7 @@ Section name:
 )
 def test_render_section(section_name, section_body, expected_docstring):
     assert (
-        GoogleDocstringInheritor._render_section(section_name, section_body)
+        DocstringRenderer._render_section(section_name, section_body)
         == expected_docstring
     )
 
@@ -153,7 +154,7 @@ def test_render_section(section_name, section_body, expected_docstring):
     ],
 )
 def test_parse_one_section(line1, line2s, expected):
-    assert GoogleDocstringInheritor._parse_one_section(line1, line2s, []) == expected
+    assert DocstringParser._parse_one_section(line1, line2s, []) == expected
 
 
 @pytest.mark.parametrize(
@@ -180,16 +181,7 @@ name:
     ],
 )
 def test_render_docstring(sections, expected):
-    assert GoogleDocstringInheritor._render_docstring(sections) == expected
-
-
-def test_inherit_section_items_with_args():
-    def func(arg):
-        """"""
-
-    expected = {"arg": GoogleDocstringInheritor.MISSING_ARG_DESCRIPTION}
-
-    assert GoogleDocstringInheritor._filter_args_section(func, {}) == expected
+    assert DocstringRenderer.render(sections) == expected
 
 
 # TODO: test section order and all sections items
