@@ -45,12 +45,11 @@ class DocstringRenderer(BaseDocstringRenderer):
 
 
 class DocstringParser(BaseDocstringParser):
+    ARGS_SECTION_NAME: ClassVar[str] = "Args"
     SECTION_NAMES: ClassVar[list[str | None]] = list(BaseDocstringParser.SECTION_NAMES)
-    SECTION_NAMES[1] = "Args"
-
-    ARGS_SECTION_NAMES: ClassVar[set[str]] = {"Args"}
-
-    SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = ARGS_SECTION_NAMES | {
+    SECTION_NAMES[1] = ARGS_SECTION_NAME
+    SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
+        ARGS_SECTION_NAME,
         "Attributes",
         "Methods",
     }

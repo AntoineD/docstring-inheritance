@@ -70,7 +70,7 @@ class BaseDocstringInheritor:
         self._filters_inherited_sections(child_sections)
         self._inherit_sections(
             self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS,
-            self._DOCSTRING_PARSER.ARGS_SECTION_NAMES,
+            self._DOCSTRING_PARSER.ARGS_SECTION_NAME,
             self._DOCSTRING_PARSER.SECTION_NAMES,
             self._MISSING_ARG_TEXT,
             parent_sections,
@@ -99,7 +99,7 @@ class BaseDocstringInheritor:
     def _inherit_sections(
         cls,
         section_names_with_items: set[str],
-        args_section_names: set[str],
+        args_section_name: str,
         section_names: list[str],
         missing_arg_text: str,
         parent_sections: SectionsType,
@@ -155,12 +155,16 @@ class BaseDocstringInheritor:
             temp_sections[section_name] = temp_section_items
 
         # Args section shall be filtered.
-        for section_name in temp_sections.keys() & args_section_names:
-            temp_sections[section_name] = cls._filter_args_section(
-                missing_arg_text,
-                child_func,
-                cast(Dict[str, str], temp_sections[section_name]),
-            )
+        args_section = cls._filter_args_section(
+            missing_arg_text,
+            child_func,
+            cast(Dict[str, str], temp_sections.get(args_section_name, {})),
+        )
+        if args_section:
+            temp_sections[args_section_name] = args_section
+        elif args_section_name in temp_sections:
+            # The args section is empty, there is nothing to document.
+            del temp_sections[args_section_name]
 
         # Reorder the standard sections.
         child_sections.clear()

@@ -133,10 +133,23 @@ MISSING_ARG_TEXT = "dummy missing"
         ),
         # Sections with args items.
         # Non-existing section in child for function without args.
-        ({ARGS_SECTION_NAME: {"parent_a": ""}}, {}, func_none, {ARGS_SECTION_NAME: {}}),
+        ({ARGS_SECTION_NAME: {"parent_a": ""}}, {}, func_none, {}),
         # Non-existing section in parent for function without args.
-        ({}, {ARGS_SECTION_NAME: {"child_a": ""}}, func_none, {ARGS_SECTION_NAME: {}}),
+        ({}, {ARGS_SECTION_NAME: {"child_a": ""}}, func_none, {}),
         # Missing argument description.
+        ({}, {}, func_args, {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}}),
+        (
+            {},
+            {ARGS_SECTION_NAME: {"child_a": ""}},
+            func_args,
+            {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}},
+        ),
+        (
+            {ARGS_SECTION_NAME: {"parent_a": ""}},
+            {},
+            func_args,
+            {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}},
+        ),
         (
             {ARGS_SECTION_NAME: {"parent_a": ""}},
             {ARGS_SECTION_NAME: {"child_a": ""}},
@@ -146,11 +159,23 @@ MISSING_ARG_TEXT = "dummy missing"
         # Argument description in parent.
         (
             {ARGS_SECTION_NAME: {"arg": "parent"}},
+            {},
+            func_args,
+            {ARGS_SECTION_NAME: {"arg": "parent"}},
+        ),
+        (
+            {ARGS_SECTION_NAME: {"arg": "parent"}},
             {ARGS_SECTION_NAME: {"child_a": ""}},
             func_args,
             {ARGS_SECTION_NAME: {"arg": "parent"}},
         ),
         # Argument description in child.
+        (
+            {},
+            {ARGS_SECTION_NAME: {"arg": "child"}},
+            func_args,
+            {ARGS_SECTION_NAME: {"arg": "child"}},
+        ),
         (
             {ARGS_SECTION_NAME: {"parent_a": ""}},
             {ARGS_SECTION_NAME: {"arg": "child"}},
@@ -169,7 +194,7 @@ MISSING_ARG_TEXT = "dummy missing"
 def test_inherit_items(parent_section, child_section, func, expected):
     BaseDocstringInheritor._inherit_sections(
         SECTION_NAMES_WITH_ITEMS,
-        ARGS_SECTION_NAMES,
+        ARGS_SECTION_NAME,
         BaseDocstringParser.SECTION_NAMES,
         MISSING_ARG_TEXT,
         parent_section,

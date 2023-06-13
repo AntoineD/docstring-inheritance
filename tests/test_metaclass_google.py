@@ -19,6 +19,8 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import textwrap
+
 import pytest
 
 from docstring_inheritance import GoogleDocstringInheritanceInitMeta
@@ -50,7 +52,7 @@ def test_args_inheritance(inheritance_class):
                 xx: int
             """
 
-    excepted = """
+    expected = """
 Args:
     xx: int
     x: int
@@ -59,7 +61,7 @@ Args:
     y: float
     **kwargs: int"""
 
-    assert Child.method.__doc__ == excepted
+    assert Child.method.__doc__ == expected
 
 
 @parametrize_inheritance
@@ -98,7 +100,7 @@ def test_class_doc_inheritance(inheritance_class):
             From Child.
         """
 
-    excepted = """\
+    expected = """\
 Class Child.
 
 Attributes:
@@ -114,7 +116,7 @@ Note:
     From Child.\
 """
 
-    assert Child.__doc__ == excepted
+    assert Child.__doc__ == expected
 
 
 @parametrize_inheritance
@@ -151,7 +153,7 @@ def test_class_doc_inheritance_with_init():
         def __init__(self, b, c):
             pass
 
-    excepted = """\
+    expected = """\
 Class Child.
 
 Args:
@@ -162,5 +164,24 @@ Note:
     From Child.\
 """
 
-    assert Child.__doc__ == excepted
+    assert Child.__doc__ == expected
     assert Child.__init__.__doc__ is None
+
+
+def test_class_doc_inheritance_with_empty_parent_doc():
+    class Parent(metaclass=GoogleDocstringInheritanceInitMeta):
+        def __init__(self, a, b):
+            pass
+
+    class Child(Parent):
+        def __init__(self, b, c):
+            """
+            Args:
+                b: n
+            """
+
+    expected = """
+Args:
+    b: n
+"""
+    assert textwrap.dedent(Child.__init__.__doc__) == expected
