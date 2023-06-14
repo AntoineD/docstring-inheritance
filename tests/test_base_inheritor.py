@@ -189,6 +189,19 @@ MISSING_ARG_TEXT = "dummy missing"
             func_args,
             {ARGS_SECTION_NAME: {"arg": "child"}},
         ),
+        # Section ordering.
+        (
+            {},
+            {"Returns": "", None: ""},
+            func_none,
+            {None: "", "Returns": ""},
+        ),
+        (
+            {},
+            {"Returns": "", ARGS_SECTION_NAME: {"arg": ""}, None: ""},
+            func_args,
+            {None: "", ARGS_SECTION_NAME: {"arg": ""}, "Returns": ""},
+        ),
     ],
 )
 def test_inherit_items(parent_section, child_section, func, expected):

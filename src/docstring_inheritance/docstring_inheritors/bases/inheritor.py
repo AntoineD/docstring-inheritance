@@ -109,6 +109,10 @@ class BaseDocstringInheritor:
         """Inherit the sections of a child from the parent sections.
 
         Args:
+            section_names_with_items: The names of the section with items.
+            args_section_name: The name of the section with method arguments.
+            section_names: The names of all the section.
+            missing_arg_text: This text for the missing arguments.
             parent_sections: The parent docstring sections.
             child_sections: The child docstring sections.
             child_func: The child function which sections inherit from the parent.
@@ -181,7 +185,7 @@ class BaseDocstringInheritor:
 
     @staticmethod
     def _filter_args_section(
-        missing_args_text: str,
+        missing_arg_text: str,
         func: Callable[..., Any],
         section_items: dict[str, str],
     ) -> dict[str, str]:
@@ -192,6 +196,7 @@ class BaseDocstringInheritor:
         a default description defined in :attr:`._MISSING_ARG_TEXT`.
 
         Args:
+            missing_arg_text: This text for the missing arguments.
             func: The function that provides the signature.
             section_items: The docstring section items.
 
@@ -217,6 +222,6 @@ class BaseDocstringInheritor:
             if arg in section_items:
                 ordered_section[arg] = section_items[arg]
             else:
-                ordered_section[arg] = missing_args_text
+                ordered_section[arg] = missing_arg_text
 
         return ordered_section
