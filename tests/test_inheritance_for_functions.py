@@ -59,9 +59,6 @@ def test_google():
         References:
             Parent references
 
-        Todo:
-            Parent todo
-
         Yields:
             Parent yields
         """
@@ -128,9 +125,6 @@ References:
 
 Examples:
     Child examples
-
-Todo:
-    Parent todo
 """
 
     inherit_google_docstring(parent.__doc__, child)

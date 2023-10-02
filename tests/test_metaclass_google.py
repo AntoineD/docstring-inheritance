@@ -75,7 +75,7 @@ def test_class_doc_inheritance(inheritance_class):
         Methods:
             a: From GrandParent.
 
-        Note:
+        Notes:
             From GrandParent.
         """
 
@@ -96,7 +96,7 @@ def test_class_doc_inheritance(inheritance_class):
             a: From Child.
             c : From Child.
 
-        Note:
+        Notes:
             From Child.
         """
 
@@ -112,7 +112,7 @@ Methods:
     a: From GrandParent.
     b: From Parent.
 
-Note:
+Notes:
     From Child.\
 """
 
@@ -146,7 +146,7 @@ def test_class_doc_inheritance_with_init():
         Args:
             c: c from Child.
 
-        Note:
+        Notes:
             From Child.
         """
 
@@ -160,7 +160,7 @@ Args:
     b: b from Parent.
     c: c from Child.
 
-Note:
+Notes:
     From Child.\
 """
 

@@ -54,14 +54,20 @@ class GoogleDocstringInheritor(AbstractDocstringInheritor):
         cls, line1: str, line2_rstripped: str, reversed_section_body_lines: list[str]
     ) -> tuple[str, str] | tuple[None, None]:
         # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: B950
-        line1s = line1.rstrip()
+        # The parsing of a section is complete when the first line line1 has:
+        # - no leading blank spaces,
+        # - ends with :,
+        # - has a second line indented by at least 2 blank spaces,
+        # - has a section name.
+        line1_rstripped = line1.rstrip()
         if (
-            not line1s.startswith(" ")
-            and line1s.endswith(":")
+            not line1_rstripped.startswith(" ")
+            and line1_rstripped.endswith(":")
             and line2_rstripped.startswith("  ")
+            and line1_rstripped[:-1].strip() in cls._SECTION_NAMES
         ):
             reversed_section_body_lines += [line2_rstripped]
-            return line1s.rstrip(" :"), cls._get_section_body(
+            return line1_rstripped.rstrip(" :"), cls._get_section_body(
                 reversed_section_body_lines
             )
         return None, None

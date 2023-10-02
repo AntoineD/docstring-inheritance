@@ -78,7 +78,7 @@ Extended summary.
 Args:
     arg
 
-Section name:
+Notes:
     Section body.
 
         Indented line.
@@ -88,7 +88,7 @@ Section name:
 
 Extended summary.""",
                 "Args": {"arg": ""},
-                "Section name": """\
+                "Notes": """\
 Section body.
 
     Indented line.""",
@@ -156,13 +156,16 @@ def test_get_section_body(section_body, expected):
 @pytest.mark.parametrize(
     "line1,line2s,expected",
     [
-        (" name", "  body", (None, None)),
-        (" name:", "  body", (None, None)),
-        ("name", "  body", (None, None)),
-        ("name:", " body", (None, None)),
-        ("name:", "  body", ("name", "body")),
-        ("name :", "  body", ("name", "body")),
-        ("name:", "   body", ("name", "body")),
+        (" Args", "  body", (None, None)),
+        (" Args:", "  body", (None, None)),
+        ("Args", "  body", (None, None)),
+        ("Args:", " body", (None, None)),
+        ("Dummy:", "  body", (None, None)),
+        ("Dummy :", "  body", (None, None)),
+        ("Dummy:", "   body", (None, None)),
+        ("Args:", "  body", ("Args", "body")),
+        ("Args :", "  body", ("Args", "body")),
+        ("Args:", "   body", ("Args", "body")),
     ],
 )
 def test_parse_one_section(line1, line2s, expected):
@@ -178,16 +181,16 @@ def test_parse_one_section(line1, line2s, expected):
             """body""",
         ),
         (
-            {None: "body", "name": "body"},
+            {None: "body", "Args": "body"},
             """body
 
-name:
+Args:
     body""",
         ),
         (
-            {"name": "body"},
+            {"Args": "body"},
             """
-name:
+Args:
     body""",
         ),
     ],
