@@ -5,24 +5,26 @@
 #    pip-compile --extra=test --output-file=requirements/test.txt
 #
 covdefaults==2.3.0
-    # via docstring-inheritance (setup.py)
-coverage[toml]==7.2.7
+    # via docstring-inheritance (pyproject.toml)
+coverage[toml]==7.3.1
     # via
     #   covdefaults
     #   pytest-cov
-exceptiongroup==1.1.1
+exceptiongroup==1.1.3
     # via pytest
 iniconfig==2.0.0
     # via pytest
-packaging==23.1
+packaging==23.2
     # via pytest
-pluggy==1.0.0
+pluggy==1.3.0
     # via pytest
-pytest==7.3.1
+pytest==7.4.2
     # via
-    #   docstring-inheritance (setup.py)
+    #   docstring-inheritance (pyproject.toml)
     #   pytest-cov
 pytest-cov==4.1.0
-    # via docstring-inheritance (setup.py)
+    # via docstring-inheritance (pyproject.toml)
 tomli==2.0.1
-    # via pytest
+    # via
+    #   coverage
+    #   pytest

@@ -41,10 +41,3 @@ Tracker = "https://github.com/AntoineD/docstring-inheritance/issues"
 
 [tool.black]
 target-version = ['py38']
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-
-[tool.coverage.run]
-plugins = ["covdefaults"]
-source = ["docstring_inheritance"]
