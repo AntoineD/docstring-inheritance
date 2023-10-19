@@ -49,7 +49,7 @@ class DocstringParser(BaseDocstringParser):
 
     SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
         ARGS_SECTION_NAME,
-        "OtherParameters",
+        "Other Parameters",
         "Attributes",
         "Methods",
     }
