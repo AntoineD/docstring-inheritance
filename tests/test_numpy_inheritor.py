@@ -22,6 +22,7 @@ from __future__ import annotations
 import pytest
 from test_base_parser import _test_parse_sections
 
+from docstring_inheritance import NumpyDocstringInheritor
 from docstring_inheritance.docstring_inheritors.numpy import DocstringParser
 from docstring_inheritance.docstring_inheritors.numpy import DocstringRenderer
 
@@ -161,7 +162,7 @@ def test_render_section(section_name, section_body, expected_docstring):
     ],
 )
 def test_parse_one_section(line1, line2s, expected):
-    assert DocstringRenderer._parse_one_section(line1, line2s, []) == expected
+    assert DocstringParser._parse_one_section(line1, line2s, []) == expected
 
 
 # The following are test for methods of AbstractDocstringInheritor that depend on
@@ -206,12 +207,18 @@ def test_parse_one_section(line1, line2s, expected):
     ],
 )
 def test_inherit_sections(parent_sections, child_sections, expected_sections):
-    new_child_sections = NumpyDocstringInheritor._inherit_sections(
-        parent_sections, child_sections, lambda: None
+    NumpyDocstringInheritor._inherit_sections(
+        NumpyDocstringInheritor._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS,
+        NumpyDocstringInheritor._DOCSTRING_PARSER.ARGS_SECTION_NAME,
+        NumpyDocstringInheritor._DOCSTRING_PARSER.SECTION_NAMES,
+        NumpyDocstringInheritor._MISSING_ARG_TEXT,
+        parent_sections,
+        child_sections,
+        lambda: None,
     )
-    assert new_child_sections == expected_sections
+    assert child_sections == expected_sections
     # Verify the order of the keys.
-    assert list(new_child_sections.keys()) == list(expected_sections.keys())
+    assert list(child_sections.keys()) == list(expected_sections.keys())
 
 
 @pytest.mark.parametrize(

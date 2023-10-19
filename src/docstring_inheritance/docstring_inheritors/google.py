@@ -79,7 +79,7 @@ class DocstringParser(BaseDocstringParser):
             not line1_rstripped.startswith(" ")
             and line1_rstripped.endswith(":")
             and line2_rstripped.startswith("  ")
-            and line1_rstripped[:-1].strip() in cls._SECTION_NAMES
+            and line1_rstripped[:-1].strip() in cls.SECTION_NAMES
         ):
             reversed_section_body_lines += [line2_rstripped]
             return line1_rstripped.rstrip(" :"), cls._get_section_body(
