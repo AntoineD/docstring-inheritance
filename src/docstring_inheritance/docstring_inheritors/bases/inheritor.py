@@ -82,7 +82,7 @@ class BaseDocstringInheritor:
     @classmethod
     def _filters_inherited_sections(
         cls,
-        sections: SectionsType | dict[str, str],
+        sections: SectionsType,
     ) -> None:
         """Filter the sections for item to be explicitly inherited.
 
@@ -91,7 +91,7 @@ class BaseDocstringInheritor:
         """
         for key, item in tuple(sections.items()):
             if isinstance(item, dict):
-                cls._filters_inherited_sections(item)
+                cls._filters_inherited_sections(cast(SectionsType, item))
             elif item.strip().startswith(cls.INHERIT_SECTION_TAG):
                 del sections[key]
 
@@ -100,7 +100,7 @@ class BaseDocstringInheritor:
         cls,
         section_names_with_items: set[str],
         args_section_name: str,
-        section_names: list[str],
+        section_names: list[str | None],
         missing_arg_text: str,
         parent_sections: SectionsType,
         child_sections: SectionsType,

@@ -19,8 +19,6 @@
 # SOFTWARE.
 from __future__ import annotations
 
-import textwrap
-
 import pytest
 
 from docstring_inheritance.docstring_inheritors.bases.inheritor import (

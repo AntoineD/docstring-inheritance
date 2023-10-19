@@ -60,12 +60,12 @@ class BaseDocstringParser:
     """Names of the sections."""
 
     ARGS_SECTION_NAME: ClassVar[str]
-    """The name of the section for methods arguments."""
+    """The name of the section with methods arguments."""
 
     SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]]
-    """The names of the sections with items."""
+    """The Names of all the sections with items, including `ARGS_SECTION_NAME`."""
 
-    _SECTION_ITEMS_REGEX: ClassVar[re.Pattern] = re.compile(
+    _SECTION_ITEMS_REGEX: ClassVar[re.Pattern[str]] = re.compile(
         r"(\**\w+)(.*?)(?:$|(?=\n\**\w+))", flags=re.DOTALL
     )
 
