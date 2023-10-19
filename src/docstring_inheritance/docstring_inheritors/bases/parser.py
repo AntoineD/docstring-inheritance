@@ -91,7 +91,7 @@ class BaseDocstringParser:
         cls,
         reversed_section_body_lines: list[str],
     ) -> str:
-        """Create the docstring of a section.
+        """Return the docstring of a section.
 
         Args:
             reversed_section_body_lines: The lines of docstrings in reversed order.

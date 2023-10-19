@@ -307,10 +307,10 @@ def test_inherit_section_items_with_args(func, section_items, expected):
         ({}, {}),
         ({"": ""}, {"": ""}),
         ({"": {"": ""}}, {"": {"": ""}}),
-        ({"": "__inherit_section_doc__"}, {}),
-        ({"": "__inherit_section_doc__", "a": ""}, {"a": ""}),
-        ({"": {"": "__inherit_section_doc__"}}, {"": {}}),
-        ({"": {"": "__inherit_section_doc__", "a": ""}}, {"": {"a": ""}}),
+        ({"": "__inherit_doc__"}, {}),
+        ({"": "__inherit_doc__", "a": ""}, {"a": ""}),
+        ({"": {"": "__inherit_doc__"}}, {"": {}}),
+        ({"": {"": "__inherit_doc__", "a": ""}}, {"": {"a": ""}}),
     ),
 )
 def test_filter_inherited_sections(sections, expected):

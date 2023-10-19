@@ -40,7 +40,7 @@ class BaseDocstringInheritor:
     MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
     """The fall back description for a method argument without a description."""
 
-    INHERIT_SECTION_TAG: ClassVar[str] = "__inherit_section_doc__"
+    INHERIT_SECTION_PLACEHOLDER: ClassVar[str] = "__inherit_doc__"
     """Placeholder used to indicate that a section docstring shall be inherited."""
 
     _MISSING_ARG_TEXT: ClassVar[str]
@@ -92,7 +92,7 @@ class BaseDocstringInheritor:
         for key, item in tuple(sections.items()):
             if isinstance(item, dict):
                 cls._filters_inherited_sections(cast(SectionsType, item))
-            elif item.strip().startswith(cls.INHERIT_SECTION_TAG):
+            elif item.strip().startswith(cls.INHERIT_SECTION_PLACEHOLDER):
                 del sections[key]
 
     @classmethod

@@ -73,8 +73,6 @@ class DocstringParser(BaseDocstringParser):
 
 
 class NumpyDocstringInheritor(BaseDocstringInheritor):
-    _MISSING_ARG_TEXT: ClassVar[
-        str
-    ] = f"\n    {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
+    _MISSING_ARG_TEXT = f"\n    {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
     _DOCSTRING_PARSER = DocstringParser
     _DOCSTRING_RENDERER = DocstringRenderer
