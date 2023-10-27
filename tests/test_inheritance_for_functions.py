@@ -23,6 +23,7 @@ import inspect
 
 import pytest
 
+from docstring_inheritance import inherit_docstring
 from docstring_inheritance import inherit_google_docstring
 from docstring_inheritance import inherit_numpy_docstring
 from docstring_inheritance.class_docstrings_inheritor import ClassDocstringsInheritor
@@ -128,6 +129,38 @@ Examples:
 """
 
     inherit_google_docstring(parent.__doc__, child)
+    assert child.__doc__ == expected.strip("\n")
+
+
+def test_decorator():
+    def parent(arg, *parent_varargs, **parent_kwargs):
+        """Parent summary.
+
+        Args:
+            arg: desc
+            *parent_varargs: Parent *args
+            **parent_kwargs: Parent **kwargs
+        """
+
+    @inherit_docstring(source=parent, style="google")
+    def child(x, missing_doc, *child_varargs, **child_kwargs):
+        """Child summary.
+
+        Args:
+            x: X
+            child_varargs: Not *args
+            *child_varargs: Child *args
+            **child_kwargs: Child **kwargs
+        """
+
+    expected = """Child summary.
+
+Args:
+    x: X
+    missing_doc: The description is missing.
+    *child_varargs: Child *args
+    **child_kwargs: Child **kwargs
+"""
     assert child.__doc__ == expected.strip("\n")
 
 
