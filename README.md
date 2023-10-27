@@ -191,6 +191,42 @@ Notes:
 """
 ```
 
+## Using decorators
+
+Functions and methods can be decorated with the `inherit_docstring` decorator
+to inherit the docstring of another function or method. For example, the above
+example can be rewritten as:
+
+```python
+from docstring_inheritance import inherit_docstring
+
+
+def parent():
+  """Parent summary.
+
+  Args:
+      x: Description for x.
+      y: Description for y.
+
+  Notes:
+      Parent notes.
+  """
+
+
+@inherit_docstring(source=parent, style="google")
+def child():
+  """
+  Args:
+      z: Description for z.
+
+  Returns:
+      Something.
+
+  Notes:
+      Child notes.
+  """
+```
+
 # Docstring inheritance specification
 
 ## Sections order

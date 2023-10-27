@@ -19,7 +19,7 @@
 # SOFTWARE.
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable, Literal
 
 from .class_docstrings_inheritor import ClassDocstringsInheritor
 from .class_docstrings_inheritor import DocstringInheritor
@@ -120,3 +120,16 @@ class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
             inherit_numpy_docstring,
             init_in_class=True,
         )
+
+
+def inherit_docstring(func: Callable = None, *, source: Callable = None, style: Literal["numpy", "google"] = "numpy"):
+    """Decorator for inherit docstring from other functions."""
+    assert source is not None, "Source function is not given."
+    assert style in ("numpy", "google"), "Style must be either 'numpy' or 'google'."
+
+    def wrapper(f):
+        inherit_func = inherit_numpy_docstring if style == "numpy" else inherit_google_docstring
+        inherit_func(source.__doc__, f)
+        return f
+
+    return wrapper if func is None else wrapper(func)
