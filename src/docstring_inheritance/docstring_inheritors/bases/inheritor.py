@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import inspect
+import warnings
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
@@ -29,11 +30,14 @@ from typing import ClassVar
 from typing import Dict
 from typing import cast
 
-from . import SectionsType
-
 if TYPE_CHECKING:
+    from . import SectionsType
     from .parser import BaseDocstringParser
     from .renderer import BaseDocstringRenderer
+
+
+class DocstringInheritanceWarning(UserWarning):
+    """A warning for docstring inheritance."""
 
 
 class BaseDocstringInheritor:
@@ -44,9 +48,6 @@ class BaseDocstringInheritor:
 
     MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
     """The fall back description for a method argument without a description."""
-
-    INHERIT_SECTION_PLACEHOLDER: ClassVar[str] = "__inherit_doc__"
-    """Placeholder used to indicate that a section docstring shall be inherited."""
 
     _MISSING_ARG_TEXT: ClassVar[str]
     """The actual formatted text bound to a missing method argument."""
@@ -72,7 +73,6 @@ class BaseDocstringInheritor:
 
         parent_sections = self._DOCSTRING_PARSER.parse(parent_doc)
         child_sections = self._DOCSTRING_PARSER.parse(child_func.__doc__)
-        self._filters_inherited_sections(child_sections)
         self._inherit_sections(
             self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS,
             self._DOCSTRING_PARSER.ARGS_SECTION_NAME,
@@ -83,22 +83,6 @@ class BaseDocstringInheritor:
             child_func,
         )
         child_func.__doc__ = self._DOCSTRING_RENDERER.render(child_sections)
-
-    @classmethod
-    def _filters_inherited_sections(
-        cls,
-        sections: SectionsType,
-    ) -> None:
-        """Filter the sections for item to be explicitly inherited.
-
-        Args:
-            sections: The sections to filter.
-        """
-        for key, item in tuple(sections.items()):
-            if isinstance(item, dict):
-                cls._filters_inherited_sections(cast(SectionsType, item))
-            elif cls.INHERIT_SECTION_PLACEHOLDER in item:
-                del sections[key]
 
     @classmethod
     def _inherit_sections(
@@ -224,6 +208,8 @@ class BaseDocstringInheritor:
 
         ordered_section = {}
         for arg in all_args:
+            msg = f"The docstring for the argument '{arg}' is missing."
+            warnings.warn(msg, category=DocstringInheritanceWarning, stacklevel=2)
             ordered_section[arg] = section_items.get(arg, missing_arg_text)
 
         return ordered_section

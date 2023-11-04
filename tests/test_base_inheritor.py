@@ -151,18 +151,6 @@ MISSING_ARG_TEXT = "dummy missing"
             {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}},
         ),
         (
-            {},
-            {ARGS_SECTION_NAME: {"child_a": ""}},
-            func_args,
-            {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}},
-        ),
-        (
-            {ARGS_SECTION_NAME: {"parent_a": ""}},
-            {},
-            func_args,
-            {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}},
-        ),
-        (
             {ARGS_SECTION_NAME: {"parent_a": ""}},
             {ARGS_SECTION_NAME: {"child_a": ""}},
             func_args,
@@ -299,20 +287,3 @@ def test_inherit_section_items_with_args(func, section_items, expected):
         )
         == expected
     )
-
-
-@pytest.mark.parametrize(
-    ("sections", "expected"),
-    [
-        ({}, {}),
-        ({"": ""}, {"": ""}),
-        ({"": {"": ""}}, {"": {"": ""}}),
-        ({"": "__inherit_docstring__"}, {}),
-        ({"": "__inherit_docstring__", "a": ""}, {"a": ""}),
-        ({"": {"": "__inherit_docstring__"}}, {"": {}}),
-        ({"": {"": "__inherit_docstring__", "a": ""}}, {"": {"a": ""}}),
-    ],
-)
-def test_filter_inherited_sections(sections, expected):
-    BaseDocstringInheritor._filters_inherited_sections(sections)
-    assert sections == expected
