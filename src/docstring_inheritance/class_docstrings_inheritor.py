@@ -129,9 +129,11 @@ class ClassDocstringsInheritor:
                     if parent_doc is not None:
                         self._docstring_inheritor(parent_doc, attr)
                         # As opposed to the class docstring inheritance, and following
-                        # the MRO for methods, we inherit only from the first found parent.
+                        # the MRO for methods,
+                        # we inherit only from the first found parent.
                         break
-                    # TODO: else WARN that no dosctring is defined and none can be inherited.
+                    # TODO: else WARN that no dosctring is defined and
+                    # none can be inherited.
 
     @staticmethod
     def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:

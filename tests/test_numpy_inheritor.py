@@ -28,7 +28,7 @@ from docstring_inheritance.docstring_inheritors.numpy import DocstringRenderer
 
 
 @pytest.mark.parametrize(
-    "unindented_docstring,expected_sections",
+    ("unindented_docstring", "expected_sections"),
     [
         ("", {}),
         (
@@ -107,7 +107,7 @@ def test_parse_sections(unindented_docstring, expected_sections):
 
 
 @pytest.mark.parametrize(
-    "section_name,section_body,expected_docstring",
+    ("section_name", "section_body", "expected_docstring"),
     [
         (
             None,
@@ -146,7 +146,7 @@ def test_render_section(section_name, section_body, expected_docstring):
 
 
 @pytest.mark.parametrize(
-    "line1,line2s,expected",
+    ("line1", "line2s", "expected"),
     [
         ("", "--", (None, None)),
         ("", "***", (None, None)),
@@ -170,7 +170,7 @@ def test_parse_one_section(line1, line2s, expected):
 
 
 @pytest.mark.parametrize(
-    "parent_sections,child_sections,expected_sections",
+    ("parent_sections", "child_sections", "expected_sections"),
     [
         # Section missing in child.
         ({0: 0}, {}, {0: 0}),
@@ -222,7 +222,7 @@ def test_inherit_sections(parent_sections, child_sections, expected_sections):
 
 
 @pytest.mark.parametrize(
-    "sections,expected",
+    ("sections", "expected"),
     [
         ({}, ""),
         (

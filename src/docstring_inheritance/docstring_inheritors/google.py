@@ -68,7 +68,7 @@ class DocstringParser(BaseDocstringParser):
         line2_rstripped: str,
         reversed_section_body_lines: list[str],
     ) -> tuple[str, str] | tuple[None, None]:
-        # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: B950
+        # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: E501
         # The parsing of a section is complete when the first line line1 has:
         # - no leading blank spaces,
         # - ends with :,

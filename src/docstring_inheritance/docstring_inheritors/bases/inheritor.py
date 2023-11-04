@@ -20,15 +20,18 @@
 from __future__ import annotations
 
 import inspect
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
-from typing import cast
 from typing import ClassVar
 from typing import Dict
+from typing import cast
 
 from . import SectionsType
-from .parser import BaseDocstringParser
-from .renderer import BaseDocstringRenderer
+
+if TYPE_CHECKING:
+    from .parser import BaseDocstringParser
+    from .renderer import BaseDocstringRenderer
 
 
 class BaseDocstringInheritor:
@@ -92,7 +95,7 @@ class BaseDocstringInheritor:
         for key, item in tuple(sections.items()):
             if isinstance(item, dict):
                 cls._filters_inherited_sections(cast(SectionsType, item))
-            elif item.strip().startswith(cls.INHERIT_SECTION_PLACEHOLDER):
+            elif cls.INHERIT_SECTION_PLACEHOLDER in item:
                 del sections[key]
 
     @classmethod
@@ -217,11 +220,8 @@ class BaseDocstringInheritor:
         if varkw is not None:
             all_args += [f"**{varkw}"]
 
-        ordered_section = dict()
+        ordered_section = {}
         for arg in all_args:
-            if arg in section_items:
-                ordered_section[arg] = section_items[arg]
-            else:
-                ordered_section[arg] = missing_arg_text
+            ordered_section[arg] = section_items.get(arg, missing_arg_text)
 
         return ordered_section

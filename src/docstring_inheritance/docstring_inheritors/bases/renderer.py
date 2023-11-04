@@ -20,8 +20,10 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import TYPE_CHECKING
 
-from . import SectionsType
+if TYPE_CHECKING:
+    from . import SectionsType
 
 
 class BaseDocstringRenderer:

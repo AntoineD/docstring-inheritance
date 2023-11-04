@@ -79,7 +79,7 @@ MISSING_ARG_TEXT = "dummy missing"
 
 
 @pytest.mark.parametrize(
-    "parent_section,child_section,func,expected",
+    ("parent_section", "child_section", "func", "expected"),
     [
         ({}, {}, func_none, {}),
         # Non-existing section in child.
@@ -230,7 +230,7 @@ def test_inherit_items(parent_section, child_section, func, expected):
 
 
 @pytest.mark.parametrize(
-    "func,section_items,expected",
+    ("func", "section_items", "expected"),
     [
         (func_none, {}, {}),
         # Non-existing args are removed.
@@ -302,16 +302,16 @@ def test_inherit_section_items_with_args(func, section_items, expected):
 
 
 @pytest.mark.parametrize(
-    "sections,expected",
-    (
+    ("sections", "expected"),
+    [
         ({}, {}),
         ({"": ""}, {"": ""}),
         ({"": {"": ""}}, {"": {"": ""}}),
-        ({"": "__inherit_doc__"}, {}),
-        ({"": "__inherit_doc__", "a": ""}, {"a": ""}),
-        ({"": {"": "__inherit_doc__"}}, {"": {}}),
-        ({"": {"": "__inherit_doc__", "a": ""}}, {"": {"a": ""}}),
-    ),
+        ({"": "__inherit_docstring__"}, {}),
+        ({"": "__inherit_docstring__", "a": ""}, {"a": ""}),
+        ({"": {"": "__inherit_docstring__"}}, {"": {}}),
+        ({"": {"": "__inherit_docstring__", "a": ""}}, {"": {"a": ""}}),
+    ],
 )
 def test_filter_inherited_sections(sections, expected):
     BaseDocstringInheritor._filters_inherited_sections(sections)

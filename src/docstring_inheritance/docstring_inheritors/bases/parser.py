@@ -25,9 +25,11 @@ import sys
 from abc import abstractmethod
 from itertools import dropwhile
 from itertools import tee
+from typing import TYPE_CHECKING
 from typing import ClassVar
 
-from . import SectionsType
+if TYPE_CHECKING:
+    from . import SectionsType
 
 if sys.version_info >= (3, 10):  # pragma: >=3.10 cover
     from itertools import pairwise

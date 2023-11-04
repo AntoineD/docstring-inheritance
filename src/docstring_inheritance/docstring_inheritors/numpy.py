@@ -21,9 +21,7 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from .bases.inheritor import (
-    BaseDocstringInheritor,
-)
+from .bases.inheritor import BaseDocstringInheritor
 from .bases.parser import BaseDocstringParser
 from .bases.renderer import BaseDocstringRenderer
 
@@ -61,13 +59,13 @@ class DocstringParser(BaseDocstringParser):
         line2_rstripped: str,
         reversed_section_body_lines: list[str],
     ) -> tuple[str, str] | tuple[None, None]:
-        # See https://github.com/numpy/numpydoc/blob/d85f54ea342c1d223374343be88da94ce9f58dec/numpydoc/docscrape.py#L179  # noqa: B950
+        # See https://github.com/numpy/numpydoc/blob/d85f54ea342c1d223374343be88da94ce9f58dec/numpydoc/docscrape.py#L179  # noqa: E501
         if len(line2_rstripped) >= 3 and (set(line2_rstripped) in ({"-"}, {"="})):
             line1s = line1.rstrip()
             min_line_length = len(line1s)
             if line2_rstripped.startswith(
-                "-" * min_line_length
-            ) or line2_rstripped.startswith("=" * min_line_length):
+                ("-" * min_line_length, "=" * min_line_length)
+            ):
                 return line1s, cls._get_section_body(reversed_section_body_lines)
         return None, None
 

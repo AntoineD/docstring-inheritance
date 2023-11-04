@@ -27,7 +27,7 @@ from docstring_inheritance.docstring_inheritors.bases.parser import BaseDocstrin
 
 
 @pytest.mark.parametrize(
-    "section_body,expected",
+    ("section_body", "expected"),
     [
         ([], ""),
         (["foo"], "foo"),
@@ -40,8 +40,8 @@ def test_get_section_body(section_body, expected):
 
 
 @pytest.mark.parametrize(
-    "section_body,expected_matches",
-    (
+    ("section_body", "expected_matches"),
+    [
         ("foo", {"foo": ""}),
         ("foo : str\n    Foo.", {"foo": " : str\n    Foo."}),
         ("foo\nbar", {"foo": "", "bar": ""}),
@@ -50,7 +50,7 @@ def test_get_section_body(section_body, expected):
             "foo : str\n    Foo.\nbar : int\n    Bar.",
             {"foo": " : str\n    Foo.", "bar": " : int\n    Bar."},
         ),
-    ),
+    ],
 )
 def test_section_items_regex(section_body, expected_matches):
     assert BaseDocstringParser._parse_section_items(section_body) == expected_matches
