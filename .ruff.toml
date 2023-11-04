@@ -9,8 +9,6 @@ ignore = [
     "E203",
     # Checks for undocumented magic method definitions.
     "D105",
-    # Checks for noqa directives that are no longer applicable.
-    "RUF100",
     # Checks for long exception messages that are not defined in the exception class itself.
     "TRY003",
     # Avoid unexpected behavior with the formatter.

@@ -17,6 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Docstring inheritance entry point."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -67,8 +69,7 @@ class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
 
 
 class GoogleDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
-    """Metaclass for inheriting docstrings in Google format with ``__init__`` in the
-    class docstring."""
+    """Metaclass for inheriting docstrings in Google format with init-in-class."""
 
     def __init__(
         self,
@@ -104,8 +105,7 @@ class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
 
 
 class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
-    """Metaclass for inheriting docstrings in Numpy format with ``__init__`` in the
-    class docstring."""
+    """Metaclass for inheriting docstrings in Numpy format with init-in-class."""
 
     def __init__(
         self,

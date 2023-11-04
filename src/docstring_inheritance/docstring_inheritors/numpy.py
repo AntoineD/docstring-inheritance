@@ -17,6 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Classes for inheriting NumPy docstrings."""
+
 from __future__ import annotations
 
 from typing import ClassVar
@@ -27,6 +29,8 @@ from .bases.renderer import BaseDocstringRenderer
 
 
 class DocstringRenderer(BaseDocstringRenderer):
+    """The renderer for NumPy docstrings."""
+
     @staticmethod
     def _render_section(
         section_name: str | None,
@@ -43,6 +47,8 @@ class DocstringRenderer(BaseDocstringRenderer):
 
 
 class DocstringParser(BaseDocstringParser):
+    """The parser for NumPy docstrings."""
+
     ARGS_SECTION_NAME: ClassVar[str] = "Parameters"
 
     SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
@@ -71,6 +77,8 @@ class DocstringParser(BaseDocstringParser):
 
 
 class NumpyDocstringInheritor(BaseDocstringInheritor):
+    """The inheritor for NumPy docstrings."""
+
     _MISSING_ARG_TEXT = f"\n    {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
     _DOCSTRING_PARSER = DocstringParser
     _DOCSTRING_RENDERER = DocstringRenderer

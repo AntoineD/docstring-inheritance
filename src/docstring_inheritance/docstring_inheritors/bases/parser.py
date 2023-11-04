@@ -17,6 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Base class for docstrings parsers."""
+
 from __future__ import annotations
 
 import inspect
@@ -42,6 +44,8 @@ else:  # pragma: <3.10 cover
 
 
 class BaseDocstringParser:
+    """The base class for docstring parsers."""
+
     SECTION_NAMES: ClassVar[list[str | None]] = [
         None,
         "Parameters",

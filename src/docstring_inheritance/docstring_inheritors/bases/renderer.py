@@ -27,6 +27,8 @@ if TYPE_CHECKING:
 
 
 class BaseDocstringRenderer:
+    """The docstring base class renderer."""
+
     @classmethod
     def render(cls, sections: SectionsType) -> str:
         """Render a docstring.

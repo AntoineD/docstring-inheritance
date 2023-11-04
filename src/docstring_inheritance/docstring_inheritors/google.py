@@ -17,6 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Classes for inheriting Google docstrings."""
+
 from __future__ import annotations
 
 import textwrap
@@ -28,6 +30,8 @@ from .bases.renderer import BaseDocstringRenderer
 
 
 class DocstringRenderer(BaseDocstringRenderer):
+    """The renderer for Google docstrings."""
+
     @staticmethod
     def _render_section(
         section_name: str | None,
@@ -45,6 +49,8 @@ class DocstringRenderer(BaseDocstringRenderer):
 
 
 class DocstringParser(BaseDocstringParser):
+    """The parser for Google docstrings."""
+
     ARGS_SECTION_NAME: ClassVar[str] = "Args"
     SECTION_NAMES: ClassVar[list[str | None]] = list(BaseDocstringParser.SECTION_NAMES)
     SECTION_NAMES[1] = ARGS_SECTION_NAME
@@ -89,6 +95,8 @@ class DocstringParser(BaseDocstringParser):
 
 
 class GoogleDocstringInheritor(BaseDocstringInheritor):
+    """The inheritor for Google docstrings."""
+
     _MISSING_ARG_TEXT = f": {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
     _DOCSTRING_PARSER = DocstringParser
     _DOCSTRING_RENDERER = DocstringRenderer
