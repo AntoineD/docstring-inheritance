@@ -163,8 +163,6 @@ class BaseDocstringInheritor:
                 f"the parent doc is\n{indent(parent_doc, ' ' * 4)}\n"
                 f"the child doc is\n{indent(child_doc, ' ' * 4)}"
             )
-            if section_path[0] is None:
-                section_path[0] = "Summary"
             self._warn(section_path, msg)
 
     def _warn(self, section_path: list[str], msg: str) -> None:
