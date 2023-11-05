@@ -45,7 +45,7 @@ class _BaseDocstringInheritanceMeta(type):
     ) -> None:
         super().__init__(class_name, class_bases, class_dict)
         if class_bases:
-            ClassDocstringsInheritor.inherit_docstring(
+            ClassDocstringsInheritor.inherit_docstrings(
                 cls, docstring_inheritor, init_in_class
             )
 

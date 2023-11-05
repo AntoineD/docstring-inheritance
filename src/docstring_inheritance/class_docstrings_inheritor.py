@@ -66,7 +66,7 @@ class ClassDocstringsInheritor:
         self._init_in_class = init_in_class
 
     @classmethod
-    def inherit_docstring(
+    def inherit_docstrings(
         cls,
         class_: type,
         docstring_inheritor: DocstringInheritor,
