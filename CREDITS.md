@@ -13,18 +13,15 @@
 
 # External applications
 
-- [black](https://black.readthedocs.io): MIT
 - [build](https://pypa-build.readthedocs.io): MIT
 - [docformatter](https://github.com/myint/docformatter): MIT
-- [flake8](https://flake8.pycqa.org): MIT
 - [Lucas-C/pre-commit-hooks](https://github.com/Lucas-C/pre-commit-hooks): MIT
 - [mypy](http://www.mypy-lang.org/): MIT
 - [pre-commit](https://pre-commit.com): MIT
 - [pygrep-hooks](https://github.com/pre-commit/pygrep-hooks): MIT
 - [pytest](https://pytest.org): MIT
 - [pytest-cov](https://pytest-cov.readthedocs.io): MIT
-- [python-reorder-import](https://github.com/asottile/reorder_python_imports): MIT
-- [pyupgrade](https://github.com/asottile/pyupgrade): MIT
+- [ruff](https://docs.astral.sh/ruff): MIT
 - [setuptools](https://setuptools.readthedocs.io/): MIT
 - [setuptools_scm](https://github.com/pypa/setuptools_scm/): MIT
 - [tox](https://tox.wiki): MIT
