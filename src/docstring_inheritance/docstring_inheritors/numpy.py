@@ -23,8 +23,10 @@ from __future__ import annotations
 
 from typing import ClassVar
 
+from .bases import SUMMARY_SECTION_NAME
 from .bases.inheritor import BaseDocstringInheritor
 from .bases.parser import BaseDocstringParser
+from .bases.parser import NoSectionFound
 from .bases.renderer import BaseDocstringRenderer
 
 
@@ -33,10 +35,10 @@ class DocstringRenderer(BaseDocstringRenderer):
 
     @staticmethod
     def _render_section(
-        section_name: str | None,
+        section_name: str,
         section_body: str | dict[str, str],
     ) -> str:
-        if section_name is None:
+        if section_name is SUMMARY_SECTION_NAME:
             assert isinstance(section_body, str)
             return section_body
         if isinstance(section_body, dict):
@@ -64,7 +66,7 @@ class DocstringParser(BaseDocstringParser):
         line1: str,
         line2_rstripped: str,
         reversed_section_body_lines: list[str],
-    ) -> tuple[str, str] | tuple[None, None]:
+    ) -> tuple[str, str]:
         # See https://github.com/numpy/numpydoc/blob/d85f54ea342c1d223374343be88da94ce9f58dec/numpydoc/docscrape.py#L179  # noqa: E501
         if len(line2_rstripped) >= 3 and (set(line2_rstripped) in ({"-"}, {"="})):
             line1s = line1.rstrip()
@@ -73,7 +75,7 @@ class DocstringParser(BaseDocstringParser):
                 ("-" * min_line_length, "=" * min_line_length)
             ):
                 return line1s, cls._get_section_body(reversed_section_body_lines)
-        return None, None
+        raise NoSectionFound
 
 
 class NumpyDocstringInheritor(BaseDocstringInheritor):

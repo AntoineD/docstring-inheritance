@@ -30,6 +30,8 @@ from itertools import tee
 from typing import TYPE_CHECKING
 from typing import ClassVar
 
+from . import SUMMARY_SECTION_NAME
+
 if TYPE_CHECKING:
     from . import SectionsType
 
@@ -43,11 +45,15 @@ else:  # pragma: <3.10 cover
         return zip(a, b)
 
 
+class NoSectionFound(BaseException):
+    """Exception raised when no section has been found when parsing one section."""
+
+
 class BaseDocstringParser:
     """The base class for docstring parsers."""
 
-    SECTION_NAMES: ClassVar[list[str | None]] = [
-        None,
+    SECTION_NAMES: ClassVar[list[str]] = [
+        SUMMARY_SECTION_NAME,
         "Parameters",
         "Returns",
         "Yields",
@@ -82,14 +88,16 @@ class BaseDocstringParser:
         line1: str,
         line2_rstripped: str,
         reversed_section_body_lines: list[str],
-    ) -> tuple[str, str] | tuple[None, None]:
+    ) -> tuple[str, str]:
         """Parse the name and body of a docstring section.
 
         It does not parse section_items items.
 
         Returns:
-            The name and docstring body parts of a section,
-            or ``(None, None)`` if no section is found.
+            The name and docstring body parts of a section.
+
+        Raises:
+            NoSectionFound: If no section is found.
         """
 
     @classmethod
@@ -137,28 +145,30 @@ class BaseDocstringParser:
         for line2, line1 in lines_pairs:
             line2_rstripped = line2.rstrip()
 
-            section_name, section_body = cls._parse_one_section(
-                line1, line2_rstripped, reversed_section_body_lines
-            )
-            if section_name is not None and section_body is not None:
-                if section_name in cls.SECTION_NAMES_WITH_ITEMS:
-                    reversed_sections[section_name] = cls._parse_section_items(
-                        section_body
-                    )
-                else:
+            try:
+                section_name, section_body = cls._parse_one_section(
+                    line1, line2_rstripped, reversed_section_body_lines
+                )
+            except NoSectionFound:
+                pass
+            else:
+                if section_name is not SUMMARY_SECTION_NAME:
+                    if section_name in cls.SECTION_NAMES_WITH_ITEMS:
+                        section_body = cls._parse_section_items(section_body)
+
                     reversed_sections[section_name] = section_body
 
-                # We took into account line1 in addition to line2,
-                # we no longer need to process line1.
-                try:
-                    next(lines_pairs)
-                except StopIteration:
-                    # The docstring has no summary section_items.
-                    has_summary = False
-                    break
+                    # We took into account line1 in addition to line2,
+                    # we no longer need to process line1.
+                    try:
+                        next(lines_pairs)
+                    except StopIteration:
+                        # The docstring has no summary section_items.
+                        has_summary = False
+                        break
 
-                reversed_section_body_lines = []
-                continue
+                    reversed_section_body_lines = []
+                    continue
 
             reversed_section_body_lines += [line2_rstripped]
         else:
@@ -172,10 +182,11 @@ class BaseDocstringParser:
             reversed_section_body_lines += [lines[0]]
 
             # Add the section_items with the short and extended summaries.
-            sections[None] = cls._get_section_body(reversed_section_body_lines)
+            sections[SUMMARY_SECTION_NAME] = cls._get_section_body(
+                reversed_section_body_lines
+            )
 
-        # dict.items() is not reversible in python < 3.8: cast to tuple.
-        for section_name_, section_body_ in reversed(tuple(reversed_sections.items())):
+        for section_name_, section_body_ in reversed(reversed_sections.items()):
             sections[section_name_] = section_body_
 
         return sections

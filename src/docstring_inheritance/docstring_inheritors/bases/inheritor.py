@@ -112,7 +112,7 @@ class BaseDocstringInheritor:
         self,
         parent_sections: SectionsType | dict[str, str],
         child_sections: SectionsType | dict[str, str],
-        section_path: Sequence[str | None] = (),
+        section_path: Sequence[str] = (),
     ) -> None:
         """Issue a warning when the parent and child sections are similar.
 
@@ -125,15 +125,15 @@ class BaseDocstringInheritor:
             return
 
         for section_name, child_section in child_sections.items():
-            parent_section = parent_sections.get(cast(str, section_name))
+            parent_section = parent_sections.get(section_name)
             if parent_section is None:
                 continue
 
             # TODO: add Raises section?
             if section_name in self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS:
                 self._warn_similar_sections(
-                    cast(dict[str, str], parent_section),
-                    cast(dict[str, str], child_section),
+                    cast(Dict[str, str], parent_section),
+                    cast(Dict[str, str], child_section),
                     section_path=[section_name],
                 )
             else:
@@ -147,7 +147,7 @@ class BaseDocstringInheritor:
         self,
         parent_doc: str,
         child_doc: str,
-        section_path: list[str | None],
+        section_path: list[str],
     ) -> None:
         """Issue a warning when the parent and child docs are similar.
 
@@ -165,7 +165,7 @@ class BaseDocstringInheritor:
             )
             if section_path[0] is None:
                 section_path[0] = "Summary"
-            self._warn(cast(list[str], section_path), msg)
+            self._warn(section_path, msg)
 
     def _warn(self, section_path: list[str], msg: str) -> None:
         """Issue a warning.
@@ -185,7 +185,7 @@ class BaseDocstringInheritor:
         self,
         section_names_with_items: set[str],
         args_section_name: str,
-        section_names: list[str | None],
+        section_names: list[str],
         missing_arg_text: str,
         parent_sections: SectionsType,
         child_sections: SectionsType,

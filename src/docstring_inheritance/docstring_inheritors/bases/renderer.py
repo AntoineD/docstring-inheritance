@@ -22,6 +22,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
+from . import SUMMARY_SECTION_NAME
+
 if TYPE_CHECKING:
     from . import SectionsType
 
@@ -49,7 +51,7 @@ class BaseDocstringRenderer:
 
         rendered = "\n\n".join(rendered_sections)
 
-        if None not in sections:
+        if SUMMARY_SECTION_NAME not in sections:
             # Add an empty summary line,
             # Sphinx will not behave correctly otherwise with the Google format.
             return "\n" + rendered
@@ -59,7 +61,7 @@ class BaseDocstringRenderer:
     @staticmethod
     @abstractmethod
     def _render_section(
-        section_name: str | None,
+        section_name: str,
         section_body: str | dict[str, str],
     ) -> str:
         """Return a rendered docstring section.

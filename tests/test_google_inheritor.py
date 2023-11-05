@@ -22,6 +22,8 @@ from __future__ import annotations
 import pytest
 from test_base_parser import _test_parse_sections
 
+from docstring_inheritance.docstring_inheritors.bases import SUMMARY_SECTION_NAME
+from docstring_inheritance.docstring_inheritors.bases.parser import NoSectionFound
 from docstring_inheritance.docstring_inheritors.google import DocstringParser
 from docstring_inheritance.docstring_inheritors.google import DocstringRenderer
 
@@ -33,7 +35,7 @@ from docstring_inheritance.docstring_inheritors.google import DocstringRenderer
         (
             "Short summary.",
             {
-                None: "Short summary.",
+                SUMMARY_SECTION_NAME: "Short summary.",
             },
         ),
         (
@@ -42,7 +44,7 @@ from docstring_inheritance.docstring_inheritors.google import DocstringRenderer
 Extended summary.
 """,
             {
-                None: """Short summary.
+                SUMMARY_SECTION_NAME: """Short summary.
 
 Extended summary.""",
             },
@@ -65,7 +67,7 @@ Args:
     arg
 """,
             {
-                None: """Short summary.
+                SUMMARY_SECTION_NAME: """Short summary.
 
 Extended summary.""",
                 "Args": {"arg": ""},
@@ -85,7 +87,7 @@ Notes:
         Indented line.
 """,
             {
-                None: """Short summary.
+                SUMMARY_SECTION_NAME: """Short summary.
 
 Extended summary.""",
                 "Args": {"arg": ""},
@@ -109,7 +111,7 @@ def test_parse_sections(unindented_docstring, expected_sections):
     ("section_name", "section_body", "expected_docstring"),
     [
         (
-            None,
+            SUMMARY_SECTION_NAME,
             "Short summary.",
             "Short summary.",
         ),
@@ -142,15 +144,46 @@ def test_render_section(section_name, section_body, expected_docstring):
 
 
 @pytest.mark.parametrize(
+    ("line1", "line2s"),
+    [
+        (
+            " Args",
+            "  body",
+        ),
+        (
+            " Args:",
+            "  body",
+        ),
+        (
+            "Args",
+            "  body",
+        ),
+        (
+            "Args:",
+            " body",
+        ),
+        (
+            "Dummy:",
+            "  body",
+        ),
+        (
+            "Dummy :",
+            "  body",
+        ),
+        (
+            "Dummy:",
+            "   body",
+        ),
+    ],
+)
+def test_parse_one_section_no_section(line1, line2s):
+    with pytest.raises(NoSectionFound):
+        DocstringParser._parse_one_section(line1, line2s, [])
+
+
+@pytest.mark.parametrize(
     ("line1", "line2s", "expected"),
     [
-        (" Args", "  body", (None, None)),
-        (" Args:", "  body", (None, None)),
-        ("Args", "  body", (None, None)),
-        ("Args:", " body", (None, None)),
-        ("Dummy:", "  body", (None, None)),
-        ("Dummy :", "  body", (None, None)),
-        ("Dummy:", "   body", (None, None)),
         ("Args:", "  body", ("Args", "body")),
         ("Args :", "  body", ("Args", "body")),
         ("Args:", "   body", ("Args", "body")),
@@ -165,11 +198,11 @@ def test_parse_one_section(line1, line2s, expected):
     [
         ({}, ""),
         (
-            {None: "body"},
+            {SUMMARY_SECTION_NAME: "body"},
             """body""",
         ),
         (
-            {None: "body", "Args": "body"},
+            {SUMMARY_SECTION_NAME: "body", "Args": "body"},
             """body
 
 Args:

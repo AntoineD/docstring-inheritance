@@ -24,8 +24,10 @@ from __future__ import annotations
 import textwrap
 from typing import ClassVar
 
+from .bases import SUMMARY_SECTION_NAME
 from .bases.inheritor import BaseDocstringInheritor
 from .bases.parser import BaseDocstringParser
+from .bases.parser import NoSectionFound
 from .bases.renderer import BaseDocstringRenderer
 
 
@@ -34,10 +36,10 @@ class DocstringRenderer(BaseDocstringRenderer):
 
     @staticmethod
     def _render_section(
-        section_name: str | None,
+        section_name: str,
         section_body: str | dict[str, str],
     ) -> str:
-        if section_name is None:
+        if section_name is SUMMARY_SECTION_NAME:
             assert isinstance(section_body, str)
             return section_body
         if isinstance(section_body, dict):
@@ -52,7 +54,7 @@ class DocstringParser(BaseDocstringParser):
     """The parser for Google docstrings."""
 
     ARGS_SECTION_NAME: ClassVar[str] = "Args"
-    SECTION_NAMES: ClassVar[list[str | None]] = list(BaseDocstringParser.SECTION_NAMES)
+    SECTION_NAMES: ClassVar[list[str]] = list(BaseDocstringParser.SECTION_NAMES)
     SECTION_NAMES[1] = ARGS_SECTION_NAME
     SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
         ARGS_SECTION_NAME,
@@ -73,7 +75,7 @@ class DocstringParser(BaseDocstringParser):
         line1: str,
         line2_rstripped: str,
         reversed_section_body_lines: list[str],
-    ) -> tuple[str, str] | tuple[None, None]:
+    ) -> tuple[str, str]:
         # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: E501
         # The parsing of a section is complete when the first line line1 has:
         # - no leading blank spaces,
@@ -91,7 +93,7 @@ class DocstringParser(BaseDocstringParser):
             return line1_rstripped.rstrip(" :"), cls._get_section_body(
                 reversed_section_body_lines
             )
-        return None, None
+        raise NoSectionFound
 
 
 class GoogleDocstringInheritor(BaseDocstringInheritor):

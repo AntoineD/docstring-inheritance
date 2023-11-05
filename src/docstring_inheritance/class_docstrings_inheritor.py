@@ -25,12 +25,13 @@ from types import FunctionType
 from types import WrapperDescriptorType
 from typing import Any
 from typing import Callable
+from typing import Type
 
 from docstring_inheritance.docstring_inheritors.bases.inheritor import (
     BaseDocstringInheritor,
 )
 
-DocstringInheritorClass = type[BaseDocstringInheritor]
+DocstringInheritorClass = Type[BaseDocstringInheritor]
 
 
 class ClassDocstringsInheritor:
