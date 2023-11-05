@@ -152,25 +152,24 @@ class BaseDocstringParser:
             except NoSectionFound:
                 pass
             else:
-                if section_name is not SUMMARY_SECTION_NAME:
-                    if section_name in cls.SECTION_NAMES_WITH_ITEMS:
-                        reversed_sections[section_name] = cls._parse_section_items(
-                            section_body
-                        )
-                    else:
-                        reversed_sections[section_name] = section_body
+                if section_name in cls.SECTION_NAMES_WITH_ITEMS:
+                    reversed_sections[section_name] = cls._parse_section_items(
+                        section_body
+                    )
+                else:
+                    reversed_sections[section_name] = section_body
 
-                    # We took into account line1 in addition to line2,
-                    # we no longer need to process line1.
-                    try:
-                        next(lines_pairs)
-                    except StopIteration:
-                        # The docstring has no summary section_items.
-                        has_summary = False
-                        break
+                # We took into account line1 in addition to line2,
+                # we no longer need to process line1.
+                try:
+                    next(lines_pairs)
+                except StopIteration:
+                    # The docstring has no summary section_items.
+                    has_summary = False
+                    break
 
-                    reversed_section_body_lines = []
-                    continue
+                reversed_section_body_lines = []
+                continue
 
             reversed_section_body_lines += [line2_rstripped]
         else:
