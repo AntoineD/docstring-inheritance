@@ -24,6 +24,7 @@ from __future__ import annotations
 from typing import ClassVar
 
 from .bases import SUMMARY_SECTION_NAME
+from .bases import SubSectionType
 from .bases.inheritor import BaseDocstringInheritor
 from .bases.parser import BaseDocstringParser
 from .bases.parser import NoSectionFound
@@ -36,7 +37,7 @@ class DocstringRenderer(BaseDocstringRenderer):
     @staticmethod
     def _render_section(
         section_name: str,
-        section_body: str | dict[str, str],
+        section_body: SubSectionType,
     ) -> str:
         if section_name is SUMMARY_SECTION_NAME:
             assert isinstance(section_body, str)

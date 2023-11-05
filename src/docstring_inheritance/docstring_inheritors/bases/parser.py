@@ -138,7 +138,7 @@ class BaseDocstringParser:
         lines_pairs = iter(pairwise(reversed(lines)))
 
         reversed_section_body_lines: list[str] = []
-        reversed_sections: dict[str, str | dict[str, str]] = {}
+        reversed_sections: SectionsType = {}
 
         # Iterate 2 lines at a time to look for the section_items headers
         # that are underlined.
@@ -154,9 +154,11 @@ class BaseDocstringParser:
             else:
                 if section_name is not SUMMARY_SECTION_NAME:
                     if section_name in cls.SECTION_NAMES_WITH_ITEMS:
-                        section_body = cls._parse_section_items(section_body)
-
-                    reversed_sections[section_name] = section_body
+                        reversed_sections[section_name] = cls._parse_section_items(
+                            section_body
+                        )
+                    else:
+                        reversed_sections[section_name] = section_body
 
                     # We took into account line1 in addition to line2,
                     # we no longer need to process line1.

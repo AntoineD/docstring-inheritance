@@ -23,6 +23,7 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING
 
 from . import SUMMARY_SECTION_NAME
+from . import SubSectionType
 
 if TYPE_CHECKING:
     from . import SectionsType
@@ -62,7 +63,7 @@ class BaseDocstringRenderer:
     @abstractmethod
     def _render_section(
         section_name: str,
-        section_body: str | dict[str, str],
+        section_body: SubSectionType,
     ) -> str:
         """Return a rendered docstring section.
 

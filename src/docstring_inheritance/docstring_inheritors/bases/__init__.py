@@ -24,7 +24,8 @@ from __future__ import annotations
 from typing import Dict
 from typing import Union
 
-SectionsType = Dict[str, Union[str, Dict[str, str]]]
+SubSectionType = Union[str, Dict[str, str]]
+SectionsType = Dict[str, SubSectionType]
 
 SUMMARY_SECTION_NAME = ""
 """The internal name of the un-named summary sections (short and extended)."""
