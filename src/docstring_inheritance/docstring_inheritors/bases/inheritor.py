@@ -21,8 +21,11 @@
 
 from __future__ import annotations
 
+import difflib
 import inspect
+import os
 import warnings
+from textwrap import indent
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
@@ -35,6 +38,12 @@ if TYPE_CHECKING:
     from . import SectionsType
     from .parser import BaseDocstringParser
     from .renderer import BaseDocstringRenderer
+
+SIMILARITY_RATIO = float(os.environ.get("DOCSTRING_INHERITANCE_SIMILARITY_RATIO", 0.0))
+SIMILARITY_RATIO = 0.9
+
+if not (0 <= SIMILARITY_RATIO <= 1):
+    raise ValueError("The docstring inheritance similarity ration must be in [0,1].")
 
 
 class DocstringInheritanceWarning(UserWarning):
@@ -98,9 +107,80 @@ class BaseDocstringInheritor:
         inheritor.__child_func.__doc__ = inheritor._DOCSTRING_RENDERER.render(
             child_sections
         )
-        child_func.__doc__ = self._DOCSTRING_RENDERER.render(child_sections)
 
-    @classmethod
+    def _warn_similar_sections(
+        self,
+        parent_sections: SectionsType | dict[str, str],
+        child_sections: SectionsType | dict[str, str],
+        section_path: Sequence[str | None] = (),
+    ) -> None:
+        """Issue a warning when the parent and child sections are similar.
+
+        Args:
+            parent_sections: The parent sections.
+            child_sections: The child sections.
+            section_path: The hierarchy of section names.
+        """
+        if SIMILARITY_RATIO == 0.0:
+            return
+
+        for section_name, child_section in child_sections.items():
+            parent_section = parent_sections.get(cast(str, section_name))
+            if parent_section is None:
+                continue
+
+            # TODO: add Raises section?
+            if section_name in self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS:
+                self._warn_similar_sections(
+                    cast(dict[str, str], parent_section),
+                    cast(dict[str, str], child_section),
+                    section_path=[section_name],
+                )
+            else:
+                self._warn_similar_section(
+                    cast(str, parent_section),
+                    cast(str, child_section),
+                    section_path=[*section_path, section_name],
+                )
+
+    def _warn_similar_section(
+        self,
+        parent_doc: str,
+        child_doc: str,
+        section_path: list[str | None],
+    ) -> None:
+        """Issue a warning when the parent and child docs are similar.
+
+        Args:
+            parent_doc: The parent documentation.
+            child_doc: The child documentation.
+            section_path: The hierarchy of section names.
+        """
+        ratio = difflib.SequenceMatcher(None, parent_doc, child_doc).ratio()
+        if ratio > SIMILARITY_RATIO:
+            msg = (
+                f"the docstrings have a similarity ration of {ratio}, "
+                f"the parent doc is\n{indent(parent_doc, ' ' * 4)}\n"
+                f"the child doc is\n{indent(child_doc, ' ' * 4)}"
+            )
+            if section_path[0] is None:
+                section_path[0] = "Summary"
+            self._warn(cast(list[str], section_path), msg)
+
+    def _warn(self, section_path: list[str], msg: str) -> None:
+        """Issue a warning.
+
+        Args:
+            section_path: The hierarchy of section names.
+            msg: The warning message.
+        """
+        msg = (
+            f"File {inspect.getfile(self.__child_func)}: "
+            f"Function {self.__child_func.__qualname__}: "
+            f"Section {'/'.join(section_path)}: " + msg
+        )
+        warnings.warn(msg, category=DocstringInheritanceWarning, stacklevel=2)
+
     def _inherit_sections(
         self,
         section_names_with_items: set[str],
@@ -223,8 +303,9 @@ class BaseDocstringInheritor:
 
         ordered_section = {}
         for arg in all_args:
-            msg = f"The docstring for the argument '{arg}' is missing."
-            warnings.warn(msg, category=DocstringInheritanceWarning, stacklevel=2)
+            self._warn(
+                [section_name], f"The docstring for the argument '{arg}' is missing."
+            )
             ordered_section[arg] = section_items.get(arg, missing_arg_text)
 
         return ordered_section
