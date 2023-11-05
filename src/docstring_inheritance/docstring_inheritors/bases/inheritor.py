@@ -159,7 +159,7 @@ class BaseDocstringInheritor:
         ratio = difflib.SequenceMatcher(None, parent_doc, child_doc).ratio()
         if ratio > SIMILARITY_RATIO:
             msg = (
-                f"the docstrings have a similarity ration of {ratio}, "
+                f"the docstrings have a similarity ratio of {ratio}, "
                 f"the parent doc is\n{indent(parent_doc, ' ' * 4)}\n"
                 f"the child doc is\n{indent(child_doc, ' ' * 4)}"
             )
