@@ -28,6 +28,7 @@ from typing import Any
 from typing import Callable
 from typing import ClassVar
 from typing import Dict
+from typing import Sequence
 from typing import cast
 
 if TYPE_CHECKING:
@@ -58,8 +59,18 @@ class BaseDocstringInheritor:
     _DOCSTRING_RENDERER: ClassVar[type[BaseDocstringRenderer]]
     """The docstring renderer."""
 
-    def __call__(
+    __child_func: Callable[..., Any]
+    """The function or method to inherit the docstrings of."""
+
+    def __init__(
         self,
+        child_func: Callable[..., Any],
+    ) -> None:
+        self.__child_func = child_func
+
+    @classmethod
+    def inherit(
+        cls,
         parent_doc: str | None,
         child_func: Callable[..., Any],
     ) -> None:
@@ -71,29 +82,33 @@ class BaseDocstringInheritor:
         if parent_doc is None:
             return
 
-        parent_sections = self._DOCSTRING_PARSER.parse(parent_doc)
-        child_sections = self._DOCSTRING_PARSER.parse(child_func.__doc__)
-        self._inherit_sections(
-            self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS,
-            self._DOCSTRING_PARSER.ARGS_SECTION_NAME,
-            self._DOCSTRING_PARSER.SECTION_NAMES,
-            self._MISSING_ARG_TEXT,
+        inheritor = cls(child_func)
+
+        parent_sections = inheritor._DOCSTRING_PARSER.parse(parent_doc)
+        child_sections = inheritor._DOCSTRING_PARSER.parse(child_func.__doc__)
+        inheritor._warn_similar_sections(parent_sections, child_sections)
+        inheritor._inherit_sections(
+            inheritor._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS,
+            inheritor._DOCSTRING_PARSER.ARGS_SECTION_NAME,
+            inheritor._DOCSTRING_PARSER.SECTION_NAMES,
+            inheritor._MISSING_ARG_TEXT,
             parent_sections,
             child_sections,
-            child_func,
+        )
+        inheritor.__child_func.__doc__ = inheritor._DOCSTRING_RENDERER.render(
+            child_sections
         )
         child_func.__doc__ = self._DOCSTRING_RENDERER.render(child_sections)
 
     @classmethod
     def _inherit_sections(
-        cls,
+        self,
         section_names_with_items: set[str],
         args_section_name: str,
         section_names: list[str | None],
         missing_arg_text: str,
         parent_sections: SectionsType,
         child_sections: SectionsType,
-        child_func: Callable[..., Any],
     ) -> None:
         """Inherit the sections of a child from the parent sections.
 
@@ -104,7 +119,6 @@ class BaseDocstringInheritor:
             missing_arg_text: This text for the missing arguments.
             parent_sections: The parent docstring sections.
             child_sections: The child docstring sections.
-            child_func: The child function which sections inherit from the parent.
         """
         # TODO:
         # prnt_only_raises = "Raises" in parent_sections and not (
@@ -148,11 +162,12 @@ class BaseDocstringInheritor:
             temp_sections[section_name] = temp_section_items
 
         # Args section shall be filtered.
-        args_section = cls._filter_args_section(
+        args_section = self._filter_args_section(
             missing_arg_text,
-            child_func,
             cast(Dict[str, str], temp_sections.get(args_section_name, {})),
+            args_section_name,
         )
+
         if args_section:
             temp_sections[args_section_name] = args_section
         elif args_section_name in temp_sections:
@@ -172,11 +187,11 @@ class BaseDocstringInheritor:
         # Add the remaining non-standard sections.
         child_sections.update(temp_sections)
 
-    @staticmethod
     def _filter_args_section(
+        self,
         missing_arg_text: str,
-        func: Callable[..., Any],
         section_items: dict[str, str],
+        section_name: str = "",
     ) -> dict[str, str]:
         """Filter the args section items with the args of a signature.
 
@@ -186,25 +201,25 @@ class BaseDocstringInheritor:
 
         Args:
             missing_arg_text: This text for the missing arguments.
-            func: The function that provides the signature.
+            section_name: The name of the section.
             section_items: The docstring section items.
 
         Returns:
             The section items filtered with the function signature.
         """
-        args, varargs, varkw, _, kwonlyargs = inspect.getfullargspec(func)[:5]
+        full_arg_spec = inspect.getfullargspec(self.__child_func)
 
-        all_args = args
+        all_args = full_arg_spec.args
         if "self" in all_args:
             all_args.remove("self")
 
-        if varargs is not None:
-            all_args += [f"*{varargs}"]
+        if full_arg_spec.varargs is not None:
+            all_args += [f"*{full_arg_spec.varargs}"]
 
-        all_args += kwonlyargs
+        all_args += full_arg_spec.kwonlyargs
 
-        if varkw is not None:
-            all_args += [f"**{varkw}"]
+        if full_arg_spec.varkw is not None:
+            all_args += [f"**{full_arg_spec.varkw}"]
 
         ordered_section = {}
         for arg in all_args:

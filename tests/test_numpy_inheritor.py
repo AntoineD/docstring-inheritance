@@ -207,14 +207,13 @@ def test_parse_one_section(line1, line2s, expected):
     ],
 )
 def test_inherit_sections(parent_sections, child_sections, expected_sections):
-    NumpyDocstringInheritor._inherit_sections(
+    NumpyDocstringInheritor(lambda: None)._inherit_sections(
         NumpyDocstringInheritor._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS,
         NumpyDocstringInheritor._DOCSTRING_PARSER.ARGS_SECTION_NAME,
         NumpyDocstringInheritor._DOCSTRING_PARSER.SECTION_NAMES,
         NumpyDocstringInheritor._MISSING_ARG_TEXT,
         parent_sections,
         child_sections,
-        lambda: None,
     )
     assert child_sections == expected_sections
     # Verify the order of the keys.

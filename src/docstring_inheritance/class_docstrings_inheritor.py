@@ -25,9 +25,12 @@ from types import FunctionType
 from types import WrapperDescriptorType
 from typing import Any
 from typing import Callable
-from typing import Optional
 
-DocstringInheritor = Callable[[Optional[str], Callable[..., Any]], None]
+from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+    BaseDocstringInheritor,
+)
+
+DocstringInheritorClass = type[BaseDocstringInheritor]
 
 
 class ClassDocstringsInheritor:
@@ -36,7 +39,7 @@ class ClassDocstringsInheritor:
     _cls: type
     """The class to process."""
 
-    _docstring_inheritor: DocstringInheritor
+    _docstring_inheritor: DocstringInheritorClass
     """The docstring inheritor."""
 
     _init_in_class: bool
@@ -48,7 +51,7 @@ class ClassDocstringsInheritor:
     def __init__(
         self,
         cls: type,
-        docstring_inheritor: DocstringInheritor,
+        docstring_inheritor: DocstringInheritorClass,
         init_in_class: bool,
     ) -> None:
         """
@@ -69,7 +72,7 @@ class ClassDocstringsInheritor:
     def inherit_docstrings(
         cls,
         class_: type,
-        docstring_inheritor: DocstringInheritor,
+        docstring_inheritor: DocstringInheritorClass,
         init_in_class: bool,
     ) -> None:
         """Create the inherited docstring for all the docstrings of the class.
@@ -109,7 +112,7 @@ class ClassDocstringsInheritor:
             # As opposed to the attribute inheritance, and following the way a class is
             # assembled by type(), the docstring of a class is the combination of the
             # docstrings of its parents.
-            self._docstring_inheritor(parent_cls.__doc__, func)
+            self._docstring_inheritor.inherit(parent_cls.__doc__, func)
 
         self._cls.__doc__ = func.__doc__
 
@@ -129,7 +132,7 @@ class ClassDocstringsInheritor:
                 if parent_method is not None:
                     parent_doc = parent_method.__doc__
                     if parent_doc is not None:
-                        self._docstring_inheritor(parent_doc, attr)
+                        self._docstring_inheritor.inherit(parent_doc, attr)
                         # As opposed to the class docstring inheritance, and following
                         # the MRO for methods,
                         # we inherit only from the first found parent.

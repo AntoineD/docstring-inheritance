@@ -150,28 +150,28 @@ from docstring_inheritance import inherit_google_docstring
 
 
 def parent():
-  """Parent summary.
+    """Parent summary.
 
-  Args:
-      x: Description for x.
-      y: Description for y.
+    Args:
+        x: Description for x.
+        y: Description for y.
 
-  Notes:
-      Parent notes.
-  """
+    Notes:
+        Parent notes.
+    """
 
 
 def child():
-  """
-  Args:
-      z: Description for z.
+    """
+    Args:
+        z: Description for z.
 
-  Returns:
-      Something.
+    Returns:
+        Something.
 
-  Notes:
-      Child notes.
-  """
+    Notes:
+        Child notes.
+    """
 
 
 inherit_google_docstring(parent.__doc__, child)

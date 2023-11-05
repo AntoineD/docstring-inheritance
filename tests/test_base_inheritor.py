@@ -205,14 +205,14 @@ MISSING_ARG_TEXT = "dummy missing"
     ],
 )
 def test_inherit_items(parent_section, child_section, func, expected):
-    BaseDocstringInheritor._inherit_sections(
+    base_inheritor = BaseDocstringInheritor(func)
+    base_inheritor._inherit_sections(
         SECTION_NAMES_WITH_ITEMS,
         ARGS_SECTION_NAME,
         BaseDocstringParser.SECTION_NAMES,
         MISSING_ARG_TEXT,
         parent_section,
         child_section,
-        func,
     )
     assert child_section == expected
 
@@ -281,9 +281,7 @@ def test_inherit_items(parent_section, child_section, func, expected):
     ],
 )
 def test_inherit_section_items_with_args(func, section_items, expected):
+    base_inheritor = BaseDocstringInheritor(func)
     assert (
-        BaseDocstringInheritor._filter_args_section(
-            MISSING_ARG_TEXT, func, section_items
-        )
-        == expected
+        base_inheritor._filter_args_section(MISSING_ARG_TEXT, section_items) == expected
     )
