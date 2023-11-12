@@ -173,9 +173,10 @@ class BaseDocstringInheritor:
             msg: The warning message.
         """
         msg = (
-            f"File {inspect.getfile(self.__child_func)}: "
-            f"Function {self.__child_func.__qualname__}: "
-            f"Section {'/'.join(section_path)}: " + msg
+            f"File {inspect.getfile(self.__child_func)}:"
+            f"{inspect.getsourcelines(self.__child_func)[1]}: "
+            f"in {self.__child_func.__qualname__}: "
+            f"section {'/'.join(section_path)}: " + msg
         )
         warnings.warn(msg, category=DocstringInheritanceWarning, stacklevel=2)
 
@@ -302,7 +303,7 @@ class BaseDocstringInheritor:
         ordered_section = {}
         for arg in all_args:
             self._warn(
-                [section_name], f"The docstring for the argument '{arg}' is missing."
+                [section_name], f"the docstring for the argument '{arg}' is missing."
             )
             ordered_section[arg] = section_items.get(arg, missing_arg_text)
 

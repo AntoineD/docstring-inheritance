@@ -24,6 +24,9 @@ import pytest
 from docstring_inheritance.docstring_inheritors.bases.inheritor import (
     BaseDocstringInheritor,
 )
+from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+    DocstringInheritanceWarning,
+)
 from docstring_inheritance.docstring_inheritors.bases.parser import BaseDocstringParser
 
 
@@ -285,3 +288,40 @@ def test_inherit_section_items_with_args(func, section_items, expected):
     assert (
         base_inheritor._filter_args_section(MISSING_ARG_TEXT, section_items) == expected
     )
+
+
+def test_warning_for_missing_arg():
+    base_inheritor = BaseDocstringInheritor(func_args)
+    match = (
+        "File .*.docstring-inheritance.tests.test_base_inheritor.py:41: "
+        r"in func_args: section : the docstring for the argument 'arg' is missing\."
+    )
+    with pytest.warns(DocstringInheritanceWarning, match=match):
+        base_inheritor._filter_args_section("", {})
+
+
+def test_no_warning_for_missing_arg():
+    base_inheritor = BaseDocstringInheritor(func_args)
+    base_inheritor._filter_args_section("", {"args": ""})
+
+
+# @pytest.mark.parametrize("similarity_ratio", [1.0, 0.0])
+# @pytest.mark.parametrize(
+#     ("parent_sections", "child_sections"), [({"X": "x"}, {"X": "x"})]
+# )
+# def test_warning_for_similar_sections(
+#     monkeypatch, similarity_ratio, parent_sections, child_sections
+# ):
+#     match = (
+#         r"File .*.docstring-inheritance.tests.test_base_inheritor.py:41: "
+#         r"in func_args: section : the docstring for the argument 'arg' is missing\."
+#     )
+#     if similarity_ratio == 0.0:
+#         context = warnings.catch_warnings()
+#     else:
+#         context = pytest.warns(DocstringInheritanceWarning, match=match)
+#
+#     base_inheritor = BaseDocstringInheritor(func_args)
+#     monkeypatch.setattr(base_inheritor._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS = mock
+#     with context:
+#         base_inheritor._warn_similar_sections(parent_sections, child_sections)
