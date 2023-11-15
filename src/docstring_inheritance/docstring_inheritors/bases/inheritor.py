@@ -31,7 +31,6 @@ from typing import Any
 from typing import Callable
 from typing import ClassVar
 from typing import Dict
-from typing import Sequence
 from typing import cast
 
 if TYPE_CHECKING:
@@ -39,11 +38,33 @@ if TYPE_CHECKING:
     from .parser import BaseDocstringParser
     from .renderer import BaseDocstringRenderer
 
-SIMILARITY_RATIO = float(os.environ.get("DOCSTRING_INHERITANCE_SIMILARITY_RATIO", 0.0))
-SIMILARITY_RATIO = 0.9
 
-if not (0 <= SIMILARITY_RATIO <= 1):
-    raise ValueError("The docstring inheritance similarity ration must be in [0,1].")
+def get_similarity_ratio(env_ratio: str | None) -> float:
+    """Check the value of the similarity ratio.
+
+    If the passed ratio is ``None`` then the default value of 0. is returned.
+
+    Args:
+        env_ratio: The raw value of the ratio from the environment variable.
+
+    Returns:
+        The value of the ratio.
+
+    Raises:
+        ValueError: If the ratio cannot be determined or has a bad value.
+    """
+    if env_ratio is None:
+        return 0.0
+    try:
+        ratio = float(env_ratio)
+    except ValueError:
+        raise ValueError(
+            "The docstring inheritance similarity ratio cannot be determined from "
+            f"'{env_ratio}'."
+        ) from None
+    if not (0.0 <= ratio <= 1.0):
+        raise ValueError("The docstring inheritance similarity ratio must be in [0,1].")
+    return ratio
 
 
 class DocstringInheritanceWarning(UserWarning):
@@ -67,6 +88,11 @@ class BaseDocstringInheritor:
 
     __child_func: Callable[..., Any]
     """The function or method to inherit the docstrings of."""
+
+    __similarity_ratio: ClassVar[float] = get_similarity_ratio(
+        os.environ.get("DOCSTRING_INHERITANCE_SIMILARITY_RATIO")
+    )
+    """The similarity ratio for comparing child to parent docstrings."""
 
     def __init__(
         self,
@@ -108,7 +134,7 @@ class BaseDocstringInheritor:
         self,
         parent_sections: SectionsType | dict[str, str],
         child_sections: SectionsType | dict[str, str],
-        section_path: Sequence[str] = (),
+        super_section_name: str = "",
     ) -> None:
         """Issue a warning when the parent and child sections are similar.
 
@@ -117,7 +143,7 @@ class BaseDocstringInheritor:
             child_sections: The child sections.
             section_path: The hierarchy of section names.
         """
-        if SIMILARITY_RATIO == 0.0:
+        if self.__similarity_ratio == 0.0:
             return
 
         for section_name, child_section in child_sections.items():
@@ -130,20 +156,22 @@ class BaseDocstringInheritor:
                 self._warn_similar_sections(
                     cast(Dict[str, str], parent_section),
                     cast(Dict[str, str], child_section),
-                    section_path=[section_name],
+                    super_section_name=section_name,
                 )
             else:
                 self._warn_similar_section(
                     cast(str, parent_section),
                     cast(str, child_section),
-                    section_path=[*section_path, section_name],
+                    super_section_name,
+                    section_name,
                 )
 
     def _warn_similar_section(
         self,
         parent_doc: str,
         child_doc: str,
-        section_path: list[str],
+        super_section_name: str,
+        section_name: str,
     ) -> None:
         """Issue a warning when the parent and child docs are similar.
 
@@ -153,15 +181,18 @@ class BaseDocstringInheritor:
             section_path: The hierarchy of section names.
         """
         ratio = difflib.SequenceMatcher(None, parent_doc, child_doc).ratio()
-        if ratio > SIMILARITY_RATIO:
+        if ratio >= self.__similarity_ratio:
+            if super_section_name:
+                parent_doc = f"{super_section_name}: {parent_doc}"
+                child_doc = f"{super_section_name}: {child_doc}"
             msg = (
                 f"the docstrings have a similarity ratio of {ratio}, "
                 f"the parent doc is\n{indent(parent_doc, ' ' * 4)}\n"
                 f"the child doc is\n{indent(child_doc, ' ' * 4)}"
             )
-            self._warn(section_path, msg)
+            self._warn(section_name, msg)
 
-    def _warn(self, section_path: list[str], msg: str) -> None:
+    def _warn(self, section_path: str, msg: str) -> None:
         """Issue a warning.
 
         Args:
@@ -172,7 +203,7 @@ class BaseDocstringInheritor:
             f"File {inspect.getfile(self.__child_func)}:"
             f"{inspect.getsourcelines(self.__child_func)[1]}: "
             f"in {self.__child_func.__qualname__}: "
-            f"section {'/'.join(section_path)}: " + msg
+            f"section {section_path}: {msg}"
         )
         warnings.warn(msg, category=DocstringInheritanceWarning, stacklevel=2)
 
@@ -296,7 +327,7 @@ class BaseDocstringInheritor:
         ordered_section = {}
         for arg in all_args:
             self._warn(
-                [section_name], f"the docstring for the argument '{arg}' is missing."
+                section_name, f"the docstring for the argument '{arg}' is missing."
             )
             ordered_section[arg] = section_items.get(arg, missing_arg_text)
 

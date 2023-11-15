@@ -19,6 +19,8 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import re
+import warnings
 from typing import ClassVar
 
 import pytest
@@ -28,6 +30,9 @@ from docstring_inheritance.docstring_inheritors.bases.inheritor import (
 )
 from docstring_inheritance.docstring_inheritors.bases.inheritor import (
     DocstringInheritanceWarning,
+)
+from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+    get_similarity_ratio,
 )
 from docstring_inheritance.docstring_inheritors.bases.parser import BaseDocstringParser
 
@@ -305,12 +310,15 @@ def test_inherit_section_items_with_args(func, section_items, expected):
     )
 
 
+ERROR_PREFIX = (
+    "File .*.docstring-inheritance.tests.test_base_inheritor.py:48: "
+    "in func_args: section "
+)
+
+
 def test_warning_for_missing_arg():
     base_inheritor = BaseDocstringInheritor(func_args)
-    match = (
-        "File .*.docstring-inheritance.tests.test_base_inheritor.py:43: "
-        r"in func_args: section : the docstring for the argument 'arg' is missing\."
-    )
+    match = ERROR_PREFIX + r": the docstring for the argument 'arg' is missing\."
     with pytest.warns(DocstringInheritanceWarning, match=match):
         base_inheritor._filter_args_section("", {})
 
@@ -320,23 +328,75 @@ def test_no_warning_for_missing_arg():
     base_inheritor._filter_args_section("", {"args": ""})
 
 
-# @pytest.mark.parametrize("similarity_ratio", [1.0, 0.0])
-# @pytest.mark.parametrize(
-#     ("parent_sections", "child_sections"), [({"X": "x"}, {"X": "x"})]
-# )
-# def test_warning_for_similar_sections(
-#     monkeypatch, similarity_ratio, parent_sections, child_sections
-# ):
-#     match = (
-#         r"File .*.docstring-inheritance.tests.test_base_inheritor.py:41: "
-#         r"in func_args: section : the docstring for the argument 'arg' is missing\."
-#     )
-#     if similarity_ratio == 0.0:
-#         context = warnings.catch_warnings()
-#     else:
-#         context = pytest.warns(DocstringInheritanceWarning, match=match)
-#
-#     base_inheritor = BaseDocstringInheritor(func_args)
-#     monkeypatch.setattr(base_inheritor._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS = mock
-#     with context:
-#         base_inheritor._warn_similar_sections(parent_sections, child_sections)
+@pytest.mark.parametrize(
+    ("similarity_ratio", "warn", "parent_sections", "child_sections"),
+    [
+        (1.0, True, {"X": "x"}, {"X": "x"}),
+        (0.1, False, {}, {"X": "x"}),
+        (0.0, False, {"X": "x"}, {"X": "x"}),
+        (0.6, True, {"X": "xx"}, {"X": "x"}),
+        (0.7, False, {"X": "xx"}, {"X": "x"}),
+        # Subsections
+        (1.0, True, {"DummyArgs": {"X": "x"}}, {"DummyArgs": {"X": "x"}}),
+        (0.1, False, {"DummyArgs": {}}, {"DummyArgs": {"X": "x"}}),
+        (0.0, False, {"DummyArgs": {"X": "x"}}, {"DummyArgs": {"X": "x"}}),
+        (0.6, True, {"DummyArgs": {"X": "xx"}}, {"DummyArgs": {"X": "x"}}),
+        (0.7, False, {"DummyArgs": {"X": "xx"}}, {"DummyArgs": {"X": "x"}}),
+    ],
+)
+def test_warning_for_similar_sections(
+    patch_class, similarity_ratio, warn, parent_sections, child_sections
+):
+    if warn:
+        try:
+            parent = parent_sections["X"]
+            child = child_sections["X"]
+        except KeyError:
+            parent = f'DummyArgs: {parent_sections["DummyArgs"]["X"]}'
+            child = f'DummyArgs: {child_sections["DummyArgs"]["X"]}'
+        match = (
+            ERROR_PREFIX + rf"X: the docstrings have a similarity ratio of \d\.\d*, "
+            rf"the parent doc is\n    {parent}\n"
+            rf"the child doc is\n    {child}"
+        )
+        context = pytest.warns(DocstringInheritanceWarning, match=match)
+    else:
+        context = warnings.catch_warnings()
+
+    base_inheritor = BaseDocstringInheritor(func_args)
+    base_inheritor._BaseDocstringInheritor__similarity_ratio = similarity_ratio
+
+    with context:
+        base_inheritor._warn_similar_sections(parent_sections, child_sections)
+
+
+ERROR_RANGE = "The docstring inheritance similarity ratio must be in [0,1]."
+ERROR_VALUE = (
+    "The docstring inheritance similarity ratio cannot be determined from '{}'."
+)
+
+
+@pytest.mark.parametrize(
+    ("ratio", "error"),
+    [
+        ("-0.1", ERROR_RANGE),
+        ("1.1", ERROR_RANGE),
+        ("", ERROR_VALUE),
+        ("x", ERROR_VALUE),
+    ],
+)
+def test_check_similarity_ratio_error(ratio, error):
+    with pytest.raises(ValueError, match=re.escape(error.format(ratio))):
+        get_similarity_ratio(ratio)
+
+
+@pytest.mark.parametrize(
+    ("ratio", "expected"),
+    [
+        ("0", 0.0),
+        ("1", 1.0),
+        ("0.5", 0.5),
+    ],
+)
+def test_check_similarity_ratio(ratio, expected):
+    assert get_similarity_ratio(ratio) == expected
