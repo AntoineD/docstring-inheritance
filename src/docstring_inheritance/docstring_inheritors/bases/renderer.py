@@ -19,6 +19,7 @@
 # SOFTWARE.
 from __future__ import annotations
 
+from abc import ABC
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
@@ -29,7 +30,7 @@ if TYPE_CHECKING:
     from . import SectionsType
 
 
-class BaseDocstringRenderer:
+class BaseDocstringRenderer(ABC):
     """The docstring base class renderer."""
 
     @classmethod

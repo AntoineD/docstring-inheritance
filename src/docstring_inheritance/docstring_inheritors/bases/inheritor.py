@@ -51,13 +51,10 @@ class DocstringInheritanceWarning(UserWarning):
 
 
 class BaseDocstringInheritor:
-    """Base class for inheriting a docstring.
-
-    This class produces a functor, it has no state and can only be called.
-    """
+    """Base class for inheriting a docstring."""
 
     MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
-    """The fall back description for a method argument without a description."""
+    """The fall back description stub for a method argument without a description."""
 
     _MISSING_ARG_TEXT: ClassVar[str]
     """The actual formatted text bound to a missing method argument."""
@@ -88,25 +85,24 @@ class BaseDocstringInheritor:
             parent_doc: The docstring of the parent.
             child_func: The child function which docstring inherit from the parent.
         """
-        if parent_doc is None:
-            return
+        if parent_doc is not None:
+            cls(child_func)._inherit(parent_doc)
 
-        inheritor = cls(child_func)
+    def _inherit(self, parent_doc: str) -> None:
+        """Inherit the docstrings of a class.
 
-        parent_sections = inheritor._DOCSTRING_PARSER.parse(parent_doc)
-        child_sections = inheritor._DOCSTRING_PARSER.parse(child_func.__doc__)
-        inheritor._warn_similar_sections(parent_sections, child_sections)
-        inheritor._inherit_sections(
-            inheritor._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS,
-            inheritor._DOCSTRING_PARSER.ARGS_SECTION_NAME,
-            inheritor._DOCSTRING_PARSER.SECTION_NAMES,
-            inheritor._MISSING_ARG_TEXT,
+        Args:
+            parent_doc: The docstring of the parent.
+        """
+        parse = self._DOCSTRING_PARSER.parse
+        parent_sections = parse(parent_doc)
+        child_sections = parse(self.__child_func.__doc__)
+        self._warn_similar_sections(parent_sections, child_sections)
+        self._inherit_sections(
             parent_sections,
             child_sections,
         )
-        inheritor.__child_func.__doc__ = inheritor._DOCSTRING_RENDERER.render(
-            child_sections
-        )
+        self.__child_func.__doc__ = self._DOCSTRING_RENDERER.render(child_sections)
 
     def _warn_similar_sections(
         self,
@@ -182,20 +178,12 @@ class BaseDocstringInheritor:
 
     def _inherit_sections(
         self,
-        section_names_with_items: set[str],
-        args_section_name: str,
-        section_names: list[str],
-        missing_arg_text: str,
         parent_sections: SectionsType,
         child_sections: SectionsType,
     ) -> None:
         """Inherit the sections of a child from the parent sections.
 
         Args:
-            section_names_with_items: The names of the section with items.
-            args_section_name: The name of the section with method arguments.
-            section_names: The names of all the section.
-            missing_arg_text: This text for the missing arguments.
             parent_sections: The parent docstring sections.
             child_sections: The child docstring sections.
         """
@@ -227,7 +215,9 @@ class BaseDocstringInheritor:
 
         # For sections with items, the sections common to parent and child are merged.
         common_section_names_with_items = (
-            parent_section_names & child_section_names & section_names_with_items
+            parent_section_names
+            & child_section_names
+            & self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS
         )
 
         for section_name in common_section_names_with_items:
@@ -242,23 +232,26 @@ class BaseDocstringInheritor:
 
         # Args section shall be filtered.
         args_section = self._filter_args_section(
-            missing_arg_text,
-            cast(Dict[str, str], temp_sections.get(args_section_name, {})),
-            args_section_name,
+            self._MISSING_ARG_TEXT,
+            cast(
+                Dict[str, str],
+                temp_sections.get(self._DOCSTRING_PARSER.ARGS_SECTION_NAME, {}),
+            ),
+            self._DOCSTRING_PARSER.ARGS_SECTION_NAME,
         )
 
         if args_section:
-            temp_sections[args_section_name] = args_section
-        elif args_section_name in temp_sections:
+            temp_sections[self._DOCSTRING_PARSER.ARGS_SECTION_NAME] = args_section
+        elif self._DOCSTRING_PARSER.ARGS_SECTION_NAME in temp_sections:
             # The args section is empty, there is nothing to document.
-            del temp_sections[args_section_name]
+            del temp_sections[self._DOCSTRING_PARSER.ARGS_SECTION_NAME]
 
         # Reorder the standard sections.
         child_sections.clear()
         child_sections.update(
             {
                 section_name: temp_sections.pop(section_name)
-                for section_name in section_names
+                for section_name in self._DOCSTRING_PARSER.SECTION_NAMES
                 if section_name in temp_sections
             }
         )

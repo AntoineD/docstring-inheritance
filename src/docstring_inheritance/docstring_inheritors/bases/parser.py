@@ -24,6 +24,7 @@ from __future__ import annotations
 import inspect
 import re
 import sys
+from abc import ABC
 from abc import abstractmethod
 from itertools import dropwhile
 from itertools import tee
@@ -49,7 +50,7 @@ class NoSectionFound(BaseException):
     """Exception raised when no section has been found when parsing one section."""
 
 
-class BaseDocstringParser:
+class BaseDocstringParser(ABC):
     """The base class for docstring parsers."""
 
     SECTION_NAMES: ClassVar[list[str]] = [

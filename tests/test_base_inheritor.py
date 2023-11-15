@@ -19,6 +19,8 @@
 # SOFTWARE.
 from __future__ import annotations
 
+from typing import ClassVar
+
 import pytest
 
 from docstring_inheritance.docstring_inheritors.bases.inheritor import (
@@ -78,7 +80,27 @@ ARGS_SECTION_NAME = "DummyArgs"
 ARGS_SECTION_NAMES = {"DummyArgs"}
 METHODS_SECTION_NAME = "MethodsArgs"
 SECTION_NAMES_WITH_ITEMS = {ARGS_SECTION_NAME, METHODS_SECTION_NAME}
-MISSING_ARG_TEXT = "dummy missing"
+MISSING_ARG_TEXT = "The description is missing."
+
+
+class DummyParser(BaseDocstringParser):
+    ARGS_SECTION_NAME = "DummyArgs"
+    ARGS_SECTION_NAMES: ClassVar[set[str]] = {"DummyArgs"}
+    METHODS_SECTION_NAME = "MethodsArgs"
+    SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
+        ARGS_SECTION_NAME,
+        METHODS_SECTION_NAME,
+    }
+
+
+@pytest.fixture()
+def patch_class():
+    """Monkey patch BaseDocstringInheritor with docstring parser constants."""
+    BaseDocstringInheritor._DOCSTRING_PARSER = DummyParser
+    BaseDocstringInheritor._MISSING_ARG_TEXT = MISSING_ARG_TEXT
+    yield
+    delattr(BaseDocstringInheritor, "_DOCSTRING_PARSER")
+    delattr(BaseDocstringInheritor, "_MISSING_ARG_TEXT")
 
 
 @pytest.mark.parametrize(
@@ -207,16 +229,9 @@ MISSING_ARG_TEXT = "dummy missing"
         ),
     ],
 )
-def test_inherit_items(parent_section, child_section, func, expected):
+def test_inherit_items(patch_class, parent_section, child_section, func, expected):
     base_inheritor = BaseDocstringInheritor(func)
-    base_inheritor._inherit_sections(
-        SECTION_NAMES_WITH_ITEMS,
-        ARGS_SECTION_NAME,
-        BaseDocstringParser.SECTION_NAMES,
-        MISSING_ARG_TEXT,
-        parent_section,
-        child_section,
-    )
+    base_inheritor._inherit_sections(parent_section, child_section)
     assert child_section == expected
 
 
@@ -293,7 +308,7 @@ def test_inherit_section_items_with_args(func, section_items, expected):
 def test_warning_for_missing_arg():
     base_inheritor = BaseDocstringInheritor(func_args)
     match = (
-        "File .*.docstring-inheritance.tests.test_base_inheritor.py:41: "
+        "File .*.docstring-inheritance.tests.test_base_inheritor.py:43: "
         r"in func_args: section : the docstring for the argument 'arg' is missing\."
     )
     with pytest.warns(DocstringInheritanceWarning, match=match):
