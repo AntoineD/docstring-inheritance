@@ -32,7 +32,7 @@ such that its derived classes fully or partly inherit the docstrings.
   not for each call.
 - Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/).
 - Missing docstring sections for signature arguments are notified by warnings.
-- Docstring sections can be compared to detect duplicated or similar contents.
+- Docstring sections can be compared to detect duplicated or similar contents that could be inherited.
 
 # Licenses
 
@@ -352,8 +352,9 @@ class Parent(metaclass=Meta):
 
 ## Detecting similar docstrings
 
-By setting the environment variable `DOCSTRING_INHERITANCE_SIMILARITY_RATIO` to a value between `0` and `1`,
-the docstring sections of a child and its parent are compared and warnings are issued when the docstrings are
+Duplicated docstrings that could benefit from inheritance can be detected
+by setting the environment variable `DOCSTRING_INHERITANCE_SIMILARITY_RATIO` to a value between `0` and `1`.
+When set, the docstring sections of a child and its parent are compared and warnings are issued when the docstrings are
 similar.
 The docstring sections are compared with
 [difflib ratio](https://docs.python.org/3/library/difflib.html#difflib.SequenceMatcher.ratio)

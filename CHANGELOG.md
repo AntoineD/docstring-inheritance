@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.0] - 2023-11
 ### Added
 - Warnings for missing method arguments in docstrings.
-- Docstring comparisons.
+- Duplicated docstrings detection for missing inheritance opportunities.
 
 ## [2.0.2] - 2023-10
 ### Added
