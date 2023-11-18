@@ -31,12 +31,14 @@ such that its derived classes fully or partly inherit the docstrings.
 - Minimum performance cost: the inheritance is performed at import time,
   not for each call.
 - Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/).
+- Missing docstring sections for signature arguments are notified by warnings.
+- Docstring sections can be compared to detect duplicated or similar contents.
 
 # Licenses
 
 The source code is distributed under the MIT license.
 The documentation is distributed under the CC BY 4.0 license.
-The dependencies, with their licenses, are given in the CREDITS.rst file.
+The dependencies, with their licenses, are given in the CREDITS.md file.
 
 # Installation
 
@@ -347,6 +349,20 @@ class Meta(abc.ABCMeta, NumpyDocstringInheritanceMeta):
 class Parent(metaclass=Meta):
   pass
 ```
+
+## Detecting similar docstrings
+
+By setting the environment variable `DOCSTRING_INHERITANCE_SIMILARITY_RATIO` to a value between `0` and `1`,
+the docstring sections of a child and its parent are compared and warnings are issued when the docstrings are
+similar.
+The docstring sections are compared with
+[difflib ratio](https://docs.python.org/3/library/difflib.html#difflib.SequenceMatcher.ratio)
+from the standard library.
+If the ratio is higher or equal to the value of `DOCSTRING_INHERITANCE_SIMILARITY_RATIO`,
+the docstring sections are considered similar.
+Use a ratio of `1` to detect identical docstring sections.
+Use a ratio lower than `1` to detect similar docstring sections.
+
 # Similar projects
 
 [custom_inherit](https://github.com/rsokl/custom_inherit):

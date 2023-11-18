@@ -34,7 +34,8 @@ def inherit_google_docstring(
     parent_doc: str | None,
     child_func: Callable[..., Any],
 ) -> None:
-    """
+    """Inherit the docstring in Google format of a function.
+
     Args:
         parent_doc: The docstring of the parent.
         child_func: The child function which docstring inherit from the parent.
@@ -46,7 +47,8 @@ def inherit_numpy_docstring(
     parent_doc: str | None,
     child_func: Callable[..., Any],
 ) -> None:
-    """
+    """Inherit the docstring in NumPy format of a function.
+
     Args:
         parent_doc: The docstring of the parent.
         child_func: The child function which docstring inherit from the parent.

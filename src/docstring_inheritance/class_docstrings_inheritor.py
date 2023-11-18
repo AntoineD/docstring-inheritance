@@ -76,7 +76,7 @@ class ClassDocstringsInheritor:
         docstring_inheritor: DocstringInheritorClass,
         init_in_class: bool,
     ) -> None:
-        """Create the inherited docstring for all the docstrings of the class.
+        """Inherit all the docstrings of the class.
 
         Args:
             class_: The class to process.
