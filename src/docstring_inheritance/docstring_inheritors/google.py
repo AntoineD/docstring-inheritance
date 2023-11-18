@@ -17,43 +17,67 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Classes for inheriting Google docstrings."""
+
 from __future__ import annotations
 
 import textwrap
 from typing import ClassVar
 
-from .base import AbstractDocstringInheritor
-from .numpy import NumpyDocstringInheritor
+from .bases import SUMMARY_SECTION_NAME
+from .bases import SubSectionType
+from .bases.inheritor import BaseDocstringInheritor
+from .bases.parser import BaseDocstringParser
+from .bases.parser import NoSectionFound
+from .bases.renderer import BaseDocstringRenderer
 
 
-class GoogleDocstringInheritor(AbstractDocstringInheritor):
-    """A class for inheriting docstrings in Google format."""
+class DocstringRenderer(BaseDocstringRenderer):
+    """The renderer for Google docstrings."""
 
-    _SECTION_NAMES: ClassVar[list[str | None]] = list(
-        AbstractDocstringInheritor._SECTION_NAMES
-    )
-    _SECTION_NAMES[1] = "Args"
+    @staticmethod
+    def _render_section(
+        section_name: str,
+        section_body: SubSectionType,
+    ) -> str:
+        if section_name is SUMMARY_SECTION_NAME:
+            assert isinstance(section_body, str)
+            return section_body
+        if isinstance(section_body, dict):
+            section_body = "\n".join(
+                f"{key}{value}" for key, value in section_body.items()
+            )
+        section_body = textwrap.indent(section_body, " " * 4)
+        return f"{section_name}:\n{section_body}"
 
-    _ARGS_SECTION_NAME: ClassVar[str] = "Args"
 
-    _SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {_ARGS_SECTION_NAME} | {
+class DocstringParser(BaseDocstringParser):
+    """The parser for Google docstrings."""
+
+    ARGS_SECTION_NAME: ClassVar[str] = "Args"
+    SECTION_NAMES: ClassVar[list[str]] = list(BaseDocstringParser.SECTION_NAMES)
+    SECTION_NAMES[1] = ARGS_SECTION_NAME
+    SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
+        ARGS_SECTION_NAME,
         "Attributes",
         "Methods",
     }
 
-    MISSING_ARG_DESCRIPTION = f": {AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION}"
-
     @classmethod
-    def _get_section_body(cls, reversed_section_body_lines: list[str]) -> str:
-        return textwrap.dedent(
-            NumpyDocstringInheritor._get_section_body(reversed_section_body_lines)
-        )
+    def _get_section_body(
+        cls,
+        reversed_section_body_lines: list[str],
+    ) -> str:
+        return textwrap.dedent(super()._get_section_body(reversed_section_body_lines))
 
     @classmethod
     def _parse_one_section(
-        cls, line1: str, line2_rstripped: str, reversed_section_body_lines: list[str]
-    ) -> tuple[str, str] | tuple[None, None]:
-        # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: B950
+        cls,
+        line1: str,
+        line2_rstripped: str,
+        reversed_section_body_lines: list[str],
+    ) -> tuple[str, str]:
+        # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: E501
         # The parsing of a section is complete when the first line line1 has:
         # - no leading blank spaces,
         # - ends with :,
@@ -64,24 +88,18 @@ class GoogleDocstringInheritor(AbstractDocstringInheritor):
             not line1_rstripped.startswith(" ")
             and line1_rstripped.endswith(":")
             and line2_rstripped.startswith("  ")
-            and line1_rstripped[:-1].strip() in cls._SECTION_NAMES
+            and line1_rstripped[:-1].strip() in cls.SECTION_NAMES
         ):
             reversed_section_body_lines += [line2_rstripped]
             return line1_rstripped.rstrip(" :"), cls._get_section_body(
                 reversed_section_body_lines
             )
-        return None, None
+        raise NoSectionFound
 
-    @classmethod
-    def _render_section(
-        cls, section_name: str | None, section_body: str | dict[str, str]
-    ) -> str:
-        if section_name is None:
-            assert isinstance(section_body, str)
-            return section_body
-        if isinstance(section_body, dict):
-            section_body = "\n".join(
-                f"{key}{value}" for key, value in section_body.items()
-            )
-        section_body = textwrap.indent(section_body, " " * 4)
-        return f"{section_name}:\n{section_body}"
+
+class GoogleDocstringInheritor(BaseDocstringInheritor):
+    """The inheritor for Google docstrings."""
+
+    _MISSING_ARG_TEXT = f": {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
+    _DOCSTRING_PARSER = DocstringParser
+    _DOCSTRING_RENDERER = DocstringRenderer

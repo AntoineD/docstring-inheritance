@@ -20,19 +20,22 @@
 from __future__ import annotations
 
 import pytest
-from test_base_inheritor import _test_parse_sections
+from test_base_parser import _test_parse_sections
 
-from docstring_inheritance import GoogleDocstringInheritor
+from docstring_inheritance.docstring_inheritors.bases import SUMMARY_SECTION_NAME
+from docstring_inheritance.docstring_inheritors.bases.parser import NoSectionFound
+from docstring_inheritance.docstring_inheritors.google import DocstringParser
+from docstring_inheritance.docstring_inheritors.google import DocstringRenderer
 
 
 @pytest.mark.parametrize(
-    "unindented_docstring,expected_sections",
+    ("unindented_docstring", "expected_sections"),
     [
         ("", {}),
         (
             "Short summary.",
             {
-                None: "Short summary.",
+                SUMMARY_SECTION_NAME: "Short summary.",
             },
         ),
         (
@@ -41,7 +44,7 @@ from docstring_inheritance import GoogleDocstringInheritor
 Extended summary.
 """,
             {
-                None: """Short summary.
+                SUMMARY_SECTION_NAME: """Short summary.
 
 Extended summary.""",
             },
@@ -64,7 +67,7 @@ Args:
     arg
 """,
             {
-                None: """Short summary.
+                SUMMARY_SECTION_NAME: """Short summary.
 
 Extended summary.""",
                 "Args": {"arg": ""},
@@ -84,7 +87,7 @@ Notes:
         Indented line.
 """,
             {
-                None: """Short summary.
+                SUMMARY_SECTION_NAME: """Short summary.
 
 Extended summary.""",
                 "Args": {"arg": ""},
@@ -98,17 +101,17 @@ Section body.
 )
 def test_parse_sections(unindented_docstring, expected_sections):
     _test_parse_sections(
-        GoogleDocstringInheritor._parse_sections,
+        DocstringParser.parse,
         unindented_docstring,
         expected_sections,
     )
 
 
 @pytest.mark.parametrize(
-    "section_name,section_body,expected_docstring",
+    ("section_name", "section_body", "expected_docstring"),
     [
         (
-            None,
+            SUMMARY_SECTION_NAME,
             "Short summary.",
             "Short summary.",
         ),
@@ -135,53 +138,71 @@ Section name:
 )
 def test_render_section(section_name, section_body, expected_docstring):
     assert (
-        GoogleDocstringInheritor._render_section(section_name, section_body)
+        DocstringRenderer._render_section(section_name, section_body)
         == expected_docstring
     )
 
 
 @pytest.mark.parametrize(
-    "section_body,expected",
+    ("line1", "line2s"),
     [
-        ([], ""),
-        ([" foo"], "foo"),
-        (["", " foo"], "foo"),
-        ([" bar", " foo"], "foo\nbar"),
+        (
+            " Args",
+            "  body",
+        ),
+        (
+            " Args:",
+            "  body",
+        ),
+        (
+            "Args",
+            "  body",
+        ),
+        (
+            "Args:",
+            " body",
+        ),
+        (
+            "Dummy:",
+            "  body",
+        ),
+        (
+            "Dummy :",
+            "  body",
+        ),
+        (
+            "Dummy:",
+            "   body",
+        ),
     ],
 )
-def test_get_section_body(section_body, expected):
-    assert GoogleDocstringInheritor._get_section_body(section_body) == expected
+def test_parse_one_section_no_section(line1, line2s):
+    with pytest.raises(NoSectionFound):
+        DocstringParser._parse_one_section(line1, line2s, [])
 
 
 @pytest.mark.parametrize(
-    "line1,line2s,expected",
+    ("line1", "line2s", "expected"),
     [
-        (" Args", "  body", (None, None)),
-        (" Args:", "  body", (None, None)),
-        ("Args", "  body", (None, None)),
-        ("Args:", " body", (None, None)),
-        ("Dummy:", "  body", (None, None)),
-        ("Dummy :", "  body", (None, None)),
-        ("Dummy:", "   body", (None, None)),
         ("Args:", "  body", ("Args", "body")),
         ("Args :", "  body", ("Args", "body")),
         ("Args:", "   body", ("Args", "body")),
     ],
 )
 def test_parse_one_section(line1, line2s, expected):
-    assert GoogleDocstringInheritor._parse_one_section(line1, line2s, []) == expected
+    assert DocstringParser._parse_one_section(line1, line2s, []) == expected
 
 
 @pytest.mark.parametrize(
-    "sections,expected",
+    ("sections", "expected"),
     [
         ({}, ""),
         (
-            {None: "body"},
+            {SUMMARY_SECTION_NAME: "body"},
             """body""",
         ),
         (
-            {None: "body", "Args": "body"},
+            {SUMMARY_SECTION_NAME: "body", "Args": "body"},
             """body
 
 Args:
@@ -196,16 +217,7 @@ Args:
     ],
 )
 def test_render_docstring(sections, expected):
-    assert GoogleDocstringInheritor._render_docstring(sections) == expected
-
-
-def test_inherit_section_items_with_args():
-    def func(arg):
-        """"""
-
-    expected = {"arg": GoogleDocstringInheritor.MISSING_ARG_DESCRIPTION}
-
-    assert GoogleDocstringInheritor._filter_args_section(func, {}) == expected
+    assert DocstringRenderer.render(sections) == expected
 
 
 # TODO: test section order and all sections items

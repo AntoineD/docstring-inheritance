@@ -17,17 +17,43 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Docstring inheritance entry point."""
+
 from __future__ import annotations
 
 from typing import Any
+from typing import Callable
 
 from .class_docstrings_inheritor import ClassDocstringsInheritor
-from .class_docstrings_inheritor import DocstringInheritor
+from .class_docstrings_inheritor import DocstringInheritorClass
 from .docstring_inheritors.google import GoogleDocstringInheritor
 from .docstring_inheritors.numpy import NumpyDocstringInheritor
 
-inherit_numpy_docstring = NumpyDocstringInheritor()
-inherit_google_docstring = GoogleDocstringInheritor()
+
+def inherit_google_docstring(
+    parent_doc: str | None,
+    child_func: Callable[..., Any],
+) -> None:
+    """Inherit the docstring in Google format of a function.
+
+    Args:
+        parent_doc: The docstring of the parent.
+        child_func: The child function which docstring inherit from the parent.
+    """
+    return GoogleDocstringInheritor.inherit(parent_doc, child_func)
+
+
+def inherit_numpy_docstring(
+    parent_doc: str | None,
+    child_func: Callable[..., Any],
+) -> None:
+    """Inherit the docstring in NumPy format of a function.
+
+    Args:
+        parent_doc: The docstring of the parent.
+        child_func: The child function which docstring inherit from the parent.
+    """
+    return NumpyDocstringInheritor.inherit(parent_doc, child_func)
 
 
 class _BaseDocstringInheritanceMeta(type):
@@ -38,12 +64,12 @@ class _BaseDocstringInheritanceMeta(type):
         class_name: str,
         class_bases: tuple[type],
         class_dict: dict[str, Any],
-        docstring_inheritor: DocstringInheritor,
+        docstring_inheritor: DocstringInheritorClass,
         init_in_class: bool,
     ) -> None:
         super().__init__(class_name, class_bases, class_dict)
         if class_bases:
-            ClassDocstringsInheritor.inherit_docstring(
+            ClassDocstringsInheritor.inherit_docstrings(
                 cls, docstring_inheritor, init_in_class
             )
 
@@ -61,14 +87,13 @@ class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
             class_name,
             class_bases,
             class_dict,
-            inherit_google_docstring,
+            GoogleDocstringInheritor,
             init_in_class=False,
         )
 
 
 class GoogleDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
-    """Metaclass for inheriting docstrings in Google format with ``__init__`` in the
-    class docstring."""
+    """Metaclass for inheriting docstrings in Google format with init-in-class."""
 
     def __init__(
         self,
@@ -80,7 +105,7 @@ class GoogleDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
             class_name,
             class_bases,
             class_dict,
-            inherit_google_docstring,
+            GoogleDocstringInheritor,
             init_in_class=True,
         )
 
@@ -98,14 +123,13 @@ class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
             class_name,
             class_bases,
             class_dict,
-            inherit_numpy_docstring,
+            NumpyDocstringInheritor,
             init_in_class=False,
         )
 
 
 class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
-    """Metaclass for inheriting docstrings in Numpy format with ``__init__`` in the
-    class docstring."""
+    """Metaclass for inheriting docstrings in Numpy format with init-in-class."""
 
     def __init__(
         self,
@@ -117,6 +141,6 @@ class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
             class_name,
             class_bases,
             class_dict,
-            inherit_numpy_docstring,
+            NumpyDocstringInheritor,
             init_in_class=True,
         )

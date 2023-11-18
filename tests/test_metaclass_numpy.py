@@ -101,8 +101,8 @@ def assert_docstring(cls):
     excepted = "Summary"
 
     assert cls.method.__doc__ == excepted
-    assert cls.classmethod.__doc__ == excepted
-    assert cls.staticmethod.__doc__ == excepted
+    assert cls.class_method.__doc__ == excepted
+    assert cls.static_method.__doc__ == excepted
     assert cls.prop.__doc__ == excepted
 
 
@@ -116,11 +116,11 @@ def test_missing_parent_attr_parent_meta(inheritance_class):
             """Summary"""
 
         @classmethod
-        def classmethod(cls):
+        def class_method(cls):
             """Summary"""
 
         @staticmethod
-        def staticmethod():
+        def static_method():
             """Summary"""
 
         @property
@@ -140,11 +140,11 @@ def test_missing_parent_attr_child_meta(inheritance_class):
             """Summary"""
 
         @classmethod
-        def classmethod(cls):
+        def class_method(cls):
             """Summary"""
 
         @staticmethod
-        def staticmethod():
+        def static_method():
             """Summary"""
 
         @property
@@ -161,11 +161,11 @@ def test_missing_parent_doc_for_attr_parent_meta(inheritance_class):
             pass
 
         @classmethod
-        def classmethod(cls):
+        def class_method(cls):
             pass
 
         @staticmethod
-        def staticmethod():
+        def static_method():
             pass
 
         @property
@@ -177,11 +177,11 @@ def test_missing_parent_doc_for_attr_parent_meta(inheritance_class):
             """Summary"""
 
         @classmethod
-        def classmethod(cls):
+        def class_method(cls):
             """Summary"""
 
         @staticmethod
-        def staticmethod():
+        def static_method():
             """Summary"""
 
         @property
@@ -198,11 +198,11 @@ def test_missing_parent_doc_for_attr_child_meta(inheritance_class):
             pass
 
         @classmethod
-        def classmethod(cls):
+        def class_method(cls):
             pass
 
         @staticmethod
-        def staticmethod():
+        def static_method():
             pass
 
         @property
@@ -214,11 +214,11 @@ def test_missing_parent_doc_for_attr_child_meta(inheritance_class):
             """Summary"""
 
         @classmethod
-        def classmethod(cls):
+        def class_method(cls):
             """Summary"""
 
         @staticmethod
-        def staticmethod():
+        def static_method():
             """Summary"""
 
         @property

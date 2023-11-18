@@ -135,7 +135,7 @@ Examples:
     "inherit_docstring", [inherit_numpy_docstring, inherit_google_docstring]
 )
 @pytest.mark.parametrize(
-    "parent_docstring,child_docstring,expected_docstring",
+    ("parent_docstring", "child_docstring", "expected_docstring"),
     [(None, None, None), ("parent", None, "parent"), (None, "child", "child")],
 )
 def test_simple(

@@ -19,44 +19,22 @@
 # SOFTWARE.
 from __future__ import annotations
 
-import textwrap
-from typing import Generator
+import re
+import warnings
+from typing import ClassVar
 
 import pytest
 
-from docstring_inheritance.docstring_inheritors.base import AbstractDocstringInheritor
-
-
-def _test_parse_sections(parse_sections, unindented_docstring, expected_sections):
-    """Verify the parsing of the sections of a docstring."""
-    # Indent uniformly.
-    docstring = textwrap.indent(unindented_docstring, " " * 4, lambda line: True)
-    # But the first line.
-    docstring = docstring.lstrip(" \t")
-    outcome = parse_sections(docstring)
-    assert outcome == expected_sections
-    # Verify the order of the keys.
-    assert list(outcome.keys()) == list(expected_sections.keys())
-
-
-@pytest.mark.parametrize(
-    "section_body,expected_matches",
-    (
-        ("foo", {"foo": ""}),
-        ("foo : str\n    Foo.", {"foo": " : str\n    Foo."}),
-        ("foo\nbar", {"foo": "", "bar": ""}),
-        ("foo : str\n    Foo.\nbar", {"foo": " : str\n    Foo.", "bar": ""}),
-        (
-            "foo : str\n    Foo.\nbar : int\n    Bar.",
-            {"foo": " : str\n    Foo.", "bar": " : int\n    Bar."},
-        ),
-    ),
+from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+    BaseDocstringInheritor,
 )
-def test_section_items_regex(section_body, expected_matches):
-    assert (
-        AbstractDocstringInheritor._parse_section_items(section_body)
-        == expected_matches
-    )
+from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+    DocstringInheritanceWarning,
+)
+from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+    get_similarity_ratio,
+)
+from docstring_inheritance.docstring_inheritors.bases.parser import BaseDocstringParser
 
 
 def func_none():
@@ -103,18 +81,35 @@ def func_all(arg1, arg2=None, *varargs, **varkw):
     pass
 
 
-@pytest.fixture(scope="module")
-def concrete_inheritor() -> Generator[type[AbstractDocstringInheritor], None, None]:
-    """Return a concrete enough AbstractDocstringInheritor."""
-    AbstractDocstringInheritor._ARGS_SECTION_NAME = "Args"
-    AbstractDocstringInheritor._SECTION_NAMES_WITH_ITEMS = {"Args", "Methods"}
-    yield AbstractDocstringInheritor
-    delattr(AbstractDocstringInheritor, "_ARGS_SECTION_NAME")
-    delattr(AbstractDocstringInheritor, "_SECTION_NAMES_WITH_ITEMS")
+ARGS_SECTION_NAME = "DummyArgs"
+ARGS_SECTION_NAMES = {"DummyArgs"}
+METHODS_SECTION_NAME = "MethodsArgs"
+SECTION_NAMES_WITH_ITEMS = {ARGS_SECTION_NAME, METHODS_SECTION_NAME}
+MISSING_ARG_TEXT = "The description is missing."
+
+
+class DummyParser(BaseDocstringParser):
+    ARGS_SECTION_NAME = "DummyArgs"
+    ARGS_SECTION_NAMES: ClassVar[set[str]] = {"DummyArgs"}
+    METHODS_SECTION_NAME = "MethodsArgs"
+    SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
+        ARGS_SECTION_NAME,
+        METHODS_SECTION_NAME,
+    }
+
+
+@pytest.fixture()
+def patch_class():
+    """Monkey patch BaseDocstringInheritor with docstring parser constants."""
+    BaseDocstringInheritor._DOCSTRING_PARSER = DummyParser
+    BaseDocstringInheritor._MISSING_ARG_TEXT = MISSING_ARG_TEXT
+    yield
+    delattr(BaseDocstringInheritor, "_DOCSTRING_PARSER")
+    delattr(BaseDocstringInheritor, "_MISSING_ARG_TEXT")
 
 
 @pytest.mark.parametrize(
-    "parent_section,child_section,func,expected",
+    ("parent_section", "child_section", "func", "expected"),
     [
         ({}, {}, func_none, {}),
         # Non-existing section in child.
@@ -139,94 +134,114 @@ def concrete_inheritor() -> Generator[type[AbstractDocstringInheritor], None, No
         ),
         # Sections with items (not Args).
         # Non-existing item in child.
-        ({"Methods": {"parent_m": ""}}, {}, func_none, {"Methods": {"parent_m": ""}}),
+        (
+            {METHODS_SECTION_NAME: {"parent_m": ""}},
+            {},
+            func_none,
+            {METHODS_SECTION_NAME: {"parent_m": ""}},
+        ),
         # Non-existing item in parent.
-        ({}, {"Methods": {"child_m": ""}}, func_none, {"Methods": {"child_m": ""}}),
+        (
+            {},
+            {METHODS_SECTION_NAME: {"child_m": ""}},
+            func_none,
+            {METHODS_SECTION_NAME: {"child_m": ""}},
+        ),
         # Child item updates the parent one (no common items).
         (
-            {"Methods": {"parent_m": ""}},
-            {"Methods": {"child_m": ""}},
+            {METHODS_SECTION_NAME: {"parent_m": ""}},
+            {METHODS_SECTION_NAME: {"child_m": ""}},
             func_none,
-            {"Methods": {"parent_m": "", "child_m": ""}},
+            {METHODS_SECTION_NAME: {"parent_m": "", "child_m": ""}},
         ),
         # Child item updates the parent one (common items).
         (
-            {"Methods": {"method": "parent"}},
-            {"Methods": {"method": "child"}},
+            {METHODS_SECTION_NAME: {"method": "parent"}},
+            {METHODS_SECTION_NAME: {"method": "child"}},
             func_none,
-            {"Methods": {"method": "child"}},
+            {METHODS_SECTION_NAME: {"method": "child"}},
         ),
         # Sections with args items.
         # Non-existing section in child for function without args.
-        ({"Args": {"parent_a": ""}}, {}, func_none, {}),
+        ({ARGS_SECTION_NAME: {"parent_a": ""}}, {}, func_none, {}),
         # Non-existing section in parent for function without args.
-        ({}, {"Args": {"child_a": ""}}, func_none, {}),
+        ({}, {ARGS_SECTION_NAME: {"child_a": ""}}, func_none, {}),
         # Missing argument description.
-        ({}, {}, func_args, {"Args": {"arg": "The description is missing."}}),
+        ({}, {}, func_args, {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}}),
         (
             {},
-            {"Args": {"child_a": ""}},
+            {ARGS_SECTION_NAME: {"child_a": ""}},
             func_args,
-            {"Args": {"arg": "The description is missing."}},
+            {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}},
         ),
         (
-            {"Args": {"parent_a": ""}},
+            {ARGS_SECTION_NAME: {"parent_a": ""}},
             {},
             func_args,
-            {"Args": {"arg": "The description is missing."}},
+            {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}},
         ),
         (
-            {"Args": {"parent_a": ""}},
-            {"Args": {"child_a": ""}},
+            {ARGS_SECTION_NAME: {"parent_a": ""}},
+            {ARGS_SECTION_NAME: {"child_a": ""}},
             func_args,
-            {"Args": {"arg": "The description is missing."}},
+            {ARGS_SECTION_NAME: {"arg": MISSING_ARG_TEXT}},
         ),
         # Argument description in parent.
         (
-            {"Args": {"arg": "parent"}},
+            {ARGS_SECTION_NAME: {"arg": "parent"}},
             {},
             func_args,
-            {"Args": {"arg": "parent"}},
+            {ARGS_SECTION_NAME: {"arg": "parent"}},
         ),
         (
-            {"Args": {"arg": "parent"}},
-            {"Args": {"child_a": ""}},
+            {ARGS_SECTION_NAME: {"arg": "parent"}},
+            {ARGS_SECTION_NAME: {"child_a": ""}},
             func_args,
-            {"Args": {"arg": "parent"}},
+            {ARGS_SECTION_NAME: {"arg": "parent"}},
         ),
         # Argument description in child.
         (
             {},
-            {"Args": {"arg": "child"}},
+            {ARGS_SECTION_NAME: {"arg": "child"}},
             func_args,
-            {"Args": {"arg": "child"}},
+            {ARGS_SECTION_NAME: {"arg": "child"}},
         ),
         (
-            {"Args": {"parent_a": ""}},
-            {"Args": {"arg": "child"}},
+            {ARGS_SECTION_NAME: {"parent_a": ""}},
+            {ARGS_SECTION_NAME: {"arg": "child"}},
             func_args,
-            {"Args": {"arg": "child"}},
+            {ARGS_SECTION_NAME: {"arg": "child"}},
         ),
         # Argument description in both parent and child.
         (
-            {"Args": {"arg": "parent"}},
-            {"Args": {"arg": "child"}},
+            {ARGS_SECTION_NAME: {"arg": "parent"}},
+            {ARGS_SECTION_NAME: {"arg": "child"}},
             func_args,
-            {"Args": {"arg": "child"}},
+            {ARGS_SECTION_NAME: {"arg": "child"}},
+        ),
+        # Section ordering.
+        (
+            {},
+            {"Returns": "", None: ""},
+            func_none,
+            {None: "", "Returns": ""},
+        ),
+        (
+            {},
+            {"Returns": "", ARGS_SECTION_NAME: {"arg": ""}, None: ""},
+            func_args,
+            {None: "", ARGS_SECTION_NAME: {"arg": ""}, "Returns": ""},
         ),
     ],
 )
-def test_inherit_items(
-    concrete_inheritor, parent_section, child_section, func, expected
-):
-    assert (
-        concrete_inheritor._inherit_sections(parent_section, child_section, func)
-        == expected
-    )
+def test_inherit_items(patch_class, parent_section, child_section, func, expected):
+    base_inheritor = BaseDocstringInheritor(func)
+    base_inheritor._inherit_sections(parent_section, child_section)
+    assert child_section == expected
 
 
 @pytest.mark.parametrize(
-    "func,section_items,expected",
+    ("func", "section_items", "expected"),
     [
         (func_none, {}, {}),
         # Non-existing args are removed.
@@ -234,11 +249,7 @@ def test_inherit_items(
         # Self arg is removed.
         (func_with_self, {"self": ""}, {}),
         # Missing arg description.
-        (
-            func_args_kwonlyargs,
-            {"arg1": ""},
-            {"arg1": "", "arg2": AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION},
-        ),
+        (func_args_kwonlyargs, {"arg1": ""}, {"arg1": "", "arg2": MISSING_ARG_TEXT}),
         # Args are ordered according to the signature.
         (
             func_args_kwonlyargs,
@@ -246,33 +257,21 @@ def test_inherit_items(
             {"arg1": "", "arg2": ""},
         ),
         # Varargs alone.
-        (
-            func_varargs,
-            {},
-            {"*varargs": AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION},
-        ),
+        (func_varargs, {}, {"*varargs": MISSING_ARG_TEXT}),
         (
             func_varargs,
             {"*varargs": ""},
             {"*varargs": ""},
         ),
         # Varkw alone.
-        (
-            func_varkw,
-            {},
-            {"**varkw": AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION},
-        ),
+        (func_varkw, {}, {"**varkw": MISSING_ARG_TEXT}),
         (
             func_varkw,
             {"**varkw": ""},
             {"**varkw": ""},
         ),
         # Kwonlyargs alone.
-        (
-            func_kwonlyargs,
-            {},
-            {"arg": AbstractDocstringInheritor.MISSING_ARG_DESCRIPTION},
-        ),
+        (func_kwonlyargs, {}, {"arg": MISSING_ARG_TEXT}),
         (
             func_kwonlyargs,
             {"arg": ""},
@@ -305,6 +304,99 @@ def test_inherit_items(
     ],
 )
 def test_inherit_section_items_with_args(func, section_items, expected):
+    base_inheritor = BaseDocstringInheritor(func)
     assert (
-        AbstractDocstringInheritor._filter_args_section(func, section_items) == expected
+        base_inheritor._filter_args_section(MISSING_ARG_TEXT, section_items) == expected
     )
+
+
+ERROR_PREFIX = (
+    "File .*.docstring-inheritance.tests.test_base_inheritor.py:48: "
+    "in func_args: section "
+)
+
+
+def test_warning_for_missing_arg():
+    base_inheritor = BaseDocstringInheritor(func_args)
+    match = ERROR_PREFIX + r": the docstring for the argument 'arg' is missing\."
+    with pytest.warns(DocstringInheritanceWarning, match=match):
+        base_inheritor._filter_args_section("", {})
+
+
+def test_no_warning_for_missing_arg():
+    base_inheritor = BaseDocstringInheritor(func_args)
+    base_inheritor._filter_args_section("", {"args": ""})
+
+
+@pytest.mark.parametrize(
+    ("similarity_ratio", "warn", "parent_sections", "child_sections"),
+    [
+        (1.0, True, {"X": "x"}, {"X": "x"}),
+        (0.1, False, {}, {"X": "x"}),
+        (0.0, False, {"X": "x"}, {"X": "x"}),
+        (0.6, True, {"X": "xx"}, {"X": "x"}),
+        (0.7, False, {"X": "xx"}, {"X": "x"}),
+        # Subsections
+        (1.0, True, {"DummyArgs": {"X": "x"}}, {"DummyArgs": {"X": "x"}}),
+        (0.1, False, {"DummyArgs": {}}, {"DummyArgs": {"X": "x"}}),
+        (0.0, False, {"DummyArgs": {"X": "x"}}, {"DummyArgs": {"X": "x"}}),
+        (0.6, True, {"DummyArgs": {"X": "xx"}}, {"DummyArgs": {"X": "x"}}),
+        (0.7, False, {"DummyArgs": {"X": "xx"}}, {"DummyArgs": {"X": "x"}}),
+    ],
+)
+def test_warning_for_similar_sections(
+    patch_class, similarity_ratio, warn, parent_sections, child_sections
+):
+    if warn:
+        try:
+            parent = parent_sections["X"]
+            child = child_sections["X"]
+        except KeyError:
+            parent = f'DummyArgs: {parent_sections["DummyArgs"]["X"]}'
+            child = f'DummyArgs: {child_sections["DummyArgs"]["X"]}'
+        match = (
+            ERROR_PREFIX + rf"X: the docstrings have a similarity ratio of \d\.\d*, "
+            rf"the parent doc is\n    {parent}\n"
+            rf"the child doc is\n    {child}"
+        )
+        context = pytest.warns(DocstringInheritanceWarning, match=match)
+    else:
+        context = warnings.catch_warnings()
+
+    base_inheritor = BaseDocstringInheritor(func_args)
+    base_inheritor._BaseDocstringInheritor__similarity_ratio = similarity_ratio
+
+    with context:
+        base_inheritor._warn_similar_sections(parent_sections, child_sections)
+
+
+ERROR_RANGE = "The docstring inheritance similarity ratio must be in [0,1]."
+ERROR_VALUE = (
+    "The docstring inheritance similarity ratio cannot be determined from '{}'."
+)
+
+
+@pytest.mark.parametrize(
+    ("ratio", "error"),
+    [
+        ("-0.1", ERROR_RANGE),
+        ("1.1", ERROR_RANGE),
+        ("", ERROR_VALUE),
+        ("x", ERROR_VALUE),
+    ],
+)
+def test_check_similarity_ratio_error(ratio, error):
+    with pytest.raises(ValueError, match=re.escape(error.format(ratio))):
+        get_similarity_ratio(ratio)
+
+
+@pytest.mark.parametrize(
+    ("ratio", "expected"),
+    [
+        ("0", 0.0),
+        ("1", 1.0),
+        ("0.5", 0.5),
+    ],
+)
+def test_check_similarity_ratio(ratio, expected):
+    assert get_similarity_ratio(ratio) == expected
