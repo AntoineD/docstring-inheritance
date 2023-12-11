@@ -199,13 +199,14 @@ class BaseDocstringInheritor:
             section_path: The hierarchy of section names.
             msg: The warning message.
         """
-        msg = (
-            f"File {inspect.getfile(self.__child_func)}:"
-            f"{inspect.getsourcelines(self.__child_func)[1]}: "
-            f"in {self.__child_func.__qualname__}: "
-            f"section {section_path}: {msg}"
+        msg = f"in {self.__child_func.__qualname__}: section {section_path}: {msg}"
+        warnings.warn_explicit(
+            msg,
+            DocstringInheritanceWarning,
+            inspect.getfile(self.__child_func),
+            inspect.getsourcelines(self.__child_func)[1],
+            module=inspect.getmodule(self.__child_func).__name__,
         )
-        warnings.warn(msg, category=DocstringInheritanceWarning, stacklevel=2)
 
     def _inherit_sections(
         self,
