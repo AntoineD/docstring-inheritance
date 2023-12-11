@@ -327,9 +327,13 @@ class BaseDocstringInheritor:
 
         ordered_section = {}
         for arg in all_args:
-            self._warn(
-                section_name, f"the docstring for the argument '{arg}' is missing."
-            )
-            ordered_section[arg] = section_items.get(arg, missing_arg_text)
+            if arg in section_items:
+                doc = section_items[arg]
+            else:
+                doc = missing_arg_text
+                self._warn(
+                    section_name, f"the docstring for the argument '{arg}' is missing."
+                )
+            ordered_section[arg] = doc
 
         return ordered_section
