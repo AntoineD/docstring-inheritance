@@ -319,7 +319,10 @@ def func_missing_arg(arg1, arg2):
 
 def test_warning_for_missing_arg():
     base_inheritor = BaseDocstringInheritor(func_missing_arg)
-    match = r"in func_missing_arg: section : the docstring for the argument 'arg2' is missing\."
+    match = (
+        r"in func_missing_arg: section : "
+        r"the docstring for the argument 'arg2' is missing\."
+    )
     with pytest.warns(DocstringInheritanceWarning, match=match):
         base_inheritor._filter_args_section("", {})
 
@@ -356,7 +359,8 @@ def test_warning_for_similar_sections(
             parent = f'DummyArgs: {parent_sections["DummyArgs"]["X"]}'
             child = f'DummyArgs: {child_sections["DummyArgs"]["X"]}'
         match = (
-            rf"in func_args: section X: the docstrings have a similarity ratio of \d\.\d*, "
+            rf"in func_args: section X: "
+            r"the docstrings have a similarity ratio of \d\.\d*, "
             rf"the parent doc is\n    {parent}\n"
             rf"the child doc is\n    {child}"
         )

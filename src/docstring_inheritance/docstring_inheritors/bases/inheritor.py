@@ -200,12 +200,14 @@ class BaseDocstringInheritor:
             msg: The warning message.
         """
         msg = f"in {self.__child_func.__qualname__}: section {section_path}: {msg}"
+        module = inspect.getmodule(self.__child_func)
+        module_name = module.__name__ if module is not None else None
         warnings.warn_explicit(
             msg,
             DocstringInheritanceWarning,
             inspect.getfile(self.__child_func),
             inspect.getsourcelines(self.__child_func)[1],
-            module=inspect.getmodule(self.__child_func).__name__,
+            module=module_name,
         )
 
     def _inherit_sections(
@@ -280,13 +282,11 @@ class BaseDocstringInheritor:
 
         # Reorder the standard sections.
         child_sections.clear()
-        child_sections.update(
-            {
-                section_name: temp_sections.pop(section_name)
-                for section_name in self._DOCSTRING_PARSER.SECTION_NAMES
-                if section_name in temp_sections
-            }
-        )
+        child_sections.update({
+            section_name: temp_sections.pop(section_name)
+            for section_name in self._DOCSTRING_PARSER.SECTION_NAMES
+            if section_name in temp_sections
+        })
 
         # Add the remaining non-standard sections.
         child_sections.update(temp_sections)

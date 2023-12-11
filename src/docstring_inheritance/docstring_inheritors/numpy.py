@@ -72,9 +72,10 @@ class DocstringParser(BaseDocstringParser):
         if len(line2_rstripped) >= 3 and (set(line2_rstripped) in ({"-"}, {"="})):
             line1s = line1.rstrip()
             min_line_length = len(line1s)
-            if line2_rstripped.startswith(
-                ("-" * min_line_length, "=" * min_line_length)
-            ):
+            if line2_rstripped.startswith((
+                "-" * min_line_length,
+                "=" * min_line_length,
+            )):
                 return line1s, cls._get_section_body(reversed_section_body_lines)
         raise NoSectionFound
 
