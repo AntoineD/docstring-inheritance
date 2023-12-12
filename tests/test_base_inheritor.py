@@ -37,47 +37,47 @@ from docstring_inheritance.docstring_inheritors.bases.inheritor import (
 from docstring_inheritance.docstring_inheritors.bases.parser import BaseDocstringParser
 
 
-def func_none():
+def func_none(): # pragma: no cover
     pass
 
 
-def func_with_self(self):
+def func_with_self(self): # pragma: no cover
     pass
 
 
-def func_args(arg):
+def func_args(arg): # pragma: no cover
     pass
 
 
-def func_args_kwonlyargs(arg1, arg2=None):
+def func_args_kwonlyargs(arg1, arg2=None): # pragma: no cover
     pass
 
 
-def func_kwonlyargs(arg=None):
+def func_kwonlyargs(arg=None): # pragma: no cover
     pass
 
 
-def func_varargs(*varargs):
+def func_varargs(*varargs): # pragma: no cover
     pass
 
 
-def func_varkw(**varkw):
+def func_varkw(**varkw): # pragma: no cover
     pass
 
 
-def func_args_varargs(arg, *varargs):
+def func_args_varargs(arg, *varargs): # pragma: no cover
     pass
 
 
-def func_varargs_varkw(*varargs, **varkw):
+def func_varargs_varkw(*varargs, **varkw): # pragma: no cover
     pass
 
 
-def func_args_varkw(arg, **varkw):
+def func_args_varkw(arg, **varkw): # pragma: no cover
     pass
 
 
-def func_all(arg1, arg2=None, *varargs, **varkw):
+def func_all(arg1, arg2=None, *varargs, **varkw): # pragma: no cover
     pass
 
 
