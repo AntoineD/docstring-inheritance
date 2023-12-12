@@ -37,47 +37,47 @@ from docstring_inheritance.docstring_inheritors.bases.inheritor import (
 from docstring_inheritance.docstring_inheritors.bases.parser import BaseDocstringParser
 
 
-def func_none():
+def func_none(): # pragma: no cover
     pass
 
 
-def func_with_self(self):
+def func_with_self(self): # pragma: no cover
     pass
 
 
-def func_args(arg):
+def func_args(arg): # pragma: no cover
     pass
 
 
-def func_args_kwonlyargs(arg1, arg2=None):
+def func_args_kwonlyargs(arg1, arg2=None): # pragma: no cover
     pass
 
 
-def func_kwonlyargs(arg=None):
+def func_kwonlyargs(arg=None): # pragma: no cover
     pass
 
 
-def func_varargs(*varargs):
+def func_varargs(*varargs): # pragma: no cover
     pass
 
 
-def func_varkw(**varkw):
+def func_varkw(**varkw): # pragma: no cover
     pass
 
 
-def func_args_varargs(arg, *varargs):
+def func_args_varargs(arg, *varargs): # pragma: no cover
     pass
 
 
-def func_varargs_varkw(*varargs, **varkw):
+def func_varargs_varkw(*varargs, **varkw): # pragma: no cover
     pass
 
 
-def func_args_varkw(arg, **varkw):
+def func_args_varkw(arg, **varkw): # pragma: no cover
     pass
 
 
-def func_all(arg1, arg2=None, *varargs, **varkw):
+def func_all(arg1, arg2=None, *varargs, **varkw): # pragma: no cover
     pass
 
 
@@ -310,15 +310,19 @@ def test_inherit_section_items_with_args(func, section_items, expected):
     )
 
 
-ERROR_PREFIX = (
-    "File .*.docstring-inheritance.tests.test_base_inheritor.py:48: "
-    "in func_args: section "
-)
+def func_missing_arg(arg1, arg2):
+    """
+    Args:
+        arg1: foo.
+    """
 
 
 def test_warning_for_missing_arg():
-    base_inheritor = BaseDocstringInheritor(func_args)
-    match = ERROR_PREFIX + r": the docstring for the argument 'arg' is missing\."
+    base_inheritor = BaseDocstringInheritor(func_missing_arg)
+    match = (
+        r"in func_missing_arg: section : "
+        r"the docstring for the argument 'arg2' is missing\."
+    )
     with pytest.warns(DocstringInheritanceWarning, match=match):
         base_inheritor._filter_args_section("", {})
 
@@ -355,7 +359,8 @@ def test_warning_for_similar_sections(
             parent = f'DummyArgs: {parent_sections["DummyArgs"]["X"]}'
             child = f'DummyArgs: {child_sections["DummyArgs"]["X"]}'
         match = (
-            ERROR_PREFIX + rf"X: the docstrings have a similarity ratio of \d\.\d*, "
+            rf"in func_args: section X: "
+            r"the docstrings have a similarity ratio of \d\.\d*, "
             rf"the parent doc is\n    {parent}\n"
             rf"the child doc is\n    {child}"
         )

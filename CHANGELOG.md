@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.2] - 2023-10
 ### Added
 - Support for Python 3.12.
- 
+
 ## [2.0.1] - 2023-09
 ### Fixed
 - Parsing of Google docstrings with Sphinx directives (like `.. math::`) is no longer considered as a section.

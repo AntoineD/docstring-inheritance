@@ -199,13 +199,16 @@ class BaseDocstringInheritor:
             section_path: The hierarchy of section names.
             msg: The warning message.
         """
-        msg = (
-            f"File {inspect.getfile(self.__child_func)}:"
-            f"{inspect.getsourcelines(self.__child_func)[1]}: "
-            f"in {self.__child_func.__qualname__}: "
-            f"section {section_path}: {msg}"
+        msg = f"in {self.__child_func.__qualname__}: section {section_path}: {msg}"
+        module = inspect.getmodule(self.__child_func)
+        module_name = module.__name__ if module is not None else None
+        warnings.warn_explicit(
+            msg,
+            DocstringInheritanceWarning,
+            inspect.getfile(self.__child_func),
+            inspect.getsourcelines(self.__child_func)[1],
+            module=module_name,
         )
-        warnings.warn(msg, category=DocstringInheritanceWarning, stacklevel=2)
 
     def _inherit_sections(
         self,
@@ -279,13 +282,11 @@ class BaseDocstringInheritor:
 
         # Reorder the standard sections.
         child_sections.clear()
-        child_sections.update(
-            {
-                section_name: temp_sections.pop(section_name)
-                for section_name in self._DOCSTRING_PARSER.SECTION_NAMES
-                if section_name in temp_sections
-            }
-        )
+        child_sections.update({
+            section_name: temp_sections.pop(section_name)
+            for section_name in self._DOCSTRING_PARSER.SECTION_NAMES
+            if section_name in temp_sections
+        })
 
         # Add the remaining non-standard sections.
         child_sections.update(temp_sections)
@@ -326,9 +327,13 @@ class BaseDocstringInheritor:
 
         ordered_section = {}
         for arg in all_args:
-            self._warn(
-                section_name, f"the docstring for the argument '{arg}' is missing."
-            )
-            ordered_section[arg] = section_items.get(arg, missing_arg_text)
+            if arg in section_items:
+                doc = section_items[arg]
+            else:
+                doc = missing_arg_text
+                self._warn(
+                    section_name, f"the docstring for the argument '{arg}' is missing."
+                )
+            ordered_section[arg] = doc
 
         return ordered_section
