@@ -31,7 +31,8 @@ such that its derived classes fully or partly inherit the docstrings.
 - Minimum performance cost: the inheritance is performed at import time,
   not for each call.
 - Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/).
-- Missing docstring sections for signature arguments are notified by warnings.
+- Missing docstring sections for signature arguments can be notified by warnings
+  when the environment variable `DOCSTRING_INHERITANCE_WARNS` is set.
 - Docstring sections can be compared to detect duplicated or similar contents that could be inherited.
 
 # Licenses

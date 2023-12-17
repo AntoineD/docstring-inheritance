@@ -21,11 +21,14 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 from typing import Callable
+from warnings import simplefilter
 
 from .class_docstrings_inheritor import ClassDocstringsInheritor
 from .class_docstrings_inheritor import DocstringInheritorClass
+from .docstring_inheritors.bases.inheritor import DocstringInheritanceWarning
 from .docstring_inheritors.google import GoogleDocstringInheritor
 from .docstring_inheritors.numpy import NumpyDocstringInheritor
 
@@ -144,3 +147,11 @@ class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
             NumpyDocstringInheritor,
             init_in_class=True,
         )
+
+
+# Ignore our warnings unless explicitly asked.
+if not {
+    "DOCSTRING_INHERITANCE_WARNS",
+    "DOCSTRING_INHERITANCE_SIMILARITY_RATIO",
+}.intersection(os.environ.keys()):
+    simplefilter("ignore", DocstringInheritanceWarning)

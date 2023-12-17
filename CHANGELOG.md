@@ -13,6 +13,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2023-12
+### Fixed
+- Warning messages are no longer shown by default. 
+  Set the environment variable `DOCSTRING_INHERITANCE_WARNS` to activate them.
+
 ## [2.1.1] - 2023-12
 ### Changed
 - Warning messages are more relevant.
