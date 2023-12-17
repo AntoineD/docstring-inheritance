@@ -237,7 +237,7 @@ def test_parse_one_section(line1, line2s, expected):
     ],
 )
 def test_inherit_sections(parent_sections, child_sections, expected_sections):
-    NumpyDocstringInheritor(lambda: None)._inherit_sections( # pragma: no cover
+    NumpyDocstringInheritor(lambda: None)._inherit_sections(  # pragma: no cover
         parent_sections,
         child_sections,
     )

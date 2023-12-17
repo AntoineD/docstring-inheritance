@@ -122,7 +122,7 @@ Notes:
 @parametrize_inheritance
 def test_do_not_inherit_from_object(inheritance_class):
     class Parent(metaclass=inheritance_class):
-        def __init__(self): # pragma: no cover
+        def __init__(self):  # pragma: no cover
             pass
 
     assert Parent.__init__.__doc__ is None
@@ -137,7 +137,7 @@ def test_class_doc_inheritance_with_init():
             b: b from Parent.
         """
 
-        def __init__(self, a, b): # pragma: no cover
+        def __init__(self, a, b):  # pragma: no cover
             pass
 
     class Child(Parent):
@@ -150,7 +150,7 @@ def test_class_doc_inheritance_with_init():
             From Child.
         """
 
-        def __init__(self, b, c): # pragma: no cover
+        def __init__(self, b, c):  # pragma: no cover
             pass
 
     expected = """\
@@ -170,11 +170,11 @@ Notes:
 
 def test_class_doc_inheritance_with_empty_parent_doc():
     class Parent(metaclass=GoogleDocstringInheritanceInitMeta):
-        def __init__(self, a, b): # pragma: no cover
+        def __init__(self, a, b):  # pragma: no cover
             pass
 
     class Child(Parent):
-        def __init__(self, b, c): # pragma: no cover
+        def __init__(self, b, c):  # pragma: no cover
             """
             Args:
                 b: n

@@ -157,35 +157,35 @@ def test_missing_parent_attr_child_meta(inheritance_class):
 @parametrize_inheritance
 def test_missing_parent_doc_for_attr_parent_meta(inheritance_class):
     class Parent(metaclass=inheritance_class):
-        def method(self): # pragma: no cover
+        def method(self):  # pragma: no cover
             pass
 
         @classmethod
-        def class_method(cls): # pragma: no cover
+        def class_method(cls):  # pragma: no cover
             pass
 
         @staticmethod
-        def static_method(): # pragma: no cover
+        def static_method():  # pragma: no cover
             pass
 
         @property
-        def prop(self): # pragma: no cover
+        def prop(self):  # pragma: no cover
             pass
 
     class Child(Parent):
-        def method(self, xx, x, *args, yy=None, y=None, **kwargs): # pragma: no cover
+        def method(self, xx, x, *args, yy=None, y=None, **kwargs):  # pragma: no cover
             """Summary"""
 
         @classmethod
-        def class_method(cls): # pragma: no cover
+        def class_method(cls):  # pragma: no cover
             """Summary"""
 
         @staticmethod
-        def static_method(): # pragma: no cover
+        def static_method():  # pragma: no cover
             """Summary"""
 
         @property
-        def prop(self): # pragma: no cover
+        def prop(self):  # pragma: no cover
             """Summary"""
 
     assert_docstring(Child)
@@ -194,35 +194,35 @@ def test_missing_parent_doc_for_attr_parent_meta(inheritance_class):
 @parametrize_inheritance
 def test_missing_parent_doc_for_attr_child_meta(inheritance_class):
     class Parent:
-        def method(self): # pragma: no cover
+        def method(self):  # pragma: no cover
             pass
 
         @classmethod
-        def class_method(cls): # pragma: no cover
+        def class_method(cls):  # pragma: no cover
             pass
 
         @staticmethod
-        def static_method(): # pragma: no cover
+        def static_method():  # pragma: no cover
             pass
 
         @property
-        def prop(self): # pragma: no cover
+        def prop(self):  # pragma: no cover
             pass
 
     class Child(Parent, metaclass=inheritance_class):
-        def method(self, xx, x, *args, yy=None, y=None, **kwargs): # pragma: no cover
+        def method(self, xx, x, *args, yy=None, y=None, **kwargs):  # pragma: no cover
             """Summary"""
 
         @classmethod
-        def class_method(cls): # pragma: no cover
+        def class_method(cls):  # pragma: no cover
             """Summary"""
 
         @staticmethod
-        def static_method(): # pragma: no cover
+        def static_method():  # pragma: no cover
             """Summary"""
 
         @property
-        def prop(self): # pragma: no cover
+        def prop(self):  # pragma: no cover
             """Summary"""
 
     assert_docstring(Child)
@@ -310,7 +310,7 @@ def test_multiple_inheritance_child_meta(inheritance_class):
 @parametrize_inheritance
 def test_multiple_inheritance_child_meta_method(inheritance_class):
     class Parent1:
-        def method(self, w, x): # pragma: no cover
+        def method(self, w, x):  # pragma: no cover
             """Summary 1
 
             Parameters
@@ -324,7 +324,7 @@ def test_multiple_inheritance_child_meta_method(inheritance_class):
             """
 
     class Child(Parent1, metaclass=inheritance_class):
-        def method(self, w, x, *args, y=None, **kwargs): # pragma: no cover
+        def method(self, w, x, *args, y=None, **kwargs):  # pragma: no cover
             pass
 
     excepted = """Summary 1
@@ -414,7 +414,7 @@ def test_several_parents_child_meta(inheritance_class):
 @parametrize_inheritance
 def test_do_not_inherit_object_child_meta(inheritance_class):
     class Parent:
-        def __init__(self): # pragma: no cover
+        def __init__(self):  # pragma: no cover
             pass
 
     class Child(Parent, metaclass=inheritance_class):
@@ -426,7 +426,7 @@ def test_do_not_inherit_object_child_meta(inheritance_class):
 @parametrize_inheritance
 def test_do_not_inherit_from_object(inheritance_class):
     class Parent(metaclass=inheritance_class):
-        def __init__(self): # pragma: no cover
+        def __init__(self):  # pragma: no cover
             pass
 
     assert Parent.__init__.__doc__ is None

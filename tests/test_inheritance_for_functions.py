@@ -29,7 +29,7 @@ from docstring_inheritance.class_docstrings_inheritor import ClassDocstringsInhe
 
 
 def test_side_effect():
-    def f(x, y=None, **kwargs): # pragma: no cover
+    def f(x, y=None, **kwargs):  # pragma: no cover
         pass
 
     ref_signature = inspect.signature(f)
