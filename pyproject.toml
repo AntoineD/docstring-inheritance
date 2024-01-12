@@ -39,6 +39,3 @@ Source = "https://github.com/AntoineD/docstring-inheritance"
 Tracker = "https://github.com/AntoineD/docstring-inheritance/issues"
 
 [tool.setuptools_scm]
-
-[tool.black]
-target-version = ['py38']
