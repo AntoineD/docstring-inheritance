@@ -58,12 +58,14 @@ def get_similarity_ratio(env_ratio: str | None) -> float:
     try:
         ratio = float(env_ratio)
     except ValueError:
-        raise ValueError(
+        msg = (
             "The docstring inheritance similarity ratio cannot be determined from "
             f"'{env_ratio}'."
-        ) from None
+        )
+        raise ValueError(msg) from None
     if not (0.0 <= ratio <= 1.0):
-        raise ValueError("The docstring inheritance similarity ratio must be in [0,1].")
+        msg = "The docstring inheritance similarity ratio must be in [0,1]."
+        raise ValueError(msg)
     return ratio
 
 

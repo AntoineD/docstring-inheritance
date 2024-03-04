@@ -3,6 +3,8 @@ unsafe-fixes = true
 preview = true
 target-version = "py38"
 src = ["src"]
+
+[lint]
 task-tags = ["TODO"]
 ignore = [
     # Conflicts with ruff format.
@@ -48,8 +50,10 @@ select = [
     "N",
     "T",
     "W",
+    "EM",
     "UP",
     "PT",
+#    "ANN",
     "FLY",
     "ISC",
     "LOG",
@@ -68,19 +72,21 @@ select = [
     "SLOT",
     "FURB",
     "PERF",
+    "TRIO",
 #    "C",
 #    "D",
 #    "S",
 #    "PL",
+#    "PD",
 #    "BLE",
 #    "FBT",
 ]
 
-[isort]
+[lint.isort]
 force-single-line = true
 
-[pydocstyle]
+[lint.pydocstyle]
 convention = "google"
 
-[per-file-ignores]
+[lint.per-file-ignores]
 "tests/*.py" = ["D", "PT009","PT011", "PT027", "PTH"]

@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import inspect
+import operator
 import re
 import sys
 from abc import ABC
@@ -115,7 +116,7 @@ class BaseDocstringParser(ABC):
             The docstring of a section.
         """
         reversed_section_body_lines = list(
-            dropwhile(lambda x: not x, reversed_section_body_lines)
+            dropwhile(operator.not_, reversed_section_body_lines)
         )
         reversed_section_body_lines.reverse()
         return "\n".join(reversed_section_body_lines)

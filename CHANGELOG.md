@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.2] - 2023-12
 ### Fixed
-- Warning messages are no longer shown by default. 
+- Warning messages are no longer shown by default.
   Set the environment variable `DOCSTRING_INHERITANCE_WARNS` to activate them.
 
 ## [2.1.1] - 2023-12
