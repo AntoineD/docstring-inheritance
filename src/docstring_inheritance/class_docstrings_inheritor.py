@@ -138,7 +138,7 @@ class ClassDocstringsInheritor:
                         # the MRO for methods,
                         # we inherit only from the first found parent.
                         break
-                    # TODO: else WARN that no dosctring is defined and
+                    # TODO: else WARN that no docstring is defined and
                     # none can be inherited.
 
     @staticmethod
