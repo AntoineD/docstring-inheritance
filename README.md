@@ -10,7 +10,6 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/docstring-inheritance)
 ![PyPI](https://img.shields.io/pypi/v/docstring-inheritance)
 ![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/docstring-inheritance)
-![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Codecov branch](https://img.shields.io/codecov/c/gh/AntoineD/docstring-inheritance/main)
 
 `docstring-inheritance` is a python package to avoid writing and maintaining duplicated python docstrings.
@@ -30,7 +29,7 @@ such that its derived classes fully or partly inherit the docstrings.
   the signature arguments are inherited individually.
 - Minimum performance cost: the inheritance is performed at import time,
   not for each call.
-- Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/).
+- Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/) and [mkdocs](https://www.mkdocs.org/) (See [below](#mkdocs)).
 - Missing docstring sections for signature arguments can be notified by warnings
   when the environment variable `DOCSTRING_INHERITANCE_WARNS` is set.
 - Docstring sections can be compared to detect duplicated or similar contents that could be inherited.
@@ -364,6 +363,24 @@ If the ratio is higher or equal to the value of `DOCSTRING_INHERITANCE_SIMILARIT
 the docstring sections are considered similar.
 Use a ratio of `1` to detect identical docstring sections.
 Use a ratio lower than `1` to detect similar docstring sections.
+
+# Mkdocs
+
+To render the documentation with `mkdocs`,
+the package `mkdocstring[python]` is required and
+the package `griffe-inherited-docstrings` is recommended,
+finally the following shall be added to `mkdocs.yml`:
+
+```yaml
+plugins:
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          extensions:
+            - griffe_inherited_docstrings
+            - docstring_inheritance.griffe
+```
 
 # Similar projects
 
