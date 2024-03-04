@@ -22,9 +22,13 @@
 from __future__ import annotations
 
 import difflib
-import inspect
 import os
 import warnings
+from inspect import getfile
+from inspect import getfullargspec
+from inspect import getmodule
+from inspect import getsourcelines
+from inspect import unwrap
 from textwrap import indent
 from typing import TYPE_CHECKING
 from typing import Any
@@ -130,7 +134,10 @@ class BaseDocstringInheritor:
             parent_sections,
             child_sections,
         )
-        self.__child_func.__doc__ = self._DOCSTRING_RENDERER.render(child_sections)
+        # Get the original function eventually behind decorators.
+        unwrap(self.__child_func).__doc__ = self._DOCSTRING_RENDERER.render(
+            child_sections
+        )
 
     def _warn_similar_sections(
         self,
@@ -202,13 +209,13 @@ class BaseDocstringInheritor:
             msg: The warning message.
         """
         msg = f"in {self.__child_func.__qualname__}: section {section_path}: {msg}"
-        module = inspect.getmodule(self.__child_func)
+        module = getmodule(self.__child_func)
         module_name = module.__name__ if module is not None else None
         warnings.warn_explicit(
             msg,
             DocstringInheritanceWarning,
-            inspect.getfile(self.__child_func),
-            inspect.getsourcelines(self.__child_func)[1],
+            getfile(self.__child_func),
+            getsourcelines(self.__child_func)[1],
             module=module_name,
         )
 
@@ -313,7 +320,7 @@ class BaseDocstringInheritor:
         Returns:
             The section items filtered with the function signature.
         """
-        full_arg_spec = inspect.getfullargspec(self.__child_func)
+        full_arg_spec = getfullargspec(self.__child_func)
 
         all_args = full_arg_spec.args
         if "self" in all_args:
