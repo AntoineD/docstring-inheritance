@@ -1,7 +1,3 @@
-[build-system]
-requires = ["setuptools", "setuptools_scm"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "docstring-inheritance"
 dynamic = ["version"]
@@ -39,3 +35,7 @@ Source = "https://github.com/AntoineD/docstring-inheritance"
 Tracker = "https://github.com/AntoineD/docstring-inheritance/issues"
 
 [tool.setuptools_scm]
+
+[build-system]
+requires = ["setuptools", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
