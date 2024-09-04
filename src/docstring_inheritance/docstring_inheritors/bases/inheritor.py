@@ -116,7 +116,7 @@ class BaseDocstringInheritor:
         Args:
             parent_doc: The docstring of the parent.
             child_func: The child function which docstring inherit from the parent.
-        """
+        """  # noqa: D205, D212
         if parent_doc is not None:
             cls(child_func)._inherit(parent_doc)
 
@@ -150,7 +150,7 @@ class BaseDocstringInheritor:
         Args:
             parent_sections: The parent sections.
             child_sections: The child sections.
-            section_path: The hierarchy of section names.
+            super_section_name: The name of the parent section.
         """
         if self.__similarity_ratio == 0.0:
             return
@@ -187,7 +187,8 @@ class BaseDocstringInheritor:
         Args:
             parent_doc: The parent documentation.
             child_doc: The child documentation.
-            section_path: The hierarchy of section names.
+            super_section_name: The name of the parent section.
+            section_name: The name of the section.
         """
         ratio = difflib.SequenceMatcher(None, parent_doc, child_doc).ratio()
         if ratio >= self.__similarity_ratio:

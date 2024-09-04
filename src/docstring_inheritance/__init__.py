@@ -81,7 +81,7 @@ class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
     """Metaclass for inheriting docstrings in Google format."""
 
     def __init__(
-        self,
+        cls,
         class_name: str,
         class_bases: tuple[type],
         class_dict: dict[str, Any],
@@ -99,7 +99,7 @@ class GoogleDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
     """Metaclass for inheriting docstrings in Google format with init-in-class."""
 
     def __init__(
-        self,
+        cls,
         class_name: str,
         class_bases: tuple[type],
         class_dict: dict[str, Any],
@@ -117,7 +117,7 @@ class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
     """Metaclass for inheriting docstrings in Numpy format."""
 
     def __init__(
-        self,
+        cls,
         class_name: str,
         class_bases: tuple[type],
         class_dict: dict[str, Any],
@@ -135,7 +135,7 @@ class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
     """Metaclass for inheriting docstrings in Numpy format with init-in-class."""
 
     def __init__(
-        self,
+        cls,
         class_name: str,
         class_bases: tuple[type],
         class_dict: dict[str, Any],
