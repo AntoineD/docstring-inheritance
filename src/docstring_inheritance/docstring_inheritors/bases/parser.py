@@ -41,7 +41,7 @@ if sys.version_info >= (3, 10):  # pragma: >=3.10 cover
     from itertools import pairwise
 else:  # pragma: <3.10 cover
     # See https://docs.python.org/3/library/itertools.html#itertools.pairwise
-    def pairwise(iterable):
+    def pairwise(iterable):  # noqa: D103
         a, b = tee(iterable)
         next(b, None)
         return zip(a, b)

@@ -25,4 +25,3 @@
 - [setuptools](https://setuptools.readthedocs.io/): MIT
 - [setuptools_scm](https://github.com/pypa/setuptools_scm/): MIT
 - [tox](https://tox.wiki): MIT
-- [twine](https://twine.readthedocs.io): MIT

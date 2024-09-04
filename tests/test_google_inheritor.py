@@ -20,12 +20,13 @@
 from __future__ import annotations
 
 import pytest
-from test_base_parser import _test_parse_sections
 
 from docstring_inheritance.docstring_inheritors.bases import SUMMARY_SECTION_NAME
 from docstring_inheritance.docstring_inheritors.bases.parser import NoSectionFound
 from docstring_inheritance.docstring_inheritors.google import DocstringParser
 from docstring_inheritance.docstring_inheritors.google import DocstringRenderer
+
+from .test_base_parser import _test_parse_sections
 
 
 @pytest.mark.parametrize(

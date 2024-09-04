@@ -9,8 +9,14 @@ task-tags = ["TODO"]
 ignore = [
     # Conflicts with ruff format.
     "E203",
+    # D100 Missing docstring in public module.
+    "D100",
+    # D100 Missing docstring in public package.
+    "D104",
     # Checks for undocumented magic method definitions.
     "D105",
+    # Missing docstring in `__init__`.
+    "D107",
     # Checks for long exception messages that are not defined in the exception class itself.
     "TRY003",
     # Avoid unexpected behavior with the formatter.
@@ -40,53 +46,64 @@ ignore = [
 ]
 select = [
     "A",
+#    "ANN",
+    "ASYNC",
     "B",
+    "BLE",
+#    "C",
     "C4",
+    "D",
+#    "DOC",
     "E",
+    "EM",
     "F",
+#    "FA",
+#    "FBT",
+    "FLY",
+    "FURB",
     "G",
     "I",
+    "ISC",
+    "INP",
+    "LOG",
     "Q",
     "N",
-    "T",
-    "W",
-    "EM",
-    "UP",
-    "PT",
-#    "ANN",
-    "FLY",
-    "ISC",
-    "LOG",
     "NPY",
+#    "PL",
+#    "PD",
+    "PT",
     "PIE",
+    "PGH",
     "PTH",
+    "PYI",
+    "PERF",
     "RET",
     "RSE",
     "RUF",
+#    "S",
     "SIM",
+#    "SLF",
+    "SLOT",
+    "T",
     "T10",
     "T20",
     "TCH",
     "TRY",
+    "W",
+    "UP",
     "YTT",
-    "SLOT",
-    "FURB",
-    "PERF",
-    "TRIO",
-#    "C",
-#    "D",
-#    "S",
-#    "PL",
-#    "PD",
-#    "BLE",
-#    "FBT",
 ]
 
 [lint.isort]
 force-single-line = true
+#required-imports = ["from __future__ import annotations"]
 
 [lint.pydocstyle]
 convention = "google"
 
 [lint.per-file-ignores]
 "tests/*.py" = ["D", "PT009","PT011", "PT027", "PTH"]
+
+[format]
+docstring-code-format = true
+docstring-code-line-length = 75

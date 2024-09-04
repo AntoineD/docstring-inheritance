@@ -61,7 +61,7 @@ class ClassDocstringsInheritor:
             docstring_inheritor: The docstring inheritor.
             init_in_class: Whether the ``__init__`` arguments documentation is in the
                 class docstring.
-        """
+        """  # noqa: D205, D212
         # Remove the new class itself and the object class from the mro,
         # object's docstrings have no interest.
         self.__mro_classes = cls.mro()[1:-1]

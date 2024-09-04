@@ -98,7 +98,7 @@ class DummyParser(BaseDocstringParser):
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def patch_class():
     """Monkey patch BaseDocstringInheritor with docstring parser constants."""
     BaseDocstringInheritor._DOCSTRING_PARSER = DummyParser
