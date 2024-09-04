@@ -26,20 +26,22 @@ from typing import Any
 from typing import ClassVar
 from typing import Literal
 
+from griffe import Alias
 from griffe import Attribute
 from griffe import Class
 from griffe import Docstring
 from griffe import Extension
+from griffe import Inspector
 from griffe import Object
 from griffe import ObjectNode
+from griffe import Visitor
 from griffe import dynamic_import
 from griffe import get_logger
-from griffe.dataclasses import Alias
 
 if TYPE_CHECKING:
     import ast
 
-    from griffe.enumerations import Parser
+    from griffe import Parser
 
 _logger = get_logger(__name__)
 
@@ -53,7 +55,14 @@ class DocstringInheritance(Extension):
     __parser_options: ClassVar[dict[str, Any]] = {}
     """The docstring parser options."""
 
-    def on_class_members(self, node: ast.AST | ObjectNode, cls: Class) -> None:
+    def on_class_members(  # noqa: D102
+        self,
+        *,
+        node: ast.AST | ObjectNode,
+        cls: Class,
+        agent: Visitor | Inspector,
+        **kwargs: Any,
+    ) -> None:
         if isinstance(node, ObjectNode):
             # Skip runtime objects, their docstrings are already OK.
             return
