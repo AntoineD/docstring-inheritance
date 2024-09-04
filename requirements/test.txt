@@ -6,23 +6,23 @@
 #
 covdefaults==2.3.0
     # via docstring-inheritance (pyproject.toml)
-coverage[toml]==7.4.3
+coverage[toml]==7.6.1
     # via
     #   covdefaults
     #   pytest-cov
-exceptiongroup==1.2.0
+exceptiongroup==1.2.2
     # via pytest
 iniconfig==2.0.0
     # via pytest
-packaging==23.2
+packaging==24.1
     # via pytest
-pluggy==1.4.0
+pluggy==1.5.0
     # via pytest
-pytest==8.1.0
+pytest==8.3.2
     # via
     #   docstring-inheritance (pyproject.toml)
     #   pytest-cov
-pytest-cov==4.1.0
+pytest-cov==5.0.0
     # via docstring-inheritance (pyproject.toml)
 tomli==2.0.1
     # via
