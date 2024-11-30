@@ -34,7 +34,6 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import ClassVar
-from typing import Dict
 from typing import cast
 
 if TYPE_CHECKING:
@@ -163,14 +162,14 @@ class BaseDocstringInheritor:
             # TODO: add Raises section?
             if section_name in self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS:
                 self._warn_similar_sections(
-                    cast(Dict[str, str], parent_section),
-                    cast(Dict[str, str], child_section),
+                    cast("dict[str, str]", parent_section),
+                    cast("dict[str, str]", child_section),
                     super_section_name=section_name,
                 )
             else:
                 self._warn_similar_section(
-                    cast(str, parent_section),
-                    cast(str, child_section),
+                    cast("str", parent_section),
+                    cast("str", child_section),
                     super_section_name,
                     section_name,
                 )
@@ -266,10 +265,10 @@ class BaseDocstringInheritor:
 
         for section_name in common_section_names_with_items:
             temp_section_items = cast(
-                Dict[str, str], parent_sections[section_name]
+                "dict[str, str]", parent_sections[section_name]
             ).copy()
             temp_section_items.update(
-                cast(Dict[str, str], child_sections[section_name])
+                cast("dict[str, str]", child_sections[section_name])
             )
 
             temp_sections[section_name] = temp_section_items
@@ -278,7 +277,7 @@ class BaseDocstringInheritor:
         args_section = self._filter_args_section(
             self._MISSING_ARG_TEXT,
             cast(
-                Dict[str, str],
+                "dict[str, str]",
                 temp_sections.get(self._DOCSTRING_PARSER.ARGS_SECTION_NAME, {}),
             ),
             self._DOCSTRING_PARSER.ARGS_SECTION_NAME,

@@ -28,7 +28,7 @@ from docstring_inheritance import NumpyDocstringInheritanceMeta
 
 parametrize_inheritance = pytest.mark.parametrize(
     "inheritance_class",
-    (NumpyDocstringInheritanceMeta, NumpyDocstringInheritanceInitMeta),
+    [NumpyDocstringInheritanceMeta, NumpyDocstringInheritanceInitMeta],
 )
 
 

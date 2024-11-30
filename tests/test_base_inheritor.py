@@ -356,8 +356,8 @@ def test_warning_for_similar_sections(
             parent = parent_sections["X"]
             child = child_sections["X"]
         except KeyError:
-            parent = f'DummyArgs: {parent_sections["DummyArgs"]["X"]}'
-            child = f'DummyArgs: {child_sections["DummyArgs"]["X"]}'
+            parent = f"DummyArgs: {parent_sections['DummyArgs']['X']}"
+            child = f"DummyArgs: {child_sections['DummyArgs']['X']}"
         match = (
             rf"in func_args: section X: "
             r"the docstrings have a similarity ratio of \d\.\d*, "

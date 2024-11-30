@@ -28,7 +28,7 @@ from docstring_inheritance import GoogleDocstringInheritanceMeta
 
 parametrize_inheritance = pytest.mark.parametrize(
     "inheritance_class",
-    (GoogleDocstringInheritanceMeta, GoogleDocstringInheritanceInitMeta),
+    [GoogleDocstringInheritanceMeta, GoogleDocstringInheritanceInitMeta],
 )
 
 
