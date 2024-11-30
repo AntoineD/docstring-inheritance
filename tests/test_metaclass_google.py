@@ -168,6 +168,58 @@ Notes:
     assert Child.__init__.__doc__ is None
 
 
+def test_class_doc_inheritance_with_init_attr():
+    class Parent(metaclass=GoogleDocstringInheritanceInitMeta):
+        """Class Parent.
+
+        Args:
+            a: a from Parent.
+            b: b from Parent.
+
+        Attributes:
+            a: a attribute.
+            b: b attribute.
+        """
+
+        def __init__(self, a, b):  # pragma: no cover
+            pass
+
+    class Child(Parent):
+        """Class Child.
+
+        Args:
+            c: c from Child.
+
+        Attributes:
+            c: c attribute.
+
+        Notes:
+            From Child.
+        """
+
+        def __init__(self, b, c):  # pragma: no cover
+            pass
+
+    expected = """\
+Class Child.
+
+Args:
+    b: b from Parent.
+    c: c from Child.
+
+Attributes:
+    a: a attribute.
+    b: b attribute.
+    c: c attribute.
+
+Notes:
+    From Child.\
+"""
+
+    assert Child.__doc__ == expected
+    assert Child.__init__.__doc__ is None
+
+
 def test_class_doc_inheritance_with_empty_parent_doc():
     class Parent(metaclass=GoogleDocstringInheritanceInitMeta):
         def __init__(self, a, b):  # pragma: no cover
