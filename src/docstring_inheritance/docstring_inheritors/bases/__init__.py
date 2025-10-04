@@ -21,9 +21,7 @@
 
 from __future__ import annotations
 
-from typing import Union
-
-SubSectionType = Union[str, dict[str, str]]
+SubSectionType = str | dict[str, str]
 SectionsType = dict[str, SubSectionType]
 
 SUMMARY_SECTION_NAME = ""

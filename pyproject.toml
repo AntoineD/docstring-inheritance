@@ -1,32 +1,27 @@
 [project]
 name = "docstring-inheritance"
-dynamic = ["version"]
 description = "Avoid writing and maintaining duplicated docstrings."
 readme = "README.md"
-license = {text = "MIT"}
-requires-python = ">=3.9,<4"
-authors = [
-    {name = "Antoine Dechaume"},
-]
+license = "MIT"
+license-files = ["LICENSE.txt"]
+authors = [{ name = "Antoine Dechaume" }]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: MacOS",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
+dynamic = ["version"]
+requires-python = ">=3.10,<4"
+optional-dependencies = { griffe = ["griffe>1"] }
 
-[project.optional-dependencies]
-test = [
-    "covdefaults",
-    "pytest",
-    "pytest-cov",
-]
+[dependency-groups]
+dev = ["covdefaults", "pytest", "pytest-cov"]
 
 [project.urls]
 Documentation = "https://antoined.github.io/docstring-inheritance"
@@ -34,8 +29,8 @@ Homepage = "https://github.com/AntoineD/docstring-inheritance"
 Source = "https://github.com/AntoineD/docstring-inheritance"
 Tracker = "https://github.com/AntoineD/docstring-inheritance/issues"
 
-[tool.setuptools_scm]
-
 [build-system]
-requires = ["setuptools", "setuptools_scm"]
+requires = ["setuptools", "setuptools_scm[toml]"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]

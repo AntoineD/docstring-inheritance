@@ -1,4 +1,3 @@
-# noqa: A005
 # Copyright 2021 Antoine DECHAUME
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -25,11 +24,9 @@ from __future__ import annotations
 import inspect
 import operator
 import re
-import sys
 from abc import ABC
 from abc import abstractmethod
 from itertools import dropwhile
-from itertools import tee
 from typing import TYPE_CHECKING
 from typing import ClassVar
 
@@ -38,14 +35,7 @@ from . import SUMMARY_SECTION_NAME
 if TYPE_CHECKING:
     from . import SectionsType
 
-if sys.version_info >= (3, 10):  # pragma: >=3.10 cover
-    from itertools import pairwise
-else:  # pragma: <3.10 cover
-    # See https://docs.python.org/3/library/itertools.html#itertools.pairwise
-    def pairwise(iterable):  # noqa: D103
-        a, b = tee(iterable)
-        next(b, None)
-        return zip(a, b)
+from itertools import pairwise
 
 
 class NoSectionFound(BaseException):

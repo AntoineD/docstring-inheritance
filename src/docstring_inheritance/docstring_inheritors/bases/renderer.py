@@ -24,10 +24,10 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING
 
 from . import SUMMARY_SECTION_NAME
-from . import SubSectionType
 
 if TYPE_CHECKING:
     from . import SectionsType
+    from . import SubSectionType
 
 
 class BaseDocstringRenderer(ABC):

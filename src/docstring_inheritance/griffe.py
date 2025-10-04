@@ -28,20 +28,20 @@ from typing import Literal
 
 from griffe import Alias
 from griffe import Attribute
-from griffe import Class
 from griffe import Docstring
 from griffe import Extension
-from griffe import Inspector
-from griffe import Object
 from griffe import ObjectNode
-from griffe import Visitor
 from griffe import dynamic_import
 from griffe import get_logger
 
 if TYPE_CHECKING:
     import ast
 
+    from griffe import Class
+    from griffe import Inspector
+    from griffe import Object
     from griffe import Parser
+    from griffe import Visitor
 
 _logger = get_logger(__name__)
 

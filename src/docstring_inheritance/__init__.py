@@ -22,15 +22,19 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 from typing import Any
-from typing import Callable
 from warnings import simplefilter
 
 from .class_docstrings_inheritor import ClassDocstringsInheritor
-from .class_docstrings_inheritor import DocstringInheritorClass
 from .docstring_inheritors.bases.inheritor import DocstringInheritanceWarning
 from .docstring_inheritors.google import GoogleDocstringInheritor
 from .docstring_inheritors.numpy import NumpyDocstringInheritor
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from .class_docstrings_inheritor import DocstringInheritorClass
 
 
 def inherit_google_docstring(

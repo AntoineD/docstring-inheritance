@@ -32,11 +32,12 @@ from inspect import unwrap
 from textwrap import indent
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Callable
 from typing import ClassVar
 from typing import cast
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from . import SectionsType
     from .parser import BaseDocstringParser
     from .renderer import BaseDocstringRenderer

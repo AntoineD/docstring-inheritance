@@ -22,14 +22,17 @@
 from __future__ import annotations
 
 import textwrap
+from typing import TYPE_CHECKING
 from typing import ClassVar
 
 from .bases import SUMMARY_SECTION_NAME
-from .bases import SubSectionType
 from .bases.inheritor import BaseDocstringInheritor
 from .bases.parser import BaseDocstringParser
 from .bases.parser import NoSectionFound
 from .bases.renderer import BaseDocstringRenderer
+
+if TYPE_CHECKING:
+    from .bases import SubSectionType
 
 
 class DocstringRenderer(BaseDocstringRenderer):
