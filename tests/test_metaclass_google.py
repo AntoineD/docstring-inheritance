@@ -19,88 +19,145 @@
 # SOFTWARE.
 from __future__ import annotations
 
+import sys
 import textwrap
+from contextlib import contextmanager
+from importlib import import_module
+from typing import TYPE_CHECKING
+from uuid import uuid4
 
 import pytest
+from griffe import Extensions
+from griffe import LinesCollection
+from griffe import temporary_pyfile
+from griffe import visit
 
 from docstring_inheritance import GoogleDocstringInheritanceInitMeta
 from docstring_inheritance import GoogleDocstringInheritanceMeta
+from docstring_inheritance.griffe import DocstringInheritance
 
-parametrize_inheritance = pytest.mark.parametrize(
-    "inheritance_class",
-    [GoogleDocstringInheritanceMeta, GoogleDocstringInheritanceInitMeta],
-)
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from collections.abc import Sequence
+    from types import ModuleType
+
+    from griffe import Module
+
+    from docstring_inheritance import _BaseGoogleDocstringInheritanceMeta
 
 
-@parametrize_inheritance
-def test_args_inheritance(inheritance_class):
-    class Parent(metaclass=inheritance_class):
-        def method(self, w, x, *args, y=None, **kwargs):
-            """
-            Args:
-                w
-                x: int
-                *args: int
-                y: float
-                **kwargs: int
-            """
+@contextmanager
+def temporary_visited_module(code: str) -> Iterator[tuple[Module, ModuleType]]:
+    """Create and visit a temporary module with the given code.
 
-    class Child(Parent):
-        def method(self, xx, x, *args, yy=None, y=None, **kwargs):
-            """
-            Args:
-                xx: int
-            """
+    Parameters:
+        code: The code of the module.
 
-    expected = """
+    Yields:
+        The visited module.
+    """
+    module_name = f"module{uuid4()}"
+    code = textwrap.dedent(code)
+    with temporary_pyfile(code, module_name=module_name) as (_, path):
+        lines_collection = LinesCollection()
+        lines_collection[path] = code.splitlines()
+        sys.path.append(str(path.parent))
+        module = visit(
+            module_name,
+            filepath=path,
+            code=code,
+            extensions=Extensions(DocstringInheritance()),
+            lines_collection=lines_collection,
+        )
+        module.modules_collection[module_name] = module
+        yield module, import_module(module_name)
+        sys.path.remove(str(path.parent))
+
+
+def assert_str(new: str, expected: str) -> None:
+    assert textwrap.dedent(new).strip() == expected.strip()
+
+
+ALL_META = (GoogleDocstringInheritanceMeta, GoogleDocstringInheritanceInitMeta)
+
+
+@pytest.mark.parametrize(
+    ("inheritance_classes", "code", "attr_to_expected"),
+    [
+        (
+            ALL_META,
+            '''
+from docstring_inheritance import {metaclass_name}
+class Parent(metaclass={metaclass_name}):
+    def method(self, w, x, *args, y=None, **kwargs):
+        """
+        Args:
+            w: will be removed
+            x: int
+            *args: int
+            y: float
+            **kwargs: int
+        """
+
+class Child(Parent):
+    def method(self, xx, x, *args, yy=None, y=None, **kwargs):
+        """
+        Args:
+            xx: int
+        """
+            ''',
+            {
+                "Child.method": """
 Args:
     xx: int
     x: int
     *args: int
     yy: The description is missing.
     y: float
-    **kwargs: int"""
+    **kwargs: int
+            """,
+            },
+        ),
+        (
+            ALL_META,
+            '''
+from docstring_inheritance import {metaclass_name}
+class GrandParent(metaclass={metaclass_name}):
+    """Class GrandParent.
 
-    assert Child.method.__doc__ == expected
+    Attributes:
+        a: From GrandParent.
 
+    Methods:
+        a: From GrandParent.
 
-@parametrize_inheritance
-def test_class_doc_inheritance(inheritance_class):
-    class GrandParent(metaclass=inheritance_class):
-        """Class GrandParent.
+    Notes:
+        From GrandParent.
+    """
 
-        Attributes:
-            a: From GrandParent.
+class Parent(GrandParent):
+    """Class Parent.
 
-        Methods:
-            a: From GrandParent.
+    Attributes:
+        b: From Parent.
 
-        Notes:
-            From GrandParent.
-        """
+    Methods:
+        b: From Parent.
+    """
 
-    class Parent(GrandParent):
-        """Class Parent.
+class Child(Parent):
+    """Class Child.
 
-        Attributes:
-            b: From Parent.
+    Attributes:
+        a: From Child.
+        c : From Child.
 
-        Methods:
-            b: From Parent.
-        """
-
-    class Child(Parent):
-        """Class Child.
-
-        Attributes:
-            a: From Child.
-            c : From Child.
-
-        Notes:
-            From Child.
-        """
-
-    expected = """\
+    Notes:
+        From Child.
+    """
+            ''',
+            {
+                "Child": """
 Class Child.
 
 Attributes:
@@ -113,47 +170,40 @@ Methods:
     b: From Parent.
 
 Notes:
-    From Child.\
-"""
+    From Child.
+            """,
+            },
+        ),
+        (
+            (GoogleDocstringInheritanceInitMeta,),
+            '''
+from docstring_inheritance import {metaclass_name}
+class Parent(metaclass={metaclass_name}):
+    """Class Parent.
 
-    assert Child.__doc__ == expected
+    Args:
+        a: a from Parent.
+        b: b from Parent.
+    """
 
+    def __init__(self, a, b):
+        pass
 
-@parametrize_inheritance
-def test_do_not_inherit_from_object(inheritance_class):
-    class Parent(metaclass=inheritance_class):
-        def __init__(self):  # pragma: no cover
-            pass
+class Child(Parent):
+    """Class Child.
 
-    assert Parent.__init__.__doc__ is None
+    Args:
+        c: c from Child.
 
+    Notes:
+        From Child.
+    """
 
-def test_class_doc_inheritance_with_init():
-    class Parent(metaclass=GoogleDocstringInheritanceInitMeta):
-        """Class Parent.
-
-        Args:
-            a: a from Parent.
-            b: b from Parent.
-        """
-
-        def __init__(self, a, b):  # pragma: no cover
-            pass
-
-    class Child(Parent):
-        """Class Child.
-
-        Args:
-            c: c from Child.
-
-        Notes:
-            From Child.
-        """
-
-        def __init__(self, b, c):  # pragma: no cover
-            pass
-
-    expected = """\
+    def __init__(self, b, c):
+        pass
+            ''',
+            {
+                "Child": """
 Class Child.
 
 Args:
@@ -161,46 +211,48 @@ Args:
     c: c from Child.
 
 Notes:
-    From Child.\
-"""
+    From Child.
+""",
+                "Child.__init__": None,
+            },
+        ),
+        (
+            (GoogleDocstringInheritanceInitMeta,),
+            '''
+from docstring_inheritance import {metaclass_name}
+class Parent(metaclass={metaclass_name}):
+    """Class Parent.
 
-    assert Child.__doc__ == expected
-    assert Child.__init__.__doc__ is None
+    Args:
+        a: a from Parent.
+        b: b from Parent.
 
+    Attributes:
+        a: a attribute.
+        b: b attribute.
+    """
 
-def test_class_doc_inheritance_with_init_attr():
-    class Parent(metaclass=GoogleDocstringInheritanceInitMeta):
-        """Class Parent.
+    def __init__(self, a, b):  # pragma: no cover
+        pass
 
-        Args:
-            a: a from Parent.
-            b: b from Parent.
+class Child(Parent):
+    """Class Child.
 
-        Attributes:
-            a: a attribute.
-            b: b attribute.
-        """
+    Args:
+        c: c from Child.
 
-        def __init__(self, a, b):  # pragma: no cover
-            pass
+    Attributes:
+        c: c attribute.
 
-    class Child(Parent):
-        """Class Child.
+    Notes:
+        From Child.
+    """
 
-        Args:
-            c: c from Child.
-
-        Attributes:
-            c: c attribute.
-
-        Notes:
-            From Child.
-        """
-
-        def __init__(self, b, c):  # pragma: no cover
-            pass
-
-    expected = """\
+    def __init__(self, b, c):  # pragma: no cover
+        pass
+            ''',
+            {
+                "Child": """
 Class Child.
 
 Args:
@@ -213,27 +265,69 @@ Attributes:
     c: c attribute.
 
 Notes:
-    From Child.\
-"""
+    From Child.
+""",
+                "Child.__init__": None,
+            },
+        ),
+        (
+            (GoogleDocstringInheritanceInitMeta,),
+            '''
+from docstring_inheritance import {metaclass_name}
+class Parent(metaclass={metaclass_name}):
+    def __init__(self, a, b):
+        pass
 
-    assert Child.__doc__ == expected
-    assert Child.__init__.__doc__ is None
-
-
-def test_class_doc_inheritance_with_empty_parent_doc():
-    class Parent(metaclass=GoogleDocstringInheritanceInitMeta):
-        def __init__(self, a, b):  # pragma: no cover
-            pass
-
-    class Child(Parent):
-        def __init__(self, b, c):  # pragma: no cover
-            """
-            Args:
-                b: n
-            """
-
-    expected = """
+class Child(Parent):
+    def __init__(self, b, c):
+        """
+        Args:
+            b: n
+        """
+''',
+            {
+                "Child.__init__": """
 Args:
     b: n
 """
-    assert textwrap.dedent(Child.__init__.__doc__) == expected
+            },
+        ),
+        (
+            ALL_META,
+            """
+from docstring_inheritance import {metaclass_name}
+class Parent(metaclass={metaclass_name}):
+    def __init__(self):  # pragma: no cover
+        pass
+        """,
+            {"Parent.__init__": None},
+        ),
+    ],
+)
+def test_args_inheritance(
+    inheritance_classes: Sequence[type[_BaseGoogleDocstringInheritanceMeta]],
+    code: str,
+    attr_to_expected: dict[str, str],
+):
+    for inheritance_class in inheritance_classes:
+        metaclass_name = inheritance_class.__name__
+        code = code.format(metaclass_name=metaclass_name)
+        with temporary_visited_module(code=code) as (griffe_module, module):
+            for attr_spec, expected in attr_to_expected.items():
+                griffe_docstring = griffe_module[attr_spec].docstring
+                if expected is None:
+                    assert griffe_docstring is None
+                else:
+                    assert_str(griffe_docstring.value, expected)
+
+                splits = attr_spec.split(".")
+                attr = module
+                while splits:
+                    item_name = splits.pop(0)
+                    attr = getattr(attr, item_name)
+
+                attr_docstring = attr.__doc__
+                if expected is None:
+                    assert attr_docstring is None
+                else:
+                    assert_str(attr_docstring, expected)

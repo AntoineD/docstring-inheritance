@@ -81,7 +81,11 @@ class _BaseDocstringInheritanceMeta(type):
             )
 
 
-class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
+class _BaseGoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
+    pass
+
+
+class GoogleDocstringInheritanceMeta(_BaseGoogleDocstringInheritanceMeta):
     """Metaclass for inheriting docstrings in Google format."""
 
     def __init__(
@@ -99,7 +103,7 @@ class GoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
         )
 
 
-class GoogleDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
+class GoogleDocstringInheritanceInitMeta(_BaseGoogleDocstringInheritanceMeta):
     """Metaclass for inheriting docstrings in Google format with init-in-class."""
 
     def __init__(
@@ -117,7 +121,11 @@ class GoogleDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
         )
 
 
-class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
+class _BaseNumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
+    pass
+
+
+class NumpyDocstringInheritanceMeta(_BaseNumpyDocstringInheritanceMeta):
     """Metaclass for inheriting docstrings in Numpy format."""
 
     def __init__(
@@ -135,7 +143,7 @@ class NumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
         )
 
 
-class NumpyDocstringInheritanceInitMeta(_BaseDocstringInheritanceMeta):
+class NumpyDocstringInheritanceInitMeta(_BaseNumpyDocstringInheritanceMeta):
     """Metaclass for inheriting docstrings in Numpy format with init-in-class."""
 
     def __init__(
