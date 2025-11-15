@@ -47,8 +47,7 @@ if TYPE_CHECKING:
     from griffe import Object
     from griffe import Visitor
 
-    ParserType = Parser | DocstringStyle | None
-    DocstringParser = Parser | Literal[""]
+    DocstringParser = DocstringStyle | Literal[""]
 
 _logger = get_logger(__name__)
 
@@ -102,7 +101,7 @@ class DocstringInheritance(Extension):
         cls,
         obj: Object | Alias,
         runtime_obj: Any,
-        docstring_parser: Parser,
+        docstring_parser: DocstringStyle,
         parser_options: DocstringOptions,
     ) -> None:
         """Set the docstring from a runtime object.
@@ -159,7 +158,7 @@ class DocstringInheritance(Extension):
         """Return the docstring parser kind."""
         for base_meta in class_.__class__.__mro__:
             if issubclass(base_meta, _BaseGoogleDocstringInheritanceMeta):
-                return Parser.google
+                return Parser.google.value
             if issubclass(base_meta, _BaseNumpyDocstringInheritanceMeta):
-                return Parser.numpy
+                return Parser.numpy.value
         return ""

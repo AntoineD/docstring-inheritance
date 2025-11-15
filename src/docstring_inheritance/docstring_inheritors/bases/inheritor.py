@@ -121,7 +121,7 @@ class BaseDocstringInheritor:
             cls(child_func)._inherit(parent_doc)
 
     def _inherit(self, parent_doc: str) -> None:
-        """Inherit the docstrings of a class.
+        """Inherit the docstrings from a parent.
 
         Args:
             parent_doc: The docstring of the parent.

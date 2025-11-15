@@ -84,6 +84,7 @@ ALL_META = (GoogleDocstringInheritanceMeta, GoogleDocstringInheritanceInitMeta)
 @pytest.mark.parametrize(
     ("inheritance_classes", "code", "attr_to_expected"),
     [
+        #################################################################################
         (
             ALL_META,
             '''
@@ -118,6 +119,7 @@ Args:
             """,
             },
         ),
+        #################################################################################
         (
             ALL_META,
             '''
@@ -174,6 +176,7 @@ Notes:
             """,
             },
         ),
+        #################################################################################
         (
             (GoogleDocstringInheritanceInitMeta,),
             '''
@@ -216,6 +219,7 @@ Notes:
                 "Child.__init__": None,
             },
         ),
+        #################################################################################
         (
             (GoogleDocstringInheritanceInitMeta,),
             '''
@@ -232,7 +236,7 @@ class Parent(metaclass={metaclass_name}):
         b: b attribute.
     """
 
-    def __init__(self, a, b):  # pragma: no cover
+    def __init__(self, a, b):
         pass
 
 class Child(Parent):
@@ -248,7 +252,7 @@ class Child(Parent):
         From Child.
     """
 
-    def __init__(self, b, c):  # pragma: no cover
+    def __init__(self, b, c):
         pass
             ''',
             {
@@ -270,6 +274,7 @@ Notes:
                 "Child.__init__": None,
             },
         ),
+        #################################################################################
         (
             (GoogleDocstringInheritanceInitMeta,),
             '''
@@ -292,12 +297,13 @@ Args:
 """
             },
         ),
+        #################################################################################
         (
             ALL_META,
             """
 from docstring_inheritance import {metaclass_name}
 class Parent(metaclass={metaclass_name}):
-    def __init__(self):  # pragma: no cover
+    def __init__(self):
         pass
         """,
             {"Parent.__init__": None},

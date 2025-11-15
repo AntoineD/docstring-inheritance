@@ -29,7 +29,7 @@ such that its derived classes fully or partly inherit the docstrings.
   the signature arguments are inherited individually.
 - Minimum performance cost: the inheritance is performed at import time,
   not for each call.
-- Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/) and [mkdocs](https://www.mkdocs.org/) (See [below](#mkdocs)).
+- Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/) and [mkdocs](https://www.mkdocs.org/) (See [below](#mkdocs)). (Be sure to install the package the package your are building the docs for in the environment used to build the docs.)
 - Missing docstring sections for signature arguments can be notified by warnings
   when the environment variable `DOCSTRING_INHERITANCE_WARNS` is set.
 - Docstring sections can be compared to detect duplicated or similar contents that could be inherited.
@@ -63,6 +63,7 @@ conda install -c conda-forge docstring-inheritance
 to enable the docstrings of a class to be inherited from its base classes.
 This feature is automatically transmitted to its derived classes as well.
 The docstring inheritance is performed for the docstrings of the:
+
 - class
 - methods
 - classmethods
@@ -199,6 +200,7 @@ Notes:
 
 The sections of an inherited docstring are sorted according to order defined in the
 [NumPy docstring format specification](https://numpydoc.readthedocs.io/en/latest/format.html):
+
 - `Summary`
 - `Extended summary`
 - `Parameters` for the NumPy format or `Args` for the Google format
@@ -224,12 +226,14 @@ even though it does not define all of these sections.
 ## Sections with items
 
 Those sections are:
+
 - `Other Parameters`
 - `Methods`
 - `Attributes`
 
 The inheritance is done at the key level,
 i.e. a section of the inheritor will not fully override the parent one:
+
 - the keys in the parent section and not in the child section are inherited,
 - the keys in the child section and not in the parent section are kept,
 - for keys that are both in the parent and child section,
@@ -285,10 +289,12 @@ The only remaining description from the parent is for the attribute `x`.
 ### Sections documenting signatures
 
 Those sections are:
+
 - `Parameters` (numpy format only)
 - `Args` (google format only)
 
 In addition to the inheritance behavior described [above](#sections-with-items):
+
 - the arguments not existing in the inheritor signature are removed,
 - the arguments are sorted according the inheritor signature,
 - the arguments with no description are provided with a dummy description.
