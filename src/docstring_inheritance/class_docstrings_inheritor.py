@@ -111,11 +111,12 @@ class ClassDocstringsInheritor:
         if func is None:
             func = self._create_dummy_func_with_doc(self._cls.__doc__)
 
+        docstring_inheritor = self._docstring_inheritor
         for parent_cls in self.__mro_classes:
             # As opposed to the attribute inheritance, and following the way a class is
             # assembled by type(), the docstring of a class is the combination of the
             # docstrings of its parents.
-            self._docstring_inheritor.inherit(parent_cls.__doc__, func)
+            docstring_inheritor.inherit(parent_cls.__doc__, func)
 
         self._cls.__doc__ = func.__doc__
 
@@ -126,11 +127,13 @@ class ClassDocstringsInheritor:
         self,
     ) -> None:
         """Create the inherited docstrings for the class attributes."""
+        docstring_inheritor = self._docstring_inheritor
+        mro_classes = self.__mro_classes
         for attr_name, attr in self._cls.__dict__.items():
             if not isinstance(attr, FunctionType):
                 continue
 
-            for parent_cls in self.__mro_classes:
+            for parent_cls in mro_classes:
                 parent_method = getattr(parent_cls, attr_name, None)
                 if parent_method is not None:
                     parent_doc = parent_method.__doc__
