@@ -244,7 +244,7 @@ method2"""
 
 
 @parametrize_inheritance
-def test_multiple_inheritance_parent_meta(inheritance_class):
+def test_multiple_inheritance_parent1_meta(inheritance_class):
     class Parent1(metaclass=inheritance_class):
         """Parent summary
 
@@ -254,6 +254,38 @@ def test_multiple_inheritance_parent_meta(inheritance_class):
         """
 
     class Parent2:
+        """Parent2 summary
+
+        Methods
+        -------
+        method1
+        """
+
+    class Child(Parent1, Parent2):
+        """
+        Attributes
+        ----------
+        attr2
+
+        Methods
+        -------
+        method2
+        """
+
+    assert_multiple_inheritance(Child)
+
+
+@parametrize_inheritance
+def test_multiple_inheritance_parent2_meta(inheritance_class):
+    class Parent1:
+        """Parent summary
+
+        Attributes
+        ----------
+        attr1
+        """
+
+    class Parent2(metaclass=inheritance_class):
         """Parent2 summary
 
         Methods
