@@ -30,13 +30,10 @@ from inspect import getmodule
 from inspect import getsourcelines
 from inspect import unwrap
 from textwrap import indent
-from types import MappingProxyType
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
 from typing import cast
-
-from docstring_inheritance.docstring_inheritors.bases import SubSectionType
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -101,6 +98,9 @@ class BaseDocstringInheritor:
     __child_sections: SectionsType
     """The sections of the child docstring."""
 
+    __has_missing_descriptions: bool
+    """Whether the child docstring has at least one missing description."""
+
     __similarity_ratio: ClassVar[float] = get_similarity_ratio(
         os.environ.get("DOCSTRING_INHERITANCE_SIMILARITY_RATIO")
     )
@@ -109,40 +109,43 @@ class BaseDocstringInheritor:
     def __init__(
         self,
         child_func: Callable[..., Any],
-        child_sections: SectionsType = MappingProxyType[str, SubSectionType]({}),
+        child_sections: SectionsType | None = None,
     ) -> None:
         """
         Args:
             child_func: The child function.
-            child_sections: The child sections.
-                (for testing purposes only, when inherit method is not called)
+            child_sections: The child sections. (for testing purposes only)
         """  # noqa: D205, D212, D415
         self.__child_func = child_func
         self.__child_sections = child_sections or self._DOCSTRING_PARSER.parse(
             self.__child_func.__doc__
         )
+        self.__has_missing_descriptions = False
+
+    @property
+    def has_missing_descriptions(self):
+        """Whether the child docstring has at least one missing description."""
+        return not self.__has_missing_descriptions
 
     def inherit(
         self,
         parent_doc: str | None,
-    ) -> bool:
+    ) -> None:
         """
         Args:
             parent_doc: The docstring of the parent.
             child_func: The child function which docstring inherit from the parent.
 
         Returns:
-            Whether there are no missing argument description in docstring
-            of the child function.
+            Whether the child docstring is complete,
+            otherwise there are missing arguments.
         """  # noqa: D205, D212
         if parent_doc is None:
-            # TODO: add test for the following return value
-            return False
+            return
 
         parent_sections = self._DOCSTRING_PARSER.parse(parent_doc)
         self._warn_similar_sections(parent_sections, self.__child_sections)
         self._inherit_sections(parent_sections)
-        return self.MISSING_ARG_DESCRIPTION not in self.__child_func.__doc__
 
     def render(self) -> None:
         """Render the docstring string for the child function."""
@@ -256,14 +259,13 @@ class BaseDocstringInheritor:
         parent_section_names = parent_sections.keys()
 
         child_sections = self.__child_sections
-        for key, value in child_sections.items():
-            if BaseDocstringInheritor.MISSING_ARG_DESCRIPTION in value:
-                del child_sections[key]
+        # TODO: is this readly useless?
+        # self.__remove_missing_descriptions(child_sections)
         child_section_names = child_sections.keys()
 
         temp_sections = {}
 
-        # Sections in parent but not child.
+        # Sections in parent but not in child.
         parent_section_names_to_copy = parent_section_names - child_section_names
         for section_name in parent_section_names_to_copy:
             temp_sections[section_name] = parent_sections[section_name]
@@ -287,28 +289,26 @@ class BaseDocstringInheritor:
                 "dict[str, str]", parent_sections[section_name]
             ).copy()
             child_section = child_sections[section_name]
-            for key, value in tuple(child_section.items()):
-                if BaseDocstringInheritor.MISSING_ARG_DESCRIPTION in value:
-                    del child_section[key]
+            self.__remove_missing_descriptions(child_section)
             temp_section_items.update(cast("dict[str, str]", child_section))
-
             temp_sections[section_name] = temp_section_items
 
-        # Args section shall be filtered.
+        arg_section_name = self._DOCSTRING_PARSER.ARGS_SECTION_NAME
+
         args_section = self._filter_args_section(
             self._MISSING_ARG_TEXT,
             cast(
                 "dict[str, str]",
-                temp_sections.get(self._DOCSTRING_PARSER.ARGS_SECTION_NAME, {}),
+                temp_sections.get(arg_section_name, {}),
             ),
-            self._DOCSTRING_PARSER.ARGS_SECTION_NAME,
+            arg_section_name,
         )
 
         if args_section:
-            temp_sections[self._DOCSTRING_PARSER.ARGS_SECTION_NAME] = args_section
-        elif self._DOCSTRING_PARSER.ARGS_SECTION_NAME in temp_sections:
+            temp_sections[arg_section_name] = args_section
+        elif arg_section_name in temp_sections:
             # The args section is empty, there is nothing to document.
-            del temp_sections[self._DOCSTRING_PARSER.ARGS_SECTION_NAME]
+            del temp_sections[arg_section_name]
 
         # Reorder the standard sections.
         child_sections.clear()
@@ -323,6 +323,12 @@ class BaseDocstringInheritor:
 
         # For testing purposes.
         return child_sections
+
+    @classmethod
+    def __remove_missing_descriptions(cls, sections) -> None:
+        for key, value in tuple(sections.items()):
+            if cls.MISSING_ARG_DESCRIPTION in value:
+                del sections[key]
 
     def _filter_args_section(
         self,
@@ -359,11 +365,13 @@ class BaseDocstringInheritor:
             all_args += [f"**{full_arg_spec.varkw}"]
 
         ordered_section = {}
+        self.__has_missing_descriptions = True
         for arg in all_args:
             if arg in section_items:
                 doc = section_items[arg]
             else:
                 doc = missing_arg_text
+                self.__has_missing_descriptions = False
                 self._warn(
                     section_name, f"the docstring for the argument '{arg}' is missing."
                 )
