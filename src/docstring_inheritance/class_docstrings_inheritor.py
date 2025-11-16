@@ -129,22 +129,30 @@ class ClassDocstringsInheritor:
         """Create the inherited docstrings for the class attributes."""
         docstring_inheritor = self._docstring_inheritor
         mro_classes = self.__mro_classes
+        missing_arg_description = docstring_inheritor.MISSING_ARG_DESCRIPTION
         for attr_name, attr in self._cls.__dict__.items():
             if not isinstance(attr, FunctionType):
                 continue
 
             for parent_cls in mro_classes:
                 parent_method = getattr(parent_cls, attr_name, None)
-                if parent_method is not None:
-                    parent_doc = parent_method.__doc__
-                    if parent_doc is not None:
-                        self._docstring_inheritor.inherit(parent_doc, attr)
-                        # As opposed to the class docstring inheritance, and following
-                        # the MRO for methods,
-                        # we inherit only from the first found parent.
-                        break
-                    # TODO: else WARN that no docstring is defined and
+                if parent_method is None:
+                    continue
+                parent_doc = parent_method.__doc__
+                # breakpoint()
+                docstring_inheritor.inherit(parent_doc, attr)
+                # In case of multiple inheritance,
+                # when the parent that has docstring inheritance
+                # is not the first one or not in the hierarchy of the first one,
+                # some arguments docstring may need to be fetched
+                # beyond the first parent.
+                # Otherwise, the inheritance is done for that attribute.
+                if parent_doc is None:
+                    # TODO:: warn that no docstring is defined and
                     # none can be inherited.
+                    continue
+                if missing_arg_description not in attr.__doc__:
+                    break
 
     @staticmethod
     def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:

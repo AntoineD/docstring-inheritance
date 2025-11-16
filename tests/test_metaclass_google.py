@@ -124,6 +124,50 @@ Args:
             ALL_META,
             '''
 from docstring_inheritance import {metaclass_name}
+class Parent1(metaclass={metaclass_name}):
+    def method(self, w, x, *args, y=None):
+        """
+        Args:
+            w: will be removed
+            x: int parent1
+            *args: int
+            y: float
+        """
+
+class Parent2:
+    def method(self, w, x, y=None, **kwargs):
+        """
+        Args:
+            w: will be removed
+            x: int parent2
+            y: float
+            **kwargs: int
+        """
+
+class Child(Parent2, Parent1):
+    def method(self, xx, x, *args, yy=None, y=None, **kwargs):
+        """
+        Args:
+            xx: int
+        """
+            ''',
+            {
+                "Child.method": """
+Args:
+    xx: int
+    x: int parent2
+    *args: int
+    yy: The description is missing.
+    y: float
+    **kwargs: int
+            """,
+            },
+        ),
+        ################################################################################
+        (
+            ALL_META,
+            '''
+from docstring_inheritance import {metaclass_name}
 class GrandParent(metaclass={metaclass_name}):
     """Class GrandParent.
 

@@ -241,6 +241,10 @@ class BaseDocstringInheritor:
         # ):
         #     parent_sections["Raises"] = None
         parent_section_names = parent_sections.keys()
+
+        for key, value in child_sections.items():
+            if BaseDocstringInheritor.MISSING_ARG_DESCRIPTION in value:
+                del child_sections[key]
         child_section_names = child_sections.keys()
 
         temp_sections = {}
@@ -268,9 +272,11 @@ class BaseDocstringInheritor:
             temp_section_items = cast(
                 "dict[str, str]", parent_sections[section_name]
             ).copy()
-            temp_section_items.update(
-                cast("dict[str, str]", child_sections[section_name])
-            )
+            child_section = child_sections[section_name]
+            for key, value in tuple(child_section.items()):
+                if BaseDocstringInheritor.MISSING_ARG_DESCRIPTION in value:
+                    del child_section[key]
+            temp_section_items.update(cast("dict[str, str]", child_section))
 
             temp_sections[section_name] = temp_section_items
 
