@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+- Inheritance of method docstrings with multiple inheritance such that at least
+  the first class is not set to inherit.
+- Performance improvements.
+
 ### Removed
 
 - Support for Python 3.9
