@@ -106,11 +106,9 @@ class BaseDocstringInheritor:
     ) -> None:
         self.__child_func = child_func
 
-    @classmethod
     def inherit(
-        cls,
+        self,
         parent_doc: str | None,
-        child_func: Callable[..., Any],
     ) -> bool:
         """
         Args:
@@ -122,8 +120,9 @@ class BaseDocstringInheritor:
             of the child function.
         """  # noqa: D205, D212
         if parent_doc is not None:
-            cls(child_func)._inherit(parent_doc)
-            return cls.MISSING_ARG_DESCRIPTION not in child_func.__doc__
+            self._inherit(parent_doc)
+            return self.MISSING_ARG_DESCRIPTION not in self.__child_func.__doc__
+        # TODO: add test for the following return value
         return False
 
     def _inherit(self, parent_doc: str) -> None:
