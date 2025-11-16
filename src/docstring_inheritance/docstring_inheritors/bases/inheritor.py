@@ -30,10 +30,13 @@ from inspect import getmodule
 from inspect import getsourcelines
 from inspect import unwrap
 from textwrap import indent
+from types import MappingProxyType
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
 from typing import cast
+
+from docstring_inheritance.docstring_inheritors.bases import SubSectionType
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -95,6 +98,9 @@ class BaseDocstringInheritor:
     __child_func: Callable[..., Any]
     """The function or method to inherit the docstrings of."""
 
+    __child_sections: SectionsType
+    """The sections of the child docstring."""
+
     __similarity_ratio: ClassVar[float] = get_similarity_ratio(
         os.environ.get("DOCSTRING_INHERITANCE_SIMILARITY_RATIO")
     )
@@ -103,8 +109,16 @@ class BaseDocstringInheritor:
     def __init__(
         self,
         child_func: Callable[..., Any],
+        child_sections: SectionsType = MappingProxyType[str, SubSectionType]({}),
     ) -> None:
+        """
+        Args:
+            child_func: The child function.
+            child_sections: The child sections.
+                (for testing purposes only, when inherit method is not called)
+        """  # noqa: D205, D212, D415
         self.__child_func = child_func
+        self.__child_sections = child_sections or {}
 
     def inherit(
         self,
@@ -119,29 +133,23 @@ class BaseDocstringInheritor:
             Whether there are no missing argument description in docstring
             of the child function.
         """  # noqa: D205, D212
-        if parent_doc is not None:
-            self._inherit(parent_doc)
-            return self.MISSING_ARG_DESCRIPTION not in self.__child_func.__doc__
-        # TODO: add test for the following return value
-        return False
+        if parent_doc is None:
+            # TODO: add test for the following return value
+            return False
 
-    def _inherit(self, parent_doc: str) -> None:
-        """Inherit the docstrings from a parent.
-
-        Args:
-            parent_doc: The docstring of the parent.
-        """
         parse = self._DOCSTRING_PARSER.parse
         parent_sections = parse(parent_doc)
-        child_sections = parse(self.__child_func.__doc__)
-        self._warn_similar_sections(parent_sections, child_sections)
-        self._inherit_sections(
-            parent_sections,
-            child_sections,
-        )
+        self.__child_sections = parse(self.__child_func.__doc__)
+        self._warn_similar_sections(parent_sections, self.__child_sections)
+        self._inherit_sections(parent_sections)
+        self.render()
+        return self.MISSING_ARG_DESCRIPTION not in self.__child_func.__doc__
+
+    def render(self) -> None:
+        """Render the docstring string."""
         # Get the original function eventually behind decorators.
         unwrap(self.__child_func).__doc__ = self._DOCSTRING_RENDERER.render(
-            child_sections
+            self.__child_sections
         )
 
     def _warn_similar_sections(
@@ -151,6 +159,8 @@ class BaseDocstringInheritor:
         super_section_name: str = "",
     ) -> None:
         """Issue a warning when the parent and child sections are similar.
+
+        This method is recursive, thus child_sections cannot be the attribute.
 
         Args:
             parent_sections: The parent sections.
@@ -228,13 +238,11 @@ class BaseDocstringInheritor:
     def _inherit_sections(
         self,
         parent_sections: SectionsType,
-        child_sections: SectionsType,
-    ) -> None:
+    ) -> SectionsType:
         """Inherit the sections of a child from the parent sections.
 
         Args:
             parent_sections: The parent docstring sections.
-            child_sections: The child docstring sections.
         """
         # TODO:
         # prnt_only_raises = "Raises" in parent_sections and not (
@@ -247,6 +255,7 @@ class BaseDocstringInheritor:
         #     parent_sections["Raises"] = None
         parent_section_names = parent_sections.keys()
 
+        child_sections = self.__child_sections
         for key, value in child_sections.items():
             if BaseDocstringInheritor.MISSING_ARG_DESCRIPTION in value:
                 del child_sections[key]
@@ -311,6 +320,9 @@ class BaseDocstringInheritor:
 
         # Add the remaining non-standard sections.
         child_sections.update(temp_sections)
+
+        # For testing purposes.
+        return child_sections
 
     def _filter_args_section(
         self,

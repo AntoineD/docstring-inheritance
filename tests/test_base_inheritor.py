@@ -235,9 +235,9 @@ def patch_class():
     ],
 )
 def test_inherit_items(patch_class, parent_section, child_section, func, expected):
-    base_inheritor = BaseDocstringInheritor(func)
-    base_inheritor._inherit_sections(parent_section, child_section)
-    assert child_section == expected
+    base_inheritor = BaseDocstringInheritor(func, child_sections=child_section)
+    child_sections = base_inheritor._inherit_sections(parent_section)
+    assert child_sections == expected
 
 
 @pytest.mark.parametrize(
