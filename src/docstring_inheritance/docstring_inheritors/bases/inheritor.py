@@ -142,15 +142,15 @@ class BaseDocstringInheritor:
         parent_sections = self._DOCSTRING_PARSER.parse(parent_doc)
         self._warn_similar_sections(parent_sections, self.__child_sections)
         self._inherit_sections(parent_sections)
-        self.render()
         return self.MISSING_ARG_DESCRIPTION not in self.__child_func.__doc__
 
     def render(self) -> None:
-        """Render the docstring string."""
-        # Get the original function eventually behind decorators.
-        unwrap(self.__child_func).__doc__ = self._DOCSTRING_RENDERER.render(
-            self.__child_sections
-        )
+        """Render the docstring string for the child function."""
+        if self.__child_sections:
+            # Get the original function eventually behind decorators.
+            unwrap(self.__child_func).__doc__ = self._DOCSTRING_RENDERER.render(
+                self.__child_sections
+            )
 
     def _warn_similar_sections(
         self,

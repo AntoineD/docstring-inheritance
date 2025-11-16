@@ -119,6 +119,7 @@ class ClassDocstringsInheritor:
             # docstrings of its parents.
             docstring_inheritor.inherit(parent_cls.__doc__)
 
+        docstring_inheritor.render()
         self._cls.__doc__ = func.__doc__
 
         if self._init_in_class and init_doc_changed:
@@ -140,8 +141,8 @@ class ClassDocstringsInheritor:
                 if parent_method is None:
                     continue
                 parent_doc = parent_method.__doc__
-                # breakpoint()
-                if docstring_inheritor.inherit(parent_doc):
+                docstring_inheritor.inherit(parent_doc)
+                if not docstring_inheritor.has_missing_descriptions:
                     # In case of multiple inheritance,
                     # when the parent that has docstring inheritance
                     # is not the first one or not in the hierarchy of the first one,
@@ -149,6 +150,8 @@ class ClassDocstringsInheritor:
                     # beyond the first parent.
                     # Otherwise, the inheritance is done for that attribute.
                     break
+
+            docstring_inheritor.render()
 
     @staticmethod
     def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:

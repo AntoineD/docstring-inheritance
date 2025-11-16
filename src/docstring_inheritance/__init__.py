@@ -47,7 +47,9 @@ def inherit_google_docstring(
         parent_doc: The docstring of the parent.
         child_func: The child function which docstring inherit from the parent.
     """
-    GoogleDocstringInheritor(child_func).inherit(parent_doc)
+    inheritor = GoogleDocstringInheritor(child_func)
+    inheritor.inherit(parent_doc)
+    inheritor.render()
 
 
 def inherit_numpy_docstring(
@@ -60,7 +62,9 @@ def inherit_numpy_docstring(
         parent_doc: The docstring of the parent.
         child_func: The child function which docstring inherit from the parent.
     """
-    NumpyDocstringInheritor(child_func).inherit(parent_doc)
+    inheritor = NumpyDocstringInheritor(child_func)
+    inheritor.inherit(parent_doc)
+    inheritor.render()
 
 
 class _BaseDocstringInheritanceMeta(type):
