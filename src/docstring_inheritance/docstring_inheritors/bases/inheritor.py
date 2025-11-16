@@ -111,14 +111,20 @@ class BaseDocstringInheritor:
         cls,
         parent_doc: str | None,
         child_func: Callable[..., Any],
-    ) -> None:
+    ) -> bool:
         """
         Args:
             parent_doc: The docstring of the parent.
             child_func: The child function which docstring inherit from the parent.
+
+        Returns:
+            Whether there are no missing argument description in docstring
+            of the child function.
         """  # noqa: D205, D212
         if parent_doc is not None:
             cls(child_func)._inherit(parent_doc)
+            return cls.MISSING_ARG_DESCRIPTION not in child_func.__doc__
+        return False
 
     def _inherit(self, parent_doc: str) -> None:
         """Inherit the docstrings from a parent.
