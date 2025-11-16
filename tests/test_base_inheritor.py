@@ -89,6 +89,8 @@ MISSING_ARG_TEXT = "The description is missing."
 
 
 class DummyParser(BaseDocstringParser):
+    """Dummy parser for testing purposes."""
+
     ARGS_SECTION_NAME = "DummyArgs"
     ARGS_SECTION_NAMES: ClassVar[set[str]] = {"DummyArgs"}
     METHODS_SECTION_NAME = "MethodsArgs"
@@ -97,15 +99,16 @@ class DummyParser(BaseDocstringParser):
         METHODS_SECTION_NAME,
     }
 
+    @classmethod
+    def parse(cls, func):
+        return {}
 
-@pytest.fixture
-def patch_class():
-    """Monkey patch BaseDocstringInheritor with docstring parser constants."""
-    BaseDocstringInheritor._DOCSTRING_PARSER = DummyParser
-    BaseDocstringInheritor._MISSING_ARG_TEXT = MISSING_ARG_TEXT
-    yield
-    delattr(BaseDocstringInheritor, "_DOCSTRING_PARSER")
-    delattr(BaseDocstringInheritor, "_MISSING_ARG_TEXT")
+
+class DummyInheritor(BaseDocstringInheritor):
+    """Dummy inheritor for testing purposes."""
+
+    _DOCSTRING_PARSER = DummyParser
+    _MISSING_ARG_TEXT = MISSING_ARG_TEXT
 
 
 @pytest.mark.parametrize(
@@ -234,8 +237,8 @@ def patch_class():
         ),
     ],
 )
-def test_inherit_items(patch_class, parent_section, child_section, func, expected):
-    base_inheritor = BaseDocstringInheritor(func, child_sections=child_section)
+def test_inherit_items(parent_section, child_section, func, expected):
+    base_inheritor = DummyInheritor(func, child_sections=child_section)
     child_sections = base_inheritor._inherit_sections(parent_section)
     assert child_sections == expected
 
@@ -304,7 +307,7 @@ def test_inherit_items(patch_class, parent_section, child_section, func, expecte
     ],
 )
 def test_inherit_section_items_with_args(func, section_items, expected):
-    base_inheritor = BaseDocstringInheritor(func)
+    base_inheritor = DummyInheritor(func)
     assert (
         base_inheritor._filter_args_section(MISSING_ARG_TEXT, section_items) == expected
     )
@@ -318,7 +321,7 @@ def func_missing_arg(arg1, arg2):
 
 
 def test_warning_for_missing_arg():
-    base_inheritor = BaseDocstringInheritor(func_missing_arg)
+    base_inheritor = DummyInheritor(func_missing_arg)
     match = (
         r"in func_missing_arg: section : "
         r"the docstring for the argument 'arg2' is missing\."
@@ -328,7 +331,7 @@ def test_warning_for_missing_arg():
 
 
 def test_no_warning_for_missing_arg():
-    base_inheritor = BaseDocstringInheritor(func_args)
+    base_inheritor = DummyInheritor(func_args)
     base_inheritor._filter_args_section("", {"args": ""})
 
 
@@ -349,7 +352,7 @@ def test_no_warning_for_missing_arg():
     ],
 )
 def test_warning_for_similar_sections(
-    patch_class, similarity_ratio, warn, parent_sections, child_sections
+    similarity_ratio, warn, parent_sections, child_sections
 ):
     if warn:
         try:
@@ -368,7 +371,7 @@ def test_warning_for_similar_sections(
     else:
         context = warnings.catch_warnings()
 
-    base_inheritor = BaseDocstringInheritor(func_args)
+    base_inheritor = DummyInheritor(func_args)
     base_inheritor._BaseDocstringInheritor__similarity_ratio = similarity_ratio
 
     with context:

@@ -118,7 +118,9 @@ class BaseDocstringInheritor:
                 (for testing purposes only, when inherit method is not called)
         """  # noqa: D205, D212, D415
         self.__child_func = child_func
-        self.__child_sections = child_sections or {}
+        self.__child_sections = child_sections or self._DOCSTRING_PARSER.parse(
+            self.__child_func.__doc__
+        )
 
     def inherit(
         self,
@@ -137,9 +139,7 @@ class BaseDocstringInheritor:
             # TODO: add test for the following return value
             return False
 
-        parse = self._DOCSTRING_PARSER.parse
-        parent_sections = parse(parent_doc)
-        self.__child_sections = parse(self.__child_func.__doc__)
+        parent_sections = self._DOCSTRING_PARSER.parse(parent_doc)
         self._warn_similar_sections(parent_sections, self.__child_sections)
         self._inherit_sections(parent_sections)
         self.render()
