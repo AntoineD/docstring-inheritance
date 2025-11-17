@@ -41,7 +41,7 @@ class DocstringRenderer(BaseDocstringRenderer):
     @staticmethod
     def _render_section(
         section_name: str,
-        section_body: SubSectionType,
+        section_body: str | SubSectionType,
     ) -> str:
         if section_name is SUMMARY_SECTION_NAME:
             assert isinstance(section_body, str)

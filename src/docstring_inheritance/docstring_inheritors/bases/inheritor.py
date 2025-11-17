@@ -38,6 +38,8 @@ from typing import cast
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from docstring_inheritance.docstring_inheritors.bases import SubSectionType
+
     from . import SectionsType
     from .parser import BaseDocstringParser
     from .renderer import BaseDocstringRenderer
@@ -123,7 +125,7 @@ class BaseDocstringInheritor:
         self.__has_missing_descriptions = False
 
     @property
-    def has_missing_descriptions(self):
+    def has_missing_descriptions(self) -> bool:
         """Whether the child docstring has at least one missing description."""
         return not self.__has_missing_descriptions
 
@@ -157,8 +159,8 @@ class BaseDocstringInheritor:
 
     def _warn_similar_sections(
         self,
-        parent_sections: SectionsType | dict[str, str],
-        child_sections: SectionsType | dict[str, str],
+        parent_sections: SectionsType | SubSectionType,
+        child_sections: SectionsType | SubSectionType,
         super_section_name: str = "",
     ) -> None:
         """Issue a warning when the parent and child sections are similar.
@@ -181,8 +183,8 @@ class BaseDocstringInheritor:
             # TODO: add Raises section?
             if section_name in self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS:
                 self._warn_similar_sections(
-                    cast("dict[str, str]", parent_section),
-                    cast("dict[str, str]", child_section),
+                    cast("SubSectionType", parent_section),
+                    cast("SubSectionType", child_section),
                     super_section_name=section_name,
                 )
             else:
@@ -259,8 +261,10 @@ class BaseDocstringInheritor:
         parent_section_names = parent_sections.keys()
 
         child_sections = self.__child_sections
+
         # TODO: is this readly useless?
         # self.__remove_missing_descriptions(child_sections)
+
         child_section_names = child_sections.keys()
 
         temp_sections = {}
@@ -286,11 +290,11 @@ class BaseDocstringInheritor:
 
         for section_name in common_section_names_with_items:
             temp_section_items = cast(
-                "dict[str, str]", parent_sections[section_name]
+                "SubSectionType", parent_sections[section_name]
             ).copy()
-            child_section = child_sections[section_name]
+            child_section = cast("SubSectionType", child_sections[section_name])
             self.__remove_missing_descriptions(child_section)
-            temp_section_items.update(cast("dict[str, str]", child_section))
+            temp_section_items.update(child_section)
             temp_sections[section_name] = temp_section_items
 
         arg_section_name = self._DOCSTRING_PARSER.ARGS_SECTION_NAME
@@ -298,7 +302,7 @@ class BaseDocstringInheritor:
         args_section = self._filter_args_section(
             self._MISSING_ARG_TEXT,
             cast(
-                "dict[str, str]",
+                "SubSectionType",
                 temp_sections.get(arg_section_name, {}),
             ),
             arg_section_name,
@@ -325,7 +329,7 @@ class BaseDocstringInheritor:
         return child_sections
 
     @classmethod
-    def __remove_missing_descriptions(cls, sections) -> None:
+    def __remove_missing_descriptions(cls, sections: SubSectionType) -> None:
         for key, value in tuple(sections.items()):
             if cls.MISSING_ARG_DESCRIPTION in value:
                 del sections[key]
@@ -333,9 +337,9 @@ class BaseDocstringInheritor:
     def _filter_args_section(
         self,
         missing_arg_text: str,
-        section_items: dict[str, str],
+        section_items: SubSectionType,
         section_name: str = "",
-    ) -> dict[str, str]:
+    ) -> SubSectionType:
         """Filter the args section items with the args of a signature.
 
         The argument ``self`` is removed. The arguments are ordered according to the

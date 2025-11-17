@@ -21,8 +21,8 @@
 
 from __future__ import annotations
 
-SubSectionType = str | dict[str, str]
-SectionsType = dict[str, SubSectionType]
+SubSectionType = dict[str, str]
+SectionsType = dict[str, str | SubSectionType]
 
 SUMMARY_SECTION_NAME = ""
 """The internal name of the un-named summary sections (short and extended)."""

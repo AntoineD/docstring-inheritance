@@ -78,12 +78,12 @@ class ClassDocstringsInheritor:
         docstring_inheritor: DocstringInheritorClass,
         init_in_class: bool,
     ) -> None:
-        """Inherit all the docstrings of the class.
+        """Inherit all docstrings of the class.
 
         Args:
             class_: The class to process.
             docstring_inheritor: The docstring inheritor.
-            init_in_class: Whether the ``__init__`` arguments documentation is in the
+            init_in_class: Whether the `__init__` arguments documentation is in the
                 class docstring.
         """
         inheritor = cls(class_, docstring_inheritor, init_in_class)
@@ -120,6 +120,7 @@ class ClassDocstringsInheritor:
             docstring_inheritor.inherit(parent_cls.__doc__)
 
         docstring_inheritor.render()
+
         self._cls.__doc__ = func.__doc__
 
         if self._init_in_class and init_doc_changed:
@@ -140,8 +141,7 @@ class ClassDocstringsInheritor:
                 parent_method = getattr(parent_cls, attr_name, None)
                 if parent_method is None:
                     continue
-                parent_doc = parent_method.__doc__
-                docstring_inheritor.inherit(parent_doc)
+                docstring_inheritor.inherit(parent_method.__doc__)
                 if not docstring_inheritor.has_missing_descriptions:
                     # In case of multiple inheritance,
                     # when the parent that has docstring inheritance

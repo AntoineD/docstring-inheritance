@@ -64,7 +64,7 @@ class BaseDocstringRenderer(ABC):
     @abstractmethod
     def _render_section(
         section_name: str,
-        section_body: SubSectionType,
+        section_body: str | SubSectionType,
     ) -> str:
         """Return a rendered docstring section.
 
