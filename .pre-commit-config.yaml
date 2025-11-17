@@ -31,7 +31,7 @@ repos:
   rev: v1.18.2
   hooks:
     - id: mypy
-      exclude: ^tests|src/docstring_inheritance/griffe\.py$\a
+      exclude: ^tests|src/docstring_inheritance/griffe\.py$
 
 - repo: https://github.com/Lucas-C/pre-commit-hooks
   rev: v1.5.5
