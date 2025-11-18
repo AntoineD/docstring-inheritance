@@ -69,6 +69,8 @@ class DocstringInheritance(Extension):
             return
 
         runtime_cls = self.__import_dynamically(cls)
+        if runtime_cls is None:
+            return
 
         docstring_parser_kind = self.__get_inherited_docstring_parser_kind(runtime_cls)
         if not docstring_parser_kind:
