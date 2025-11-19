@@ -29,6 +29,7 @@ from abc import abstractmethod
 from itertools import dropwhile
 from typing import TYPE_CHECKING
 from typing import ClassVar
+from typing import Final
 
 from . import SUMMARY_SECTION_NAME
 
@@ -74,6 +75,9 @@ class BaseDocstringParser(ABC):
         r"(\**\w+)(.*?)(?:$|(?=\n\**\w+))", flags=re.DOTALL
     )
 
+    _NO_SECTION_FOUND: Final[tuple[str, str]] = ("", "")
+    """The sentinel used to determine when _parse_one_section found no section."""
+
     @classmethod
     @abstractmethod
     def _parse_one_section(
@@ -87,10 +91,8 @@ class BaseDocstringParser(ABC):
         It does not parse section_items items.
 
         Returns:
-            The name and docstring body parts of a section.
-
-        Raises:
-            NoSectionFound: If no section is found.
+            The name and docstring body parts of a section,
+            _NO_SECTION_FOUND if no section was found.
         """
 
     @classmethod
@@ -138,13 +140,10 @@ class BaseDocstringParser(ABC):
         for line2, line1 in lines_pairs:
             line2_rstripped = line2.rstrip()
 
-            try:
-                section_name, section_body = cls._parse_one_section(
-                    line1, line2_rstripped, reversed_section_body_lines
-                )
-            except NoSectionFound:
-                pass
-            else:
+            section_name, section_body = cls._parse_one_section(
+                line1, line2_rstripped, reversed_section_body_lines
+            )
+            if section_name:
                 if section_name in cls.SECTION_NAMES_WITH_ITEMS:
                     reversed_sections[section_name] = cls._parse_section_items(
                         section_body

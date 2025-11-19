@@ -27,7 +27,6 @@ from typing import ClassVar
 from .bases import SUMMARY_SECTION_NAME
 from .bases.inheritor import BaseDocstringInheritor
 from .bases.parser import BaseDocstringParser
-from .bases.parser import NoSectionFound
 from .bases.renderer import BaseDocstringRenderer
 
 if TYPE_CHECKING:
@@ -80,7 +79,7 @@ class DocstringParser(BaseDocstringParser):
                 "=" * min_line_length,
             )):
                 return line1s, cls._get_section_body(reversed_section_body_lines)
-        raise NoSectionFound
+        return cls._NO_SECTION_FOUND
 
 
 class NumpyDocstringInheritor(BaseDocstringInheritor):
