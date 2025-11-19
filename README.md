@@ -29,7 +29,7 @@ such that its derived classes fully or partly inherit the docstrings.
   the signature arguments are inherited individually.
 - Minimum performance cost: the inheritance is performed at import time,
   not for each call.
-- Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/) and [mkdocs](https://www.mkdocs.org/) (See [below](#mkdocs)). (Be sure to install the package the package your are building the docs for in the environment used to build the docs.)
+- Compatible with rendering the documentation with [Sphinx](http://www.sphinx-doc.org/) and [mkdocs](https://www.mkdocs.org/) (See [below](#mkdocs)). (Be sure to install the package your are building the docs for in the environment used to build the docs.)
 - Missing docstring sections for signature arguments can be notified by warnings
   when the environment variable `DOCSTRING_INHERITANCE_WARNS` is set.
 - Docstring sections can be compared to detect duplicated or similar contents that could be inherited.
