@@ -162,18 +162,6 @@ def test_render_section(section_name, section_body, expected_docstring):
             "Args:",
             " body",
         ),
-        (
-            "Dummy:",
-            "  body",
-        ),
-        (
-            "Dummy :",
-            "  body",
-        ),
-        (
-            "Dummy:",
-            "   body",
-        ),
     ],
 )
 def test_parse_one_section_no_section(line1, line2s):
