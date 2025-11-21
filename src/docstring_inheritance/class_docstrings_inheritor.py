@@ -51,6 +51,8 @@ class ClassDocstringsInheritor:
     __mro_classes: list[type]
     """The MRO classes."""
 
+    __object_init_doc: Final[str | None] = object.__init__.__doc__
+
     def __init__(
         self,
         cls: type,
@@ -131,17 +133,25 @@ class ClassDocstringsInheritor:
     ) -> None:
         """Create the inherited docstrings for the class attributes."""
         mro_classes = self.__mro_classes
-        for attr_name, attr in self._cls.__dict__.items():
+        object_init_doc = self.__object_init_doc
+        init_method_name = "__init__"
+        docstring_inheritor_class = self.__docstring_inheritor
+
+        for attr_name, attr in self.__cls.__dict__.items():
             if not isinstance(attr, FunctionType):
                 continue
 
-            docstring_inheritor = self._docstring_inheritor(attr)
+            docstring_inheritor = docstring_inheritor_class(attr)
 
             for parent_cls in mro_classes:
                 parent_method = getattr(parent_cls, attr_name, None)
                 if parent_method is None:
                     continue
-                docstring_inheritor.inherit(parent_method.__doc__)
+                parent_doc = parent_method.__doc__
+                if attr_name == init_method_name and parent_doc == object_init_doc:
+                    # Do not inherit the object __init__ docstrings.
+                    continue
+                docstring_inheritor.inherit(parent_doc)
                 if not docstring_inheritor.has_missing_descriptions:
                     # In case of multiple inheritance,
                     # when the parent that has docstring inheritance
