@@ -127,7 +127,7 @@ class BaseDocstringInheritor:
     @property
     def has_missing_descriptions(self) -> bool:
         """Whether the child docstring has at least one missing description."""
-        return not self.__has_missing_descriptions
+        return self.__has_missing_descriptions
 
     def inherit(
         self,
@@ -347,13 +347,13 @@ class BaseDocstringInheritor:
             all_args += [f"**{full_arg_spec.varkw}"]
 
         ordered_section = {}
-        self.__has_missing_descriptions = True
+        self.__has_missing_descriptions = False
         for arg in all_args:
             if arg in section_items:
                 doc = section_items[arg]
             else:
                 doc = missing_arg_text
-                self.__has_missing_descriptions = False
+                self.__has_missing_descriptions = True
                 self._warn(
                     section_name, f"the docstring for the argument '{arg}' is missing."
                 )
