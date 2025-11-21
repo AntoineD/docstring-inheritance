@@ -258,44 +258,31 @@ class BaseDocstringInheritor:
         #     "Returns" in sections or "Yields" in sections
         # ):
         #     parent_sections["Raises"] = None
-        parent_section_names = parent_sections.keys()
+        # parent_section_names = parent_sections.keys()
 
         child_sections = self.__child_sections
 
         # TODO: is this readly useless?
         # self.__remove_missing_descriptions(child_sections)
 
-        child_section_names = child_sections.keys()
+        temp_sections = parent_sections.copy()
 
-        temp_sections = {}
-
-        # Sections in parent but not in child.
-        parent_section_names_to_copy = parent_section_names - child_section_names
-        for section_name in parent_section_names_to_copy:
-            temp_sections[section_name] = parent_sections[section_name]
-
-        # Remaining sections in child.
-        child_sections_names_to_copy = (
-            child_section_names - parent_section_names_to_copy
-        )
-        for section_name in child_sections_names_to_copy:
-            temp_sections[section_name] = child_sections[section_name]
-
-        # For sections with items, the sections common to parent and child are merged.
-        common_section_names_with_items = (
-            parent_section_names
-            & child_section_names
-            & self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS
+        section_names_with_items = (
+            parent_sections.keys() & self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS
         )
 
-        for section_name in common_section_names_with_items:
-            temp_section_items = cast(
-                "SubSectionType", parent_sections[section_name]
-            ).copy()
-            child_section = cast("SubSectionType", child_sections[section_name])
-            self.__remove_missing_descriptions(child_section)
-            temp_section_items.update(child_section)
-            temp_sections[section_name] = temp_section_items
+        for section_name, child_section in child_sections.items():
+            if section_name in section_names_with_items:
+                child_section = cast("SubSectionType", child_section)
+                self.__remove_missing_descriptions(child_section)
+                # TODO: remove copy.
+                parent_section = cast(
+                    "SubSectionType", parent_sections[section_name]
+                ).copy()
+                parent_section.update(child_section)
+                temp_sections[section_name] = parent_section
+            else:
+                temp_sections[section_name] = child_section
 
         arg_section_name = self._DOCSTRING_PARSER.ARGS_SECTION_NAME
 
@@ -314,19 +301,10 @@ class BaseDocstringInheritor:
             # The args section is empty, there is nothing to document.
             del temp_sections[arg_section_name]
 
-        # Reorder the standard sections.
-        child_sections.clear()
-        child_sections.update({
-            section_name: temp_sections.pop(section_name)
-            for section_name in self._DOCSTRING_PARSER.SECTION_NAMES
-            if section_name in temp_sections
-        })
-
-        # Add the remaining non-standard sections.
-        child_sections.update(temp_sections)
+        self.__child_sections = temp_sections
 
         # For testing purposes.
-        return child_sections
+        return temp_sections
 
     @classmethod
     def __remove_missing_descriptions(cls, sections: SubSectionType) -> None:

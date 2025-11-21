@@ -248,17 +248,17 @@ def test_multiple_inheritance_parent1_meta(inheritance_class):
     class Parent1(metaclass=inheritance_class):
         """Parent summary
 
-        Attributes
-        ----------
-        attr1
+        Methods
+        -------
+        method1
         """
 
     class Parent2:
         """Parent2 summary
 
-        Methods
-        -------
-        method1
+        Attributes
+        ----------
+        attr1
         """
 
     class Child(Parent1, Parent2):
@@ -280,17 +280,17 @@ def test_multiple_inheritance_parent2_meta(inheritance_class):
     class Parent1:
         """Parent summary
 
-        Attributes
-        ----------
-        attr1
+        Methods
+        -------
+        method1
         """
 
     class Parent2(metaclass=inheritance_class):
         """Parent2 summary
 
-        Methods
-        -------
-        method1
+        Attributes
+        ----------
+        attr1
         """
 
     class Child(Parent1, Parent2):
@@ -312,17 +312,17 @@ def test_multiple_inheritance_child_meta(inheritance_class):
     class Parent1:
         """Parent summary
 
-        Attributes
-        ----------
-        attr1
+        Methods
+        -------
+        method1
         """
 
     class Parent2:
         """Parent2 summary
 
-        Methods
-        -------
-        method1
+        Attributes
+        ----------
+        attr1
         """
 
     class Child(Parent1, Parent2, metaclass=inheritance_class):

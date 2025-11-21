@@ -231,8 +231,6 @@ def test_parse_one_section(line1, line2s, expected):
             {"Parameters": {}},
             {},
         ),
-        # Standard section_items names come before non-standard ones.
-        ({0: "0", "Notes": "0"}, {}, {"Notes": "0", 0: "0"}),
     ],
 )
 def test_inherit_sections(parent_sections, child_sections, expected_sections):

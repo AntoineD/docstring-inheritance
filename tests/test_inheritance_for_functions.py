@@ -66,6 +66,12 @@ def test_google():
     def child(x, missing_doc, *child_varargs, **child_kwargs):
         """Child summary.
 
+        Args:
+            x: X
+            child_varargs: Not *args
+            *child_varargs: Child *args
+            **child_kwargs: Child **kwargs
+
         Yields:
             Child yields
 
@@ -83,12 +89,6 @@ def test_google():
 
         Warnings:
             Child warnings
-
-        Args:
-            x: X
-            child_varargs: Not *args
-            *child_varargs: Child *args
-            **child_kwargs: Child **kwargs
         """
 
     expected = """Child summary.
@@ -99,8 +99,17 @@ Args:
     *child_varargs: Child *args
     **child_kwargs: Child **kwargs
 
+Examples:
+    Child examples
+
 Returns:
     Parent returns
+
+See Also:
+    Parent see also
+
+References:
+    Parent references
 
 Yields:
     Child yields
@@ -108,23 +117,14 @@ Yields:
 Raises:
     Child raises
 
+Notes:
+    Child notes
+
 Warns:
     Child warns
 
 Warnings:
     Child warnings
-
-See Also:
-    Parent see also
-
-Notes:
-    Child notes
-
-References:
-    Parent references
-
-Examples:
-    Child examples
 """
 
     inherit_google_docstring(parent.__doc__, child)
