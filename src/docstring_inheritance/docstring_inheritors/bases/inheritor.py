@@ -48,7 +48,7 @@ if TYPE_CHECKING:
 def get_similarity_ratio(env_ratio: str | None) -> float:
     """Check the value of the similarity ratio.
 
-    If the passed ratio is ``None`` then the default value of 0. is returned.
+    If the passed ratio is `None` then the default value of 0. is returned.
 
     Args:
         env_ratio: The raw value of the ratio from the environment variable.
@@ -314,8 +314,8 @@ class BaseDocstringInheritor:
     ) -> SubSectionType:
         """Filter the args section items with the args of a signature.
 
-        The argument ``self`` is removed. The arguments are ordered according to the
-        signature of ``func``. An argument of ``func`` missing in ``section_items`` gets
+        The argument `self` is removed. The arguments are ordered according to the
+        signature of `func`. An argument of `func` missing in `section_items` gets
         a default description defined in :attr:`._MISSING_ARG_TEXT`.
 
         Args:

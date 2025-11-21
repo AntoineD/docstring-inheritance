@@ -25,6 +25,7 @@ from types import FunctionType
 from types import WrapperDescriptorType
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Final
 
 from docstring_inheritance.docstring_inheritors.bases.inheritor import (
     BaseDocstringInheritor,
@@ -39,14 +40,14 @@ DocstringInheritorClass = type[BaseDocstringInheritor]
 class ClassDocstringsInheritor:
     """A class for inheriting class docstrings."""
 
-    _cls: type
+    __cls: type
     """The class to process."""
 
-    _docstring_inheritor: DocstringInheritorClass
+    __docstring_inheritor: DocstringInheritorClass
     """The docstring inheritor."""
 
     _init_in_class: bool
-    """Whether the ``__init__`` arguments documentation is in the class docstring."""
+    """Whether the `__init__` arguments documentation is in the class docstring."""
 
     __mro_classes: list[type]
     """The MRO classes."""
@@ -63,14 +64,14 @@ class ClassDocstringsInheritor:
         Args:
             cls: The class to process.
             docstring_inheritor: The docstring inheritor.
-            init_in_class: Whether the ``__init__`` arguments documentation is in the
+            init_in_class: Whether the `__init__` arguments documentation is in the
                 class docstring.
         """  # noqa: D205, D212
         # Remove the new class itself and the object class from the mro,
         # object's docstrings have no interest.
         self.__mro_classes = cls.mro()[1:-1]
-        self._cls = cls
-        self._docstring_inheritor = docstring_inheritor
+        self.__cls = cls
+        self.__docstring_inheritor = docstring_inheritor
         self._init_in_class = init_in_class
 
     @classmethod
@@ -89,31 +90,29 @@ class ClassDocstringsInheritor:
                 class docstring.
         """
         inheritor = cls(class_, docstring_inheritor, init_in_class)
-        inheritor._inherit_attrs_docstrings()
-        inheritor._inherit_class_docstring()
+        inheritor.__inherit_methods_docstrings()
+        inheritor.__inherit_class_docstring()
 
-    def _inherit_class_docstring(
-        self,
-    ) -> None:
+    def __inherit_class_docstring(self) -> None:
         """Create the inherited docstring for the class docstring."""
         func = None
         old_init_doc = None
         init_doc_changed = False
 
         if self._init_in_class:
-            init_method: Callable[..., None] = self._cls.__init__  # type: ignore[misc]
+            init_method: Callable[..., None] = self.__cls.__init__  # type: ignore[misc]
             # Ignore the case when __init__ is from object since there is no docstring
             # and its __doc__ cannot be assigned.
             if not isinstance(init_method, WrapperDescriptorType):
                 old_init_doc = init_method.__doc__
-                init_method.__doc__ = self._cls.__doc__
+                init_method.__doc__ = self.__cls.__doc__
                 func = init_method
                 init_doc_changed = True
 
         if func is None:
-            func = self._create_dummy_func_with_doc(self._cls.__doc__)
+            func = _create_dummy_func_with_doc(self.__cls.__doc__)
 
-        docstring_inheritor = self._docstring_inheritor(func)
+        docstring_inheritor = self.__docstring_inheritor(func)
 
         for parent_cls in self.__mro_classes:
             # As opposed to the attribute inheritance, and following the way a class is
@@ -123,15 +122,13 @@ class ClassDocstringsInheritor:
 
         docstring_inheritor.render()
 
-        self._cls.__doc__ = func.__doc__
+        self.__cls.__doc__ = func.__doc__
 
         if self._init_in_class and init_doc_changed:
             init_method.__doc__ = old_init_doc
 
-    def _inherit_attrs_docstrings(
-        self,
-    ) -> None:
-        """Create the inherited docstrings for the class attributes."""
+    def __inherit_methods_docstrings(self) -> None:
+        """Create the inherited docstrings for the class methods."""
         mro_classes = self.__mro_classes
         object_init_doc = self.__object_init_doc
         init_method_name = "__init__"
@@ -163,19 +160,19 @@ class ClassDocstringsInheritor:
 
             docstring_inheritor.render()
 
-    @staticmethod
-    def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:
-        """Create a dummy function with a given docstring.
 
-        Args:
-            docstring: The docstring to be assigned.
+def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:
+    """Create a dummy function with a given docstring.
 
-        Returns:
-            The function with the given docstring.
-        """
+    Args:
+        docstring: The docstring to be assigned.
 
-        def func() -> None:  # pragma: no cover
-            pass
+    Returns:
+        The function with the given docstring.
+    """
 
-        func.__doc__ = docstring
-        return func
+    def func() -> None:  # pragma: no cover
+        pass
+
+    func.__doc__ = docstring
+    return func

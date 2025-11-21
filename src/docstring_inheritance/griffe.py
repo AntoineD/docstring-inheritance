@@ -82,11 +82,13 @@ class DocstringInheritance(Extension):
 
         # Inherit the methods docstrings.
         for member in cls.members.values():
-            if not isinstance(member, Attribute):
-                runtime_member = self.__import_dynamically(member)
-                self.__set_docstring(
-                    member, runtime_member, docstring_parser_kind, parser_options
-                )
+            if isinstance(member, Attribute):
+                # Only methods can inherit docstrings.
+                continue
+            runtime_member = self.__import_dynamically(member)
+            self.__set_docstring(
+                member, runtime_member, docstring_parser_kind, parser_options
+            )
 
     @staticmethod
     def __import_dynamically(obj: Object | Alias) -> Any:
