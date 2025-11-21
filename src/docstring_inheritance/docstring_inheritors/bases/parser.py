@@ -46,25 +46,6 @@ class NoSectionFound(BaseException):
 class BaseDocstringParser(ABC):
     """The base class for docstring parsers."""
 
-    SECTION_NAMES: ClassVar[list[str]] = [
-        SUMMARY_SECTION_NAME,
-        "Parameters",
-        "Returns",
-        "Yields",
-        "Receives",
-        "Other Parameters",
-        "Attributes",
-        "Methods",
-        "Raises",
-        "Warns",
-        "Warnings",
-        "See Also",
-        "Notes",
-        "References",
-        "Examples",
-    ]
-    """Names of the sections."""
-
     ARGS_SECTION_NAME: ClassVar[str]
     """The name of the section with methods arguments."""
 

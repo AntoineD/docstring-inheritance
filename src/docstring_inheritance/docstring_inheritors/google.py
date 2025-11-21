@@ -57,8 +57,7 @@ class DocstringParser(BaseDocstringParser):
     """The parser for Google docstrings."""
 
     ARGS_SECTION_NAME: ClassVar[str] = "Args"
-    SECTION_NAMES: ClassVar[list[str]] = list(BaseDocstringParser.SECTION_NAMES)
-    SECTION_NAMES[1] = ARGS_SECTION_NAME
+
     SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
         ARGS_SECTION_NAME,
         "Attributes",
