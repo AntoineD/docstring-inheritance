@@ -144,7 +144,6 @@ class BaseDocstringInheritor:
         """  # noqa: D205, D212
         if parent_doc is None:
             return
-
         parent_sections = self._DOCSTRING_PARSER.parse(parent_doc)
         self._warn_similar_sections(parent_sections, self.__child_sections)
         self._inherit_sections(parent_sections)
@@ -265,24 +264,19 @@ class BaseDocstringInheritor:
         # TODO: is this readly useless?
         # self.__remove_missing_descriptions(child_sections)
 
-        temp_sections = parent_sections.copy()
-
         section_names_with_items = (
             parent_sections.keys() & self._DOCSTRING_PARSER.SECTION_NAMES_WITH_ITEMS
         )
+
+        new_child_sections = parent_sections
 
         for section_name, child_section in child_sections.items():
             if section_name in section_names_with_items:
                 child_section = cast("SubSectionType", child_section)
                 self.__remove_missing_descriptions(child_section)
-                # TODO: remove copy.
-                parent_section = cast(
-                    "SubSectionType", parent_sections[section_name]
-                ).copy()
-                parent_section.update(child_section)
-                temp_sections[section_name] = parent_section
+                new_child_sections[section_name].update(child_section)
             else:
-                temp_sections[section_name] = child_section
+                new_child_sections[section_name] = child_section
 
         arg_section_name = self._DOCSTRING_PARSER.ARGS_SECTION_NAME
 
@@ -290,21 +284,21 @@ class BaseDocstringInheritor:
             self._MISSING_ARG_TEXT,
             cast(
                 "SubSectionType",
-                temp_sections.get(arg_section_name, {}),
+                new_child_sections.get(arg_section_name, {}),
             ),
             arg_section_name,
         )
 
         if args_section:
-            temp_sections[arg_section_name] = args_section
-        elif arg_section_name in temp_sections:
+            new_child_sections[arg_section_name] = args_section
+        elif arg_section_name in new_child_sections:
             # The args section is empty, there is nothing to document.
-            del temp_sections[arg_section_name]
+            del new_child_sections[arg_section_name]
 
-        self.__child_sections = temp_sections
+        self.__child_sections = new_child_sections
 
         # For testing purposes.
-        return temp_sections
+        return new_child_sections
 
     @classmethod
     def __remove_missing_descriptions(cls, sections: SubSectionType) -> None:
