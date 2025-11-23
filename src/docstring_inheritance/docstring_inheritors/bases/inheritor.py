@@ -103,6 +103,9 @@ class BaseDocstringInheritor:
     __has_missing_descriptions: bool
     """Whether the child docstring has at least one missing description."""
 
+    __checked_missing_descriptions: bool
+    """Whether the child docstring has been checked for missing descriptions."""
+
     __similarity_ratio: ClassVar[float] = get_similarity_ratio(
         os.environ.get("DOCSTRING_INHERITANCE_SIMILARITY_RATIO")
     )
@@ -123,6 +126,7 @@ class BaseDocstringInheritor:
             self.__child_func.__doc__
         )
         self.__has_missing_descriptions = False
+        self.__checked_missing_descriptions = False
 
     @property
     def has_missing_descriptions(self) -> bool:
@@ -151,6 +155,10 @@ class BaseDocstringInheritor:
     def render(self) -> None:
         """Render the docstring string for the child function."""
         if self.__child_sections:
+            if not self.__checked_missing_descriptions:
+                # If there was no inheritance done,
+                # then the following checking has not been done yet.
+                self.__check_missing_args_descriptions(self.__child_sections)
             # Get the original function eventually behind decorators.
             unwrap(self.__child_func).__doc__ = self._DOCSTRING_RENDERER.render(
                 self.__child_sections
@@ -261,7 +269,7 @@ class BaseDocstringInheritor:
 
         child_sections = self.__child_sections
 
-        # TODO: is this readly useless?
+        # TODO: is this really useless?
         # self.__remove_missing_descriptions(child_sections)
 
         section_names_with_items = (
@@ -278,22 +286,7 @@ class BaseDocstringInheritor:
             else:
                 new_child_sections[section_name] = child_section
 
-        arg_section_name = self._DOCSTRING_PARSER.ARGS_SECTION_NAME
-
-        args_section = self._filter_args_section(
-            self._MISSING_ARG_TEXT,
-            cast(
-                "SubSectionType",
-                new_child_sections.get(arg_section_name, {}),
-            ),
-            arg_section_name,
-        )
-
-        if args_section:
-            new_child_sections[arg_section_name] = args_section
-        elif arg_section_name in new_child_sections:
-            # The args section is empty, there is nothing to document.
-            del new_child_sections[arg_section_name]
+        self.__check_missing_args_descriptions(new_child_sections)
 
         self.__child_sections = new_child_sections
 
@@ -354,3 +347,27 @@ class BaseDocstringInheritor:
             ordered_section[arg] = doc
 
         return ordered_section
+
+    def __check_missing_args_descriptions(self, sections: SectionsType) -> None:
+        """Check and filter the Args section.
+
+        Args:
+            sections: The docstrings sections to checked.
+        """
+        arg_section_name = self._DOCSTRING_PARSER.ARGS_SECTION_NAME
+
+        args_section = self._filter_args_section(
+            self._MISSING_ARG_TEXT,
+            cast(
+                "SubSectionType",
+                sections.get(arg_section_name, {}),
+            ),
+            arg_section_name,
+        )
+        self.__checked_missing_descriptions = True
+
+        if args_section:
+            sections[arg_section_name] = args_section
+        elif arg_section_name in sections:
+            # The args section is empty, there is nothing to document.
+            del sections[arg_section_name]

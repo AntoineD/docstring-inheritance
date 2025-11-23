@@ -112,7 +112,7 @@ def test_missing_parent_attr_parent_meta(inheritance_class):
         pass
 
     class Child(Parent):
-        def method(self, xx, x, *args, yy=None, y=None, **kwargs):
+        def method(self):
             """Summary"""
 
         @classmethod
@@ -136,7 +136,7 @@ def test_missing_parent_attr_child_meta(inheritance_class):
         pass
 
     class Child(Parent, metaclass=inheritance_class):
-        def method(self, xx, x, *args, yy=None, y=None, **kwargs):
+        def method(self):
             """Summary"""
 
         @classmethod
@@ -173,7 +173,7 @@ def test_missing_parent_doc_for_attr_parent_meta(inheritance_class):
             pass
 
     class Child(Parent):
-        def method(self, xx, x, *args, yy=None, y=None, **kwargs):  # pragma: no cover
+        def method(self):  # pragma: no cover
             """Summary"""
 
         @classmethod
@@ -210,7 +210,7 @@ def test_missing_parent_doc_for_attr_child_meta(inheritance_class):
             pass
 
     class Child(Parent, metaclass=inheritance_class):
-        def method(self, xx, x, *args, yy=None, y=None, **kwargs):  # pragma: no cover
+        def method(self):  # pragma: no cover
             """Summary"""
 
         @classmethod

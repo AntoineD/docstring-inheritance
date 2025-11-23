@@ -338,6 +338,7 @@ class Child(Parent):
                 "Child.__init__": """
 Args:
     b: n
+    c: The description is missing.
 """
             },
         ),
