@@ -352,6 +352,19 @@ class Parent(metaclass={metaclass_name}):
         """,
             {"Parent.__init__": None},
         ),
+        #################################################################################
+        (
+            ALL_META,
+            """
+from docstring_inheritance import {metaclass_name}
+class Parent(metaclass={metaclass_name}):
+    pass
+class Child(Parent):
+    def __init__(self):
+        pass
+""",
+            {"Child.__init__": None},
+        ),
     ],
 )
 def test_args_inheritance(
