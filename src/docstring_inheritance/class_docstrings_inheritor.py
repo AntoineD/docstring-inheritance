@@ -21,7 +21,6 @@
 
 from __future__ import annotations
 
-from types import FunctionType
 from types import WrapperDescriptorType
 from typing import TYPE_CHECKING
 from typing import Any
@@ -132,13 +131,13 @@ class ClassDocstringsInheritor:
         mro_classes = self.__mro_classes
         object_init_doc = self.__object_init_doc
         init_method_name = "__init__"
-        docstring_inheritor_class = self.__docstring_inheritor
+        create_inheritor = self.__docstring_inheritor.create
 
         for attr_name, attr in self.__cls.__dict__.items():
-            if not isinstance(attr, FunctionType):
+            inheritor = create_inheritor(attr)
+            if inheritor is None:
+                # This attribute is not a method or function.
                 continue
-
-            docstring_inheritor = docstring_inheritor_class(attr)
 
             for parent_cls in mro_classes:
                 parent_method = getattr(parent_cls, attr_name, None)
@@ -148,8 +147,8 @@ class ClassDocstringsInheritor:
                 if attr_name == init_method_name and parent_doc == object_init_doc:
                     # Do not inherit the object __init__ docstrings.
                     continue
-                docstring_inheritor.inherit(parent_doc)
-                if not docstring_inheritor.has_missing_descriptions:
+                inheritor.inherit(parent_doc)
+                if not inheritor.has_missing_descriptions:
                     # In case of multiple inheritance,
                     # when the parent that has docstring inheritance
                     # is not the first one or not in the hierarchy of the first one,
@@ -158,7 +157,7 @@ class ClassDocstringsInheritor:
                     # Otherwise, the inheritance is done for that attribute.
                     break
 
-            docstring_inheritor.render()
+            inheritor.render()
 
 
 def _create_dummy_func_with_doc(docstring: str | None) -> Callable[..., Any]:

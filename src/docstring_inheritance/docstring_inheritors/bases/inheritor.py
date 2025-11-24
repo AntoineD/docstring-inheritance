@@ -30,9 +30,12 @@ from inspect import getmodule
 from inspect import getsourcelines
 from inspect import unwrap
 from textwrap import indent
+from types import FunctionType
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
+from typing import Final
+from typing import Self
 from typing import cast
 
 if TYPE_CHECKING:
@@ -82,7 +85,7 @@ class DocstringInheritanceWarning(UserWarning):
 class BaseDocstringInheritor:
     """Base class for inheriting a docstring."""
 
-    MISSING_ARG_DESCRIPTION: ClassVar[str] = "The description is missing."
+    MISSING_ARG_DESCRIPTION: Final[str] = "The description is missing."
     """The fall back description stub for a method argument without a description."""
 
     _MISSING_ARG_TEXT: ClassVar[str]
@@ -94,8 +97,14 @@ class BaseDocstringInheritor:
     _DOCSTRING_RENDERER: ClassVar[type[BaseDocstringRenderer]]
     """The docstring renderer."""
 
+    __ARGS_TO_IGNORE: Final[set[str]] = {"self", "cls"}
+    """The argument names to ignore when filtering the args section."""
+
     __child_func: Callable[..., Any]
-    """The function or method to inherit the docstrings of."""
+    """The undecorated function or method to inherit the docstrings of."""
+
+    __original_child_func: Callable[..., Any]
+    """The original function or method to inherit the docstrings of."""
 
     __child_sections: SectionsType
     """The sections of the child docstring."""
@@ -111,6 +120,26 @@ class BaseDocstringInheritor:
     )
     """The similarity ratio for comparing child to parent docstrings."""
 
+    @classmethod
+    def create(
+        cls,
+        child_func: Callable[..., Any],
+    ) -> Self | None:
+        """Create an inheritor if possible.
+
+        Args:
+            child_func: The child function.
+
+        Returns:
+            The inheritor or `None` if it cannot be created from `child_func`.
+        """
+        # Unwrapping allows to properly identify decorated methods,
+        # like @staticmethod.
+        unwrapped_child_func = unwrap(child_func)
+        if not isinstance(unwrapped_child_func, FunctionType):
+            return None
+        return cls(child_func)
+
     def __init__(
         self,
         child_func: Callable[..., Any],
@@ -121,7 +150,9 @@ class BaseDocstringInheritor:
             child_func: The child function.
             child_sections: The child sections. (for testing purposes only)
         """  # noqa: D205, D212, D415
-        self.__child_func = child_func
+        # Get the function eventually behind decorators.
+        self.__child_func = unwrap(child_func)
+        self.__original_child_func = child_func
         self.__child_sections = child_sections or self._DOCSTRING_PARSER.parse(
             self.__child_func.__doc__
         )
@@ -159,10 +190,9 @@ class BaseDocstringInheritor:
                 # If there was no inheritance done,
                 # then the following checking has not been done yet.
                 self.__check_missing_args_descriptions(self.__child_sections)
-            # Get the original function eventually behind decorators.
-            unwrap(self.__child_func).__doc__ = self._DOCSTRING_RENDERER.render(
-                self.__child_sections
-            )
+            docstring = self._DOCSTRING_RENDERER.render(self.__child_sections)
+            self.__original_child_func.__doc__ = docstring
+            self.__child_func.__doc__ = docstring
 
     def _warn_similar_sections(
         self,
@@ -322,8 +352,9 @@ class BaseDocstringInheritor:
         full_arg_spec = getfullargspec(self.__child_func)
 
         all_args = full_arg_spec.args
-        if "self" in all_args:
-            all_args.remove("self")
+        for arg_name in self.__ARGS_TO_IGNORE:
+            if arg_name in all_args:
+                all_args.remove(arg_name)
 
         if full_arg_spec.varargs is not None:
             all_args += [f"*{full_arg_spec.varargs}"]

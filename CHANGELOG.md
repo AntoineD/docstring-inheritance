@@ -19,11 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Inheritance of method docstring with multiple inheritance such that at least
-  the first class is not set to inherit.
-- Performance improvements.
+  the first class does not inherit docstrings.
 - Detecting missing arguments when there was no inheritance for a docstring.
-- Inheriting from `object.__init__` when the first class in the hierarchy
+- No longer inheriting from `object.__init__` when the first class in the hierarchy
   has no docstring for `__init__`.
+  This prevents adding the docstring summaries
+  `Initialize self.  See help(type(self)) for accurate signature.`.
+- Docstring inheritance for decorated methods and functions.
+- Performance improvements.
 
 ### Removed
 

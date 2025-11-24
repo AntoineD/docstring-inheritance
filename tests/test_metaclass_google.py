@@ -358,13 +358,48 @@ class Parent(metaclass={metaclass_name}):
             ALL_META,
             """
 from docstring_inheritance import {metaclass_name}
+from functools import wraps
+def decorator(f):
+    '''Decorator'''
+    @wraps(f)
+    def w():
+        '''Dummy'''
+        return
+    return w
 class Parent(metaclass={metaclass_name}):
-    pass
+    def method(self):
+        '''Summary'''
 class Child(Parent):
-    def __init__(self):
+    @decorator
+    def method(self):
         pass
 """,
-            {"Child.__init__": None},
+            {"Child.method": """Summary"""},
+        ),
+        #################################################################################
+        (
+            ALL_META,
+            """
+from docstring_inheritance import {metaclass_name}
+class Parent(metaclass={metaclass_name}):
+    @classmethod
+    def class_method(cls):
+        '''Summary'''
+    @staticmethod
+    def static_method():
+        '''Summary'''
+class Child(Parent):
+    @classmethod
+    def class_method(cls):
+        pass
+    @staticmethod
+    def static_method():
+        pass
+""",
+            {
+                "Child.class_method": """Summary""",
+                "Child.static_method": """Summary""",
+            },
         ),
     ],
 )
