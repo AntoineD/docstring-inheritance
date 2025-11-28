@@ -35,11 +35,12 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
 from typing import Final
-from typing import Self
 from typing import cast
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from typing_extensions import Self
 
     from docstring_inheritance.docstring_inheritors.bases import SubSectionType
 
@@ -136,9 +137,9 @@ class BaseDocstringInheritor:
         # Unwrapping allows to properly identify decorated methods,
         # like @staticmethod.
         unwrapped_child_func = unwrap(child_func)
-        if not isinstance(unwrapped_child_func, FunctionType):
-            return None
-        return cls(child_func)
+        if isinstance(unwrapped_child_func, FunctionType):
+            return cls(child_func)
+        return None
 
     def __init__(
         self,

@@ -260,7 +260,7 @@ Args:
 Notes:
     From Child.
 """,
-                "Child.__init__": None,
+                "Child.__init__": "",
             },
         ),
         #################################################################################
@@ -315,7 +315,7 @@ Attributes:
 Notes:
     From Child.
 """,
-                "Child.__init__": None,
+                "Child.__init__": "",
             },
         ),
         #################################################################################
@@ -426,7 +426,7 @@ def test_args_inheritance(
                     attr = getattr(attr, item_name)
 
                 attr_docstring = attr.__doc__
-                if expected is None:
+                if expected in {None, ""}:
                     assert attr_docstring is None
                 else:
                     assert_str(attr_docstring, expected)
