@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.3.0] - 2025-11
 
+### Added
+
+- Support for Python 3.14
+
 ### Changed
 
 - No longer inheriting from `object.__init__` when the first class in the hierarchy
@@ -40,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for Python 3.12
+- Support for Python 3.13
 
 ### Removed
 
