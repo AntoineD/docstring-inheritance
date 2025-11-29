@@ -14,19 +14,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 2.3.0 - 2025-11
+
+### Changed
+
+- No longer inheriting from `object.__init__` when the first class in the hierarchy
+  has no docstring for `__init__`.
+  This prevents adding the docstring summary
+  `Initialize self.  See help(type(self)) for accurate signature.`.
+- The sections names are no longer limited to the ones defined in the docstrings formats.
+- The sections are no longer reordered.
 
 ### Fixed
 
 - Inheritance of method docstring with multiple inheritance such that at least
   the first class does not inherit docstrings.
 - Detecting missing arguments when there was no inheritance for a docstring.
-- No longer inheriting from `object.__init__` when the first class in the hierarchy
-  has no docstring for `__init__`.
-  This prevents adding the docstring summaries
-  `Initialize self.  See help(type(self)) for accurate signature.`.
 - Docstring inheritance for decorated methods and functions.
-- Performance improvements.
 
 ### Removed
 
