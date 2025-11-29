@@ -313,7 +313,7 @@ class BaseDocstringInheritor:
             if section_name in section_names_with_items:
                 child_section = cast("SubSectionType", child_section)
                 self.__remove_missing_descriptions(child_section)
-                new_child_sections[section_name].update(child_section)
+                new_child_sections[section_name].update(child_section)  # type: ignore [union-attr]
             else:
                 new_child_sections[section_name] = child_section
 
