@@ -174,13 +174,3 @@ class _DocstringUpdater:
                 parser=self.__parser,
                 parser_options=self.__parser_options,
             )
-
-
-def _docstring_above(obj: Object) -> Docstring | None:
-    with suppress(IndexError, KeyError):
-        # breakpoint()
-        for parent in obj.parent.mro():  # type: ignore[union-attr]
-            # Fetch docstring from first parent that has the member.
-            if obj.name in parent.members:
-                return parent.members[obj.name].docstring
-    return None
