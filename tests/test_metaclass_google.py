@@ -32,8 +32,8 @@ from griffe import LinesCollection
 from griffe import temporary_pyfile
 from griffe import visit
 
-from docstring_inheritance import GoogleDocstringInheritanceInitMeta
-from docstring_inheritance import GoogleDocstringInheritanceMeta
+from docstring_inheritance._internal import GoogleDocstringInheritanceInitMeta
+from docstring_inheritance._internal import GoogleDocstringInheritanceMeta
 from docstring_inheritance.griffe import DocstringInheritance
 
 if TYPE_CHECKING:
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
     from griffe import Module
 
-    from docstring_inheritance import _BaseGoogleDocstringInheritanceMeta
+    from docstring_inheritance._internal import BaseGoogleDocstringInheritanceMeta
 
 
 @contextmanager
@@ -88,7 +88,7 @@ ALL_META = (GoogleDocstringInheritanceMeta, GoogleDocstringInheritanceInitMeta)
         (
             ALL_META,
             '''
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 class Parent(metaclass={metaclass_name}):
     def method(self, w, x, *args, y=None, **kwargs):
         """
@@ -123,7 +123,7 @@ Args:
         (
             ALL_META,
             '''
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 class Parent1(metaclass={metaclass_name}):
     def method(self, w, x, *args, y=None):
         """
@@ -167,7 +167,7 @@ Args:
         (
             ALL_META,
             '''
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 class GrandParent(metaclass={metaclass_name}):
     """Class GrandParent.
 
@@ -224,7 +224,7 @@ Notes:
         (
             (GoogleDocstringInheritanceInitMeta,),
             '''
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 class Parent(metaclass={metaclass_name}):
     """Class Parent.
 
@@ -267,7 +267,7 @@ Notes:
         (
             (GoogleDocstringInheritanceInitMeta,),
             '''
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 class Parent(metaclass={metaclass_name}):
     """Class Parent.
 
@@ -322,7 +322,7 @@ Notes:
         (
             (GoogleDocstringInheritanceInitMeta,),
             '''
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 class Parent(metaclass={metaclass_name}):
     def __init__(self, a, b):
         pass
@@ -346,7 +346,7 @@ Args:
         (
             ALL_META,
             """
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 class Parent(metaclass={metaclass_name}):
     def __init__(self):
         pass
@@ -357,7 +357,7 @@ class Parent(metaclass={metaclass_name}):
         (
             ALL_META,
             """
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 from functools import wraps
 def decorator(f):
     '''Decorator'''
@@ -380,7 +380,7 @@ class Child(Parent):
         (
             ALL_META,
             """
-from docstring_inheritance import {metaclass_name}
+from docstring_inheritance._internal import {metaclass_name}
 class Parent(metaclass={metaclass_name}):
     @classmethod
     def class_method(cls):
@@ -404,7 +404,7 @@ class Child(Parent):
     ],
 )
 def test_args_inheritance(
-    inheritance_classes: Sequence[type[_BaseGoogleDocstringInheritanceMeta]],
+    inheritance_classes: Sequence[type[BaseGoogleDocstringInheritanceMeta]],
     code: str,
     attr_to_expected: dict[str, str],
 ):

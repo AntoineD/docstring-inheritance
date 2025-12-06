@@ -28,12 +28,13 @@ from abc import ABC
 from abc import abstractmethod
 from itertools import dropwhile
 from typing import TYPE_CHECKING
-from typing import ClassVar
-from typing import Final
 
 from . import SUMMARY_SECTION_NAME
 
 if TYPE_CHECKING:
+    from typing import ClassVar
+    from typing import Final
+
     from . import SectionsType
 
 from itertools import pairwise

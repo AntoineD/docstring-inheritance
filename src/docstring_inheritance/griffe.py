@@ -21,9 +21,7 @@
 from __future__ import annotations
 
 import inspect
-from contextlib import suppress
 from typing import TYPE_CHECKING
-from typing import Any
 
 from griffe import Docstring
 from griffe import Extension
@@ -32,11 +30,12 @@ from griffe import Parser
 from griffe import dynamic_import
 from griffe import get_logger
 
-from docstring_inheritance import _BaseGoogleDocstringInheritanceMeta
-from docstring_inheritance import _BaseNumpyDocstringInheritanceMeta
+from ._internal import BaseGoogleDocstringInheritanceMeta
+from ._internal import BaseNumpyDocstringInheritanceMeta
 
 if TYPE_CHECKING:
     import ast
+    from typing import Any
     from typing import Literal
 
     from griffe import Alias
@@ -78,9 +77,9 @@ def _get_parser_kind(
 ) -> DocstringParser:
     """Return the docstring parser kind of a class."""
     for base_meta in class_.__class__.__mro__:
-        if issubclass(base_meta, _BaseGoogleDocstringInheritanceMeta):
+        if issubclass(base_meta, BaseGoogleDocstringInheritanceMeta):
             return Parser.google.value
-        if issubclass(base_meta, _BaseNumpyDocstringInheritanceMeta):
+        if issubclass(base_meta, BaseNumpyDocstringInheritanceMeta):
             return Parser.numpy.value
     return ""
 

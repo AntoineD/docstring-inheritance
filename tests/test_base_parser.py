@@ -23,7 +23,9 @@ import textwrap
 
 import pytest
 
-from docstring_inheritance.docstring_inheritors.bases.parser import BaseDocstringParser
+from docstring_inheritance._internal.docstring_inheritors.bases.parser import (
+    BaseDocstringParser,
+)
 
 
 @pytest.mark.parametrize(

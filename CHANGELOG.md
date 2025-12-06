@@ -14,6 +14,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2025-12
+
+### Changed
+
+- The public API is now the bare minimum.
+- For performance reasons and because the inheritance is only useful when building the documentation,
+  the public metaclasses and functions of this package are stubs that does nothing.
+  When building the documentation,
+  enable the docstrings inheritance by setting the environment variable
+  `DOCSTRING_INHERITANCE_ENABLE=1`.
+
 ## [2.3.0] - 2025-11
 
 ### Added

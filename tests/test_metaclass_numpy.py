@@ -23,8 +23,8 @@ from inspect import getdoc
 
 import pytest
 
-from docstring_inheritance import NumpyDocstringInheritanceInitMeta
-from docstring_inheritance import NumpyDocstringInheritanceMeta
+from docstring_inheritance._internal import NumpyDocstringInheritanceInitMeta
+from docstring_inheritance._internal import NumpyDocstringInheritanceMeta
 
 parametrize_inheritance = pytest.mark.parametrize(
     "inheritance_class",

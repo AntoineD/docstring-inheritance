@@ -14,12 +14,13 @@
 
 `docstring-inheritance` is a Python package that eliminates the need to write and maintain duplicate docstrings.
 Its primary purpose is to enable docstrings defined in a base class to be inherited—either wholly or partially—by derived subclasses.
+Inheritance is applied only when it is explicitly enabled, typically during documentation builds.
 
 # Features
 
 - Handle numpy and google docstring formats (i.e. sections based docstrings):
-    - [NumPy docstring format specification](https://numpydoc.readthedocs.io/en/latest/format.html)
-    - [Google docstring format specification](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
+  - [NumPy docstring format specification](https://numpydoc.readthedocs.io/en/latest/format.html)
+  - [Google docstring format specification](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
 - Handle docstrings for functions, classes, methods, class methods, static methods, properties.
 - Handle docstrings for classes with multiple or multi-level inheritance.
 - Docstring sections are inherited individually, like methods.
@@ -31,6 +32,8 @@ Its primary purpose is to enable docstrings defined in a base class to be inheri
 - Missing docstring sections for signature arguments can be notified by warnings
   when the environment variable `DOCSTRING_INHERITANCE_WARNS` is set.
 - Docstring sections can be compared to detect duplicated or similar contents that could be inherited.
+- By default, the metaclasses and functions in this package do nothing, so they have virtually no performance impact.
+- When building documentation, enable the inheritance of the docstrings by defining the environment variable `DOCSTRING_INHERITANCE_ENABLE=1`.
 
 # Licenses
 
@@ -73,7 +76,7 @@ if `__init__` method is documented in its own docstring.
 Otherwise, if `__init__` method is documented in the class docstring,
 use the `NumpyDocstringInheritanceInitMeta` metaclass.
 
-Use the `GoogleDocstringInheritanceMeta` metaclass to inherit docstrings in google format.
+Use the `GoogleDocstringInheritanceMeta` metaclass to inherit docstrings in google format
 if `__init__` method is documented in its own docstring.
 Otherwise, if `__init__` method is documented in the class docstring,
 use the `GoogleDocstringInheritanceInitMeta` metaclass.

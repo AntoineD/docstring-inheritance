@@ -32,19 +32,18 @@ from inspect import unwrap
 from textwrap import indent
 from types import FunctionType
 from typing import TYPE_CHECKING
-from typing import Any
-from typing import ClassVar
-from typing import Final
 from typing import cast
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from typing import Any
+    from typing import ClassVar
+    from typing import Final
 
     from typing_extensions import Self
 
-    from docstring_inheritance.docstring_inheritors.bases import SubSectionType
-
     from . import SectionsType
+    from . import SubSectionType
     from .parser import BaseDocstringParser
     from .renderer import BaseDocstringRenderer
 

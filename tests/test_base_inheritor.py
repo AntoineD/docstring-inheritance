@@ -25,16 +25,18 @@ from typing import ClassVar
 
 import pytest
 
-from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+from docstring_inheritance._internal.docstring_inheritors.bases.inheritor import (
     BaseDocstringInheritor,
 )
-from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+from docstring_inheritance._internal.docstring_inheritors.bases.inheritor import (
     DocstringInheritanceWarning,
 )
-from docstring_inheritance.docstring_inheritors.bases.inheritor import (
+from docstring_inheritance._internal.docstring_inheritors.bases.inheritor import (
     get_similarity_ratio,
 )
-from docstring_inheritance.docstring_inheritors.bases.parser import BaseDocstringParser
+from docstring_inheritance._internal.docstring_inheritors.bases.parser import (
+    BaseDocstringParser,
+)
 
 
 def func_none():  # pragma: no cover

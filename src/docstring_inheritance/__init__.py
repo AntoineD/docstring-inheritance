@@ -21,153 +21,37 @@
 
 from __future__ import annotations
 
-import os
+from os import environ as _environ
 from typing import TYPE_CHECKING
-from typing import Any
-from warnings import simplefilter
-
-from .class_docstrings_inheritor import ClassDocstringsInheritor
-from .docstring_inheritors.bases.inheritor import DocstringInheritanceWarning
-from .docstring_inheritors.google import GoogleDocstringInheritor
-from .docstring_inheritors.numpy import NumpyDocstringInheritor
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from typing import Any
 
-    from .class_docstrings_inheritor import DocstringInheritorClass
+_enable_inheritance: bool = bool(_environ.get("DOCSTRING_INHERITANCE_ENABLE", False))
+"""Whether the inheritance of the docctrings is enabled."""
 
+if _enable_inheritance:
+    from ._internal import GoogleDocstringInheritanceInitMeta
+    from ._internal import GoogleDocstringInheritanceMeta
+    from ._internal import NumpyDocstringInheritanceInitMeta
+    from ._internal import NumpyDocstringInheritanceMeta
+    from ._internal import inherit_google_docstring
+    from ._internal import inherit_numpy_docstring
+else:
+    GoogleDocstringInheritanceMeta = type  # type: ignore[assignment, misc]
+    GoogleDocstringInheritanceInitMeta = type  # type: ignore[assignment, misc]
+    NumpyDocstringInheritanceMeta = type  # type: ignore[assignment, misc]
+    NumpyDocstringInheritanceInitMeta = type  # type: ignore[assignment, misc]
 
-def inherit_google_docstring(
-    parent_doc: str | None,
-    child_func: Callable[..., Any],
-) -> None:
-    """Inherit the docstring in Google format of a function.
-
-    Args:
-        parent_doc: The docstring of the parent.
-        child_func: The child function which docstring inherit from the parent.
-    """
-    inheritor = GoogleDocstringInheritor(child_func)
-    inheritor.inherit(parent_doc)
-    inheritor.render()
-
-
-def inherit_numpy_docstring(
-    parent_doc: str | None,
-    child_func: Callable[..., Any],
-) -> None:
-    """Inherit the docstring in NumPy format of a function.
-
-    Args:
-        parent_doc: The docstring of the parent.
-        child_func: The child function which docstring inherit from the parent.
-    """
-    inheritor = NumpyDocstringInheritor(child_func)
-    inheritor.inherit(parent_doc)
-    inheritor.render()
-
-
-class _BaseDocstringInheritanceMeta(type):
-    """Base metaclass for inheriting class docstrings."""
-
-    def __init__(
-        cls,
-        class_name: str,
-        class_bases: tuple[type],
-        class_dict: dict[str, Any],
-        docstring_inheritor: DocstringInheritorClass,
-        init_in_class: bool,
+    def inherit_google_docstring(  # noqa: D103
+        parent_doc: str | None,
+        child_func: Callable[..., Any],
     ) -> None:
-        super().__init__(class_name, class_bases, class_dict)
-        if class_bases:
-            ClassDocstringsInheritor.inherit_docstrings(
-                cls, docstring_inheritor, init_in_class
-            )
+        pass
 
-
-class _BaseGoogleDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
-    pass
-
-
-class GoogleDocstringInheritanceMeta(_BaseGoogleDocstringInheritanceMeta):
-    """Metaclass for inheriting docstrings in Google format."""
-
-    def __init__(
-        cls,
-        class_name: str,
-        class_bases: tuple[type],
-        class_dict: dict[str, Any],
+    def inherit_numpy_docstring(  # noqa: D103
+        parent_doc: str | None,
+        child_func: Callable[..., Any],
     ) -> None:
-        super().__init__(
-            class_name,
-            class_bases,
-            class_dict,
-            GoogleDocstringInheritor,
-            init_in_class=False,
-        )
-
-
-class GoogleDocstringInheritanceInitMeta(_BaseGoogleDocstringInheritanceMeta):
-    """Metaclass for inheriting docstrings in Google format with init-in-class."""
-
-    def __init__(
-        cls,
-        class_name: str,
-        class_bases: tuple[type],
-        class_dict: dict[str, Any],
-    ) -> None:
-        super().__init__(
-            class_name,
-            class_bases,
-            class_dict,
-            GoogleDocstringInheritor,
-            init_in_class=True,
-        )
-
-
-class _BaseNumpyDocstringInheritanceMeta(_BaseDocstringInheritanceMeta):
-    pass
-
-
-class NumpyDocstringInheritanceMeta(_BaseNumpyDocstringInheritanceMeta):
-    """Metaclass for inheriting docstrings in Numpy format."""
-
-    def __init__(
-        cls,
-        class_name: str,
-        class_bases: tuple[type],
-        class_dict: dict[str, Any],
-    ) -> None:
-        super().__init__(
-            class_name,
-            class_bases,
-            class_dict,
-            NumpyDocstringInheritor,
-            init_in_class=False,
-        )
-
-
-class NumpyDocstringInheritanceInitMeta(_BaseNumpyDocstringInheritanceMeta):
-    """Metaclass for inheriting docstrings in Numpy format with init-in-class."""
-
-    def __init__(
-        cls,
-        class_name: str,
-        class_bases: tuple[type],
-        class_dict: dict[str, Any],
-    ) -> None:
-        super().__init__(
-            class_name,
-            class_bases,
-            class_dict,
-            NumpyDocstringInheritor,
-            init_in_class=True,
-        )
-
-
-# Ignore our warnings unless explicitly asked.
-if not {
-    "DOCSTRING_INHERITANCE_WARNS",
-    "DOCSTRING_INHERITANCE_SIMILARITY_RATIO",
-}.intersection(os.environ.keys()):
-    simplefilter("ignore", DocstringInheritanceWarning)
+        pass

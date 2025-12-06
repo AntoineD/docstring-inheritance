@@ -23,15 +23,13 @@ from __future__ import annotations
 
 from types import WrapperDescriptorType
 from typing import TYPE_CHECKING
-from typing import Any
-from typing import Final
 
-from docstring_inheritance.docstring_inheritors.bases.inheritor import (
-    BaseDocstringInheritor,
-)
+from .docstring_inheritors.bases.inheritor import BaseDocstringInheritor
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from typing import Any
+    from typing import Final
 
 DocstringInheritorClass = type[BaseDocstringInheritor]
 

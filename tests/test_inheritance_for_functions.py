@@ -23,9 +23,11 @@ import inspect
 
 import pytest
 
-from docstring_inheritance import inherit_google_docstring
-from docstring_inheritance import inherit_numpy_docstring
-from docstring_inheritance.class_docstrings_inheritor import _create_dummy_func_with_doc
+from docstring_inheritance._internal import inherit_google_docstring
+from docstring_inheritance._internal import inherit_numpy_docstring
+from docstring_inheritance._internal.class_docstrings_inheritor import (
+    _create_dummy_func_with_doc,
+)
 
 
 def test_side_effect():

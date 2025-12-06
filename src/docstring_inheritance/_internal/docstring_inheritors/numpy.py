@@ -17,13 +17,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Classes for inheriting Google docstrings."""
+"""Classes for inheriting NumPy docstrings."""
 
 from __future__ import annotations
 
-import textwrap
 from typing import TYPE_CHECKING
-from typing import ClassVar
 
 from .bases import SUMMARY_SECTION_NAME
 from .bases.inheritor import BaseDocstringInheritor
@@ -31,11 +29,13 @@ from .bases.parser import BaseDocstringParser
 from .bases.renderer import BaseDocstringRenderer
 
 if TYPE_CHECKING:
+    from typing import ClassVar
+
     from .bases import SubSectionType
 
 
 class DocstringRenderer(BaseDocstringRenderer):
-    """The renderer for Google docstrings."""
+    """The renderer for NumPy docstrings."""
 
     @staticmethod
     def _render_section(
@@ -49,27 +49,20 @@ class DocstringRenderer(BaseDocstringRenderer):
             section_body = "\n".join(
                 f"{key}{value}" for key, value in section_body.items()
             )
-        section_body = textwrap.indent(section_body, " " * 4)
-        return f"{section_name}:\n{section_body}"
+        return f"{section_name}\n{'-' * len(section_name)}\n{section_body}"
 
 
 class DocstringParser(BaseDocstringParser):
-    """The parser for Google docstrings."""
+    """The parser for NumPy docstrings."""
 
-    ARGS_SECTION_NAME: ClassVar[str] = "Args"
+    ARGS_SECTION_NAME: ClassVar[str] = "Parameters"
 
     SECTION_NAMES_WITH_ITEMS: ClassVar[set[str]] = {
         ARGS_SECTION_NAME,
+        "Other Parameters",
         "Attributes",
         "Methods",
     }
-
-    @classmethod
-    def _get_section_body(
-        cls,
-        reversed_section_body_lines: list[str],
-    ) -> str:
-        return textwrap.dedent(super()._get_section_body(reversed_section_body_lines))
 
     @classmethod
     def _parse_one_section(
@@ -78,28 +71,21 @@ class DocstringParser(BaseDocstringParser):
         line2_rstripped: str,
         reversed_section_body_lines: list[str],
     ) -> tuple[str, str]:
-        # See https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings  # noqa: E501
-        # The parsing of a section is complete when the first line line1 has:
-        # - no leading blank spaces,
-        # - ends with :,
-        # - has a second line indented by at least 2 blank spaces,
-        # - has a section name.
-        line1_rstripped = line1.rstrip()
-        if (
-            not line1_rstripped.startswith(" ")
-            and line1_rstripped.endswith(":")
-            and line2_rstripped.startswith("  ")
-        ):
-            reversed_section_body_lines += [line2_rstripped]
-            return line1_rstripped.rstrip(" :"), cls._get_section_body(
-                reversed_section_body_lines
-            )
+        # See https://github.com/numpy/numpydoc/blob/d85f54ea342c1d223374343be88da94ce9f58dec/numpydoc/docscrape.py#L179  # noqa: E501
+        if len(line2_rstripped) >= 3 and (set(line2_rstripped) in ({"-"}, {"="})):
+            line1s = line1.rstrip()
+            min_line_length = len(line1s)
+            if line2_rstripped.startswith((
+                "-" * min_line_length,
+                "=" * min_line_length,
+            )):
+                return line1s, cls._get_section_body(reversed_section_body_lines)
         return cls._NO_SECTION_FOUND
 
 
-class GoogleDocstringInheritor(BaseDocstringInheritor):
-    """The inheritor for Google docstrings."""
+class NumpyDocstringInheritor(BaseDocstringInheritor):
+    """The inheritor for NumPy docstrings."""
 
-    _MISSING_ARG_TEXT = f": {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
+    _MISSING_ARG_TEXT = f"\n    {BaseDocstringInheritor.MISSING_ARG_DESCRIPTION}"
     _DOCSTRING_PARSER = DocstringParser
     _DOCSTRING_RENDERER = DocstringRenderer
