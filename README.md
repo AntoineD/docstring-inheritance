@@ -18,6 +18,8 @@ Inheritance is applied only when it is explicitly enabled, typically during docu
 
 # Features
 
+- By default, the metaclasses and functions in this package do nothing, so they have virtually no performance impact.
+- When building documentation, enable the inheritance of the docstrings by defining the environment variable `DOCSTRING_INHERITANCE_ENABLE=1`.
 - Handle numpy and google docstring formats (i.e. sections based docstrings):
   - [NumPy docstring format specification](https://numpydoc.readthedocs.io/en/latest/format.html)
   - [Google docstring format specification](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
@@ -32,8 +34,6 @@ Inheritance is applied only when it is explicitly enabled, typically during docu
 - Missing docstring sections for signature arguments can be notified by warnings
   when the environment variable `DOCSTRING_INHERITANCE_WARNS` is set.
 - Docstring sections can be compared to detect duplicated or similar contents that could be inherited.
-- By default, the metaclasses and functions in this package do nothing, so they have virtually no performance impact.
-- When building documentation, enable the inheritance of the docstrings by defining the environment variable `DOCSTRING_INHERITANCE_ENABLE=1`.
 
 # Licenses
 

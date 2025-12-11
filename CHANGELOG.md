@@ -18,12 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The public API is now the bare minimum.
 - For performance reasons and because the inheritance is only useful when building the documentation,
   the public metaclasses and functions of this package are stubs that does nothing.
   When building the documentation,
   enable the docstrings inheritance by setting the environment variable
   `DOCSTRING_INHERITANCE_ENABLE=1`.
+- The public API is now the bare minimum.
 
 ## [2.3.0] - 2025-11
 
