@@ -20,7 +20,7 @@ dynamic = ["version"]
 requires-python = ">=3.10,<4"
 # This is only required for python 3.10.
 dependencies = ["typing-extensions >=4,<5"]
-optional-dependencies = { griffe = ["griffe>1"] }
+optional-dependencies = { griffe = ["griffelib>2"] }
 
 [dependency-groups]
 dev = ["covdefaults", "pytest", "pytest-cov"]
